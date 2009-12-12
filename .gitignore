@@ -1,0 +1,23 @@
+#.gitignore - File filters for files that Git should ignore when committing
+
+# Ignore user-generated files
+*~
+
+# Ignore hidden files
+.*
+
+# Preserve files used by Git!
+!.git*
+
+# Preserve ".initial", just for the memories...
+!.initial
+
+# Ignore build-process related files
+Makefile
+*.o
+moc_*
+qrc_*
+panorama
+
+# Ignore project-related user-generated files
+*.user

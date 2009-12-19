@@ -105,10 +105,12 @@ void MainWindow::continueLoadingUI()
         if(_ui)
         {
             _ui->setParentItem(_canvas.root());
-            if(appsLoaded)
+            if(appsLoaded && _ui)
+            {
                 connect(&_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
                         _ui, SLOT(applicationDataChanged()));
-            _ui->loaded();
+                _ui->loaded();
+            }
         }
         else
             qWarning() << "The specified UI file does not contain a Panorama UI";

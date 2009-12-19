@@ -256,5 +256,14 @@ Item {
             anchors.topMargin: 3
             anchors.bottomMargin: 3
         }
+        Image {
+            anchors.right: appView.right; anchors.top: appView.top
+            source: "../images/emblems/arrow-up.png"; opacity: appView.atYBeginning ? 0 : 1
+        }
+        Image {
+            anchors.right: appView.right; anchors.bottom: appView.bottom
+            source: "../images/emblems/arrow-down.png"; opacity: appView.atYEnd ? 0 : 1
+        }
+
     }
 }

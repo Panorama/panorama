@@ -52,14 +52,18 @@ void AppAccumulator::watchedDirUpdated(const QString &d)
     {
         if(files.contains(oldFile->file)) //File existed and still exists
         {
-            //Mark for update
-            toUpdate += oldFile;
+            QDateTime lm = QFileInfo(dir.filePath(oldFile->file)).lastModified();
+            if(oldFile->lastModified < lm)
+            {
+                //Mark for update
+                toUpdate += oldFile;
+
+                //Update time stamp
+                oldFile->lastModified = lm;
+            }
 
             //Remove "new file mark"
             diff.removeOne(oldFile->file);
-
-            //Update time stamp
-            oldFile->lastModified = QFileInfo(dir.filePath(oldFile->file)).lastModified();
         }
         else
             //Mark for removal

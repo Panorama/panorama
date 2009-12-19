@@ -3,9 +3,8 @@
 
 #include <QSortFilterProxyModel>
 #include <qml.h>
+#include "applicationfiltermethods.h"
 #include "applicationmodel.h"
-
-class ApplicationModel;
 
 class ApplicationFilterModel : public QSortFilterProxyModel
 {

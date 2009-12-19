@@ -6,9 +6,7 @@
 #include <qml.h>
 #include "appaccumulator.h"
 #include "application.h"
-#include "applicationfiltermodel.h"
-
-class ApplicationFilterModel;
+#include "applicationfiltermethods.h"
 
 class ApplicationModel : public QAbstractListModel
 {

@@ -94,28 +94,18 @@ QVariant ApplicationModel::headerData(int, Qt::Orientation, int role) const
     }
 }
 
+
 QVariant ApplicationModel::inCategory(const QString &category)
 {
-    ApplicationFilterModel *result = new ApplicationFilterModel(this, this);
-    result->setFilterRole(ApplicationModel::Categories);
-    result->setFilterRegExp(category);
-    return QVariant::fromValue((QObject *)result);
+    return ApplicationFilterMethods::inCategory(this, category);
 }
 
 QVariant ApplicationModel::matching(const QString &role, const QString &value)
 {
-    ApplicationFilterModel *result = new ApplicationFilterModel(this, this);
-    result->setFilterRole(roleNames().key(role.toLocal8Bit(), int(ApplicationModel::Name)));
-    result->setFilterWildcard(value);
-    result->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    return QVariant::fromValue((QObject *)result);
+    return ApplicationFilterMethods::matching(this, role, value);
 }
 
 QVariant ApplicationModel::sortedBy(const QString &role, bool ascending)
 {
-    ApplicationFilterModel *result = new ApplicationFilterModel(this, this);
-    result->setSortRole(roleNames().key(role.toLocal8Bit(), int(ApplicationModel::Name)));
-    result->setSortCaseSensitivity(Qt::CaseInsensitive);
-    result->sort(0, ascending ? Qt::AscendingOrder : Qt::DescendingOrder);
-    return QVariant::fromValue((QObject *)result);
+    return ApplicationFilterMethods::sortedBy(this, role, ascending);
 }

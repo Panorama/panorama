@@ -6,6 +6,7 @@ PanoramaUI {
     name: "PMenu compatibility user interface"
     description: "Put this file inside of a PMenu theme to make a Panorama UI out of it!"
     author: "dflemstr"
+    settingsKey: "pmenu-colors"
 
     TextFile { id: skinCfg; source: "skin.cfg" } //TextFile isn't standard QML, but part of Panorama 1.0
 
@@ -14,7 +15,7 @@ PanoramaUI {
             var regexp = new RegExp("\\s+" + field + "\\s*=\\s*([^$]+?)\\s*;", "");
             var match = skinCfg.data.match(regexp);
 
-            if(match!= null && match.length > 1) {
+            if(match != null && match.length > 1) {
                 var data = match[1];
                 if(data.charAt(0) == '"') {
                     data = data.substring(1, data.length - 1);
@@ -144,42 +145,66 @@ PanoramaUI {
     property string cpuIcon: readField("cpu_icon")
     property int cpuIconX: readField("cpu_icon_x")
     property int cpuIconY: readField("cpu_icon_y")
-    property int cpu_text_x: readField("cpu_text_x")
-    property int cpu_text_y: readField("cpu_text_y")
-    property string cpu_text_font: readField("cpu_text_font")
-    property int cpu_text_size: readField("cpu_text_size")
-    property color cpu_text_color: readField("cpu_text_color")
-    property int cpu_text_style: readField("cpu_text_style")
+    property int cpuTextX: readField("cpu_text_x")
+    property int cpuTextY: readField("cpu_text_y")
+
+    Text { //prototype
+        id: cpuTextFontProto
+        font.bold: ((readField("cpu_text_style") & 1) == 1)
+        font.italic: ((readField("cpu_text_style") & 2) == 2)
+        font.pixelSize: readField("cpu_text_size")
+        font.family: readField("cpu_text_font")
+    }
+    property alias cpuTextFont: cpuTextFontProto.font
+    property color cpuTextFontColor: readField("cpu_text_color")
 
     property string sd1Icon: readField("sd1_icon")
     property int sd1IconX: readField("sd1_icon_x")
     property int sd1IconY: readField("sd1_icon_y")
-    property int sd1_text_x: readField("sd1_text_x")
-    property int sd1_text_y: readField("sd1_text_y")
-    property string sd1_text_font: readField("sd1_text_font")
-    property int sd1_text_size: readField("sd1_text_size")
-    property color sd1_text_color: readField("sd1_text_color")
-    property int sd1_text_style: readField("sd1_text_style")
+    property int sd1TextX: readField("sd1_text_x")
+    property int sd1TextY: readField("sd1_text_y")
+
+    Text { //prototype
+        id: sd1TextFontProto
+        font.bold: ((readField("sd1_text_style") & 1) == 1)
+        font.italic: ((readField("sd1_text_style") & 2) == 2)
+        font.pixelSize: readField("sd1_text_size")
+        font.family: readField("sd1_text_font")
+    }
+    property alias sd1TextFont: sd1TextFontProto.font
+    property color sd1TextFontColor: readField("sd1_text_color")
 
     property string sd2Icon: readField("sd2_icon")
     property int sd2IconX: readField("sd2_icon_x")
     property int sd2IconY: readField("sd2_icon_y")
-    property int sd2_text_x: readField("sd2_text_x")
-    property int sd2_text_y: readField("sd2_text_y")
-    property string sd2_text_font: readField("sd2_text_font")
-    property int sd2_text_size: readField("sd2_text_size")
-    property color sd2_text_color: readField("sd2_text_color")
-    property int sd2_text_style: readField("sd2_text_style")
+    property int sd2TextX: readField("sd2_text_x")
+    property int sd2TextY: readField("sd2_text_y")
+
+    Text { //prototype
+        id: sd2TextFontProto
+        font.bold: ((readField("sd2_text_style") & 1) == 1)
+        font.italic: ((readField("sd2_text_style") & 2) == 2)
+        font.pixelSize: readField("sd2_text_size")
+        font.family: readField("sd2_text_font")
+    }
+    property alias sd2TextFont: sd2TextFontProto.font
+    property color sd2TextFontColor: readField("sd2_text_color")
 
     property string clockIcon: readField("clock_icon")
     property int clockIconX: readField("clock_icon_x")
     property int clockIconY: readField("clock_icon_y")
-    property int clock_text_x: readField("clock_text_x")
-    property int clock_text_y: readField("clock_text_y")
-    property string clock_text_font: readField("clock_text_font")
-    property int clock_text_size: readField("clock_text_size")
-    property color clock_text_color: readField("clock_text_color")
-    property int clock_text_style: readField("clock_text_style")
+    property int clockTextX: readField("clock_text_x")
+    property int clockTextY: readField("clock_text_y")
+
+    Text { //prototype
+        id: clockTextFontProto
+        font.bold: ((readField("clock_text_style") & 1) == 1)
+        font.italic: ((readField("clock_text_style") & 2) == 2)
+        font.pixelSize: readField("clock_text_size")
+        font.family: readField("clock_text_font")
+    }
+    property alias clockTextFont: clockTextFontProto.font
+    property color clockTextFontColor: readField("clock_text_color")
 
     property bool show_categoryTitle: (readField("show_category_title") != 0)
     property string noIcon: readField("no_icon")
@@ -195,6 +220,45 @@ PanoramaUI {
     property real favoritesOpacity: 0
     property real settingsOpacity: 0
     property int selectedIndex: 0
+
+    Keys.onLeftPressed: {
+        if(selectedIndex > 0) {
+            selectedIndex -= 1;
+            changeState(selectedIndex);
+        }
+    }
+
+    Keys.onRightPressed: {
+        if(selectedIndex < 5) {
+            selectedIndex += 1;
+            changeState(selectedIndex);
+        }
+    }
+
+    Script {
+        function changeState(index) {
+            switch(index) {
+                case 0:
+                    state = "emulators";
+                    break;
+                case 1:
+                    state = "games";
+                    break;
+                case 2:
+                    state = "misc";
+                    break;
+                case 3:
+                    state = "media";
+                    break;
+                case 4:
+                    state = "favorites";
+                    break;
+                case 5:
+                    state = "settings";
+            }
+        }
+    }
+    state: "emulators"
     states: [
         State {
             name: "emulators"
@@ -305,8 +369,6 @@ PanoramaUI {
             }
         }
     ]
-
-    state: "emulators"
 
     transitions: [
         Transition {
@@ -694,6 +756,129 @@ PanoramaUI {
         opacity: settingsOpacity
     }
 
+    Image {
+        source: clockIcon
+        x: clockIconX
+        y: clockIconY
+    }
+    Item {
+        id: clockAnchor
+        y: clockTextY
+    }
+    Text {
+        x: clockTextX
+        anchors.baseline: clockAnchor.top
+        font.family: clockTextFont.family
+        font.bold: clockTextFont.bold
+        font.italic: clockTextFont.italic
+        font.pixelSize: clockTextFont.pixelSize
+        color: clockTextFontColor
+        text: time.hour + ":" + time.minute
+        Timer {
+            id: time
+            property string hour: "00"
+            property string minute: "00"
+            interval: 100
+            running: true
+            repeat: true
+            triggeredOnStart: true
+            onTriggered: {
+                var date = new Date;
+                var h = date.getHours().toString();
+                if(h.length == 1)
+                    h = "0" + h;
+                hour = h;
+                var m = date.getMinutes().toString();
+                if(m.length == 1)
+                    m = "0" + m;
+                minute = m;
+            }
+        }
+    }
+
+    Image {
+        source: sd1Icon
+        x: sd1IconX
+        y: sd1IconY
+    }
+
+    Image {
+        source: sd2Icon
+        x: sd2IconX
+        y: sd2IconY
+    }
+
+    Image {
+        source: cpuIcon
+        x: cpuIconX
+        y: cpuIconY
+    }
+    Item {
+        id: cpuAnchor
+        y: cpuTextY
+    }
+    Text {
+        x: cpuTextX
+        anchors.baseline: cpuAnchor.top
+        font.bold: cpuTextFont.bold
+        font.italic: cpuTextFont.italic
+        font.pixelSize: cpuTextFont.pixelSize
+        color: cpuTextFontColor
+        text: settingsPage.clockspeed
+    }
+
+    //The settings page:
+    Item {
+        id: settingsPage
+        x: applicationsBoxX
+        y: applicationsBoxY
+        width: applicationsBoxWidth
+        height: (iconScaleMin + applicationsSpacing * 0.5) * maxAppsPerPage
+        opacity: settingsOpacity
+        focus: ui.selectedIndex == 5
+
+        property int clockspeed: ui.sharedSetting("system", "clockspeed")
+
+        Keys.onUpPressed: {
+            if(settingsPage.clockspeed < 800) {
+                settingsPage.clockspeed += 10;
+                ui.setSharedSetting("system", "clockspeed", settingsPage.clockspeed);
+            }
+        }
+        Keys.onDownPressed: {
+            if(settingsPage.clockspeed > 300) {
+                settingsPage.clockspeed -= 10;
+                ui.setSharedSetting("system", "clockspeed", settingsPage.clockspeed);
+            }
+        }
+        Column {
+            anchors.fill: parent
+            Row {
+                Text {
+                    text: "Clockspeed: "
+                    color: smallFontHighlightColor
+                    font.bold: smallFont.bold
+                    font.italic: smallFont.italic
+                    font.pixelSize: smallFont.pixelSize
+                    font.family: smallFont.family
+                }
+                Text {
+                    text: settingsPage.clockspeed
+                    color: smallFontColor
+                    font.bold: smallFont.bold
+                    font.italic: smallFont.italic
+                    font.pixelSize: smallFont.pixelSize
+                    font.family: smallFont.family
+                }
+            }
+        }
+    }
+
+    Item {
+        id: mediaBrowser
+        focus: (ui.selectedIndex == 3)
+    }
+
     //The applications browser:
     Item {
         x: applicationsBoxX -5
@@ -701,6 +886,19 @@ PanoramaUI {
         width: applicationsBoxWidth + 10
         height: (iconScaleMin + applicationsSpacing * 0.5) * maxAppsPerPage + 40
         clip: true
+        Keys.onDigit2Pressed: { //The rightmost Pandora button
+            var favorites = sharedSetting("system", "favorites");
+            var exec = appBrowser.currentItem.execLine;
+            if(favorites.indexOf(exec) == -1) {
+                if(favorites.length > 0)
+                    favorites += "|";
+                favorites += exec;
+                setSharedSetting("system", "favorites", favorites);
+            }
+        }
+        Keys.onDigit1Pressed: {
+            execute(appBrowser.currentItem.execLine);
+        }
         ListView {
             id: appBrowser
             anchors.fill: parent
@@ -708,10 +906,12 @@ PanoramaUI {
             anchors.leftMargin: 5
             anchors.rightMargin: 5
             anchors.bottomMargin: 20
-            focus: (ui.selectedIndex == 0 || ui.selectedIndex == 1 || ui.selectedIndex == 3)
+            focus: (ui.selectedIndex == 0 || ui.selectedIndex == 1 || ui.selectedIndex == 2 || ui.selectedIndex == 4)
             model: (ui.selectedIndex == 0) ? ui.applications.inCategory("Emulator").sortedBy("name", true)
                  : (ui.selectedIndex == 1) ? ui.applications.inCategory("Game").sortedBy("name", true)
-                 :  ui.applications.sortedBy("name", true)
+                 : (ui.selectedIndex == 2) ? ui.applications.inCategory("^(?!Game|Emulator)$").sortedBy("name", true)
+                 : (ui.selectedIndex == 4) ? ui.applications.matching("exec", sharedSetting("system", "favorites")).sortedBy("name", true)
+                 : ui.applications.matching("exec", "^$") //Lists nothing
 
             opacity: Math.max(emusOpacity, Math.max(gamesOpacity, Math.max(miscOpacity, favoritesOpacity)))
             spacing: applicationsSpacing * 0.5
@@ -735,39 +935,48 @@ PanoramaUI {
             }
             highlight: appHighlight
             highlightFollowsCurrentItem: false
-            delegate: Row {
+            delegate: Item {
                 id: deleg
                 width: applicationsBoxWidth
                 height: iconScaleMin
-                Image {
-                    source: icon
-                    width: iconScaleMin
-                    height: iconScaleMin
+                property string execLine: exec
+                MouseRegion {
+                    anchors.fill: parent
+                    onClicked: appBrowser.currentIndex = index
                 }
-                Item {
-                    width: 5
-                    height: iconScaleMin
-                }
-                Column {
-                    width: parent.width - iconScaleMin
-                    anchors.verticalCenter: parent.verticalCenter
-                    Text {
-                        color: deleg.isCurrentItem ?
-                            ui.bigFontColorHighlight : ui.bigFontColor
-                        font.bold: bigFont.bold
-                        font.italic: bigFont.italic
-                        font.pixelSize: bigFont.pixelSize
-                        font.family: bigFont.family
-                        text: name
+                Row {
+                    anchors.fill: parent
+                    Image {
+                        source: icon
+                        width: iconScaleMin
+                        height: iconScaleMin
+                        smooth: true
                     }
-                    Text {
-                        color: deleg.isCurrentItem ?
-                            ui.smallFontColorHighlight : ui.smallFontColor
-                        font.bold: smallFont.bold
-                        font.italic: smallFont.italic
-                        font.pixelSize: smallFont.pixelSize
-                        font.family: smallFont.family
-                        text: name
+                    Item {
+                        width: 5
+                        height: iconScaleMin
+                    }
+                    Column {
+                        width: parent.width - iconScaleMin
+                        anchors.verticalCenter: parent.verticalCenter
+                        Text {
+                            color: deleg.isCurrentItem ?
+                                ui.bigFontColorHighlight : ui.bigFontColor
+                            font.bold: bigFont.bold
+                            font.italic: bigFont.italic
+                            font.pixelSize: bigFont.pixelSize
+                            font.family: bigFont.family
+                            text: name
+                        }
+                        Text {
+                            color: deleg.isCurrentItem ?
+                                ui.smallFontColorHighlight : ui.smallFontColor
+                            font.bold: smallFont.bold
+                            font.italic: smallFont.italic
+                            font.pixelSize: smallFont.pixelSize
+                            font.family: smallFont.family
+                            text: name
+                        }
                     }
                 }
             }

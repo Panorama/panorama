@@ -97,7 +97,7 @@ PanoramaUI {
                 highlightColor: palette.highlight
                 textColor: palette.light
                 appSource: ui.applications.inCategory(categoryFilter)
-                    .matching("name", "*" + nameFilter + "*")
+                    .matching("name", (nameFilter.length == 0) ? ".*" : ".*" + nameFilter + ".*")
                     .sortedBy("name", true)
                 onSelected: {
                     ui.execute(execLine);

@@ -139,7 +139,7 @@ void AppAccumulator::addViaDesktopFile(const QString &f)
         if(!result.name.isEmpty() && !result.exec.isEmpty())
         {
             QString oldExec = result.exec;
-            result.exec = QCryptographicHash::hash(oldExec.toLocal8Bit(), QCryptographicHash::Sha1).toBase64();
+            result.exec = QCryptographicHash::hash(oldExec.toLocal8Bit(), QCryptographicHash::Sha1).toHex();
             _apps += result;
             _execs[result.exec] = oldExec;
             emit appAdded(result);

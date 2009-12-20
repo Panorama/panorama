@@ -14,7 +14,7 @@ QVariant ApplicationFilterMethods::matching(QAbstractItemModel *source, const QS
     ApplicationFilterModel *result = new ApplicationFilterModel(source, source);
     result->setParent(source);
     result->setFilterRole(source->roleNames().key(role.toLocal8Bit(), ApplicationModel::Name));
-    result->setFilterWildcard(value);
+    result->setFilterRegExp(value);
     result->setFilterCaseSensitivity(Qt::CaseInsensitive);
     return QVariant::fromValue((QObject *)result);
 }

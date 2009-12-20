@@ -104,12 +104,14 @@ QString PanoramaUI::sharedSetting(const QString &section, const QString &key)
         return QString();
 }
 
-void PanoramaUI::execute(const QString &command)
+void PanoramaUI::execute(const QString &sha1)
 {
-    QProcess process;
-    QString cleanCommand(command);
-    cleanCommand.remove(QRegExp("%\\w"));
-    process.startDetached(cleanCommand);
+    QString cleanCommand(AppAccumulator::getExec(sha1));
+    if(!cleanCommand.isEmpty())
+    {
+        cleanCommand.remove(QRegExp("%\\w"));
+        QProcess::startDetached(cleanCommand);
+    }
 }
 
 void PanoramaUI::applicationDataChanged()

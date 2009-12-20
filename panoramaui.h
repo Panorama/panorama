@@ -9,6 +9,8 @@
 #include <QAbstractItemModel>
 #include <QtDeclarative/QmlGraphicsItem>
 
+#include "appaccumulator.h"
+
 /**
  * The base class for all PanoramaUI instances.
  * This class is extended from actual .qml files via the QtScript core
@@ -56,7 +58,7 @@ public:
     Q_INVOKABLE void setSharedSetting(const QString &section, const QString &key, const QString &value);
     Q_INVOKABLE QString sharedSetting(const QString &section, const QString &key);
 
-    Q_INVOKABLE void execute(const QString &command);
+    Q_INVOKABLE void execute(const QString &sha1);
 
 public slots:
     void applicationDataChanged();

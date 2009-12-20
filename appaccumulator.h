@@ -7,7 +7,7 @@
 #include <QList>
 #include <QFileSystemWatcher>
 #include <QDateTime>
-
+#include <QCryptographicHash>
 #include "application.h"
 #include "desktopfile.h"
 
@@ -27,6 +27,8 @@ public:
 
     /** Loads all .desktop files from the specified search paths (not recursive) */
     void loadFrom(const QStringList &searchpaths);
+
+    static QString getExec(const QString &key);
 
 signals:
     /** An application has been found or added to one of the search paths */
@@ -48,6 +50,7 @@ private:
     void removeViaDesktopFile(const QString &file);
     bool shouldAddThisApp(const QString &file) const;
 
+    static QHash<QString, QString> _execs;
     QFileSystemWatcher _watcher;
     QList<Application> _apps;
     QHash<QString, QList<FileInfo *> > _currentFileInfos;

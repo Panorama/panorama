@@ -124,7 +124,7 @@ void MainWindow::useConfig(QHash<QString, QHash<QString, QString> *> *config)
 
 void MainWindow::switchToUI(const QString &uiDir, const QString &uiName)
 {
-    emit uiChanged(QDir(QDir(uiDir).filePath(uiName)).filePath("ui.qml"));
+    emit uiChanged(QString(uiDir).append("/").append(uiName).append("/ui.qml"));
 }
 
 void MainWindow::loadApps() {

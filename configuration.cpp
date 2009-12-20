@@ -55,31 +55,56 @@ void Configuration::readFile(const QString &f)
             section = line.mid(1, line.length() - 2);
         else if(section.isEmpty() && line.startsWith("uiDirectory"))
         {
-            line = line.split("=").at(1).trimmed();
-            if(!line.isEmpty() && _uiDir != line)
+            QStringList parts = line.split("=");
+            if(parts.count() > 1)
             {
-                _uiDir = line;
-                changed = true;
+                parts.removeFirst();
+                line = parts.join("=").trimmed();
+
+                if(line.startsWith("\""))
+                    line = line.mid(1, line.length() - 2);
+
+                if(_uiDir != line)
+                {
+                    _uiDir = line;
+                    changed = true;
+                }
             }
         }
         else if(section.isEmpty() && line.startsWith("ui"))
         {
-            line = line.split("=").at(1).trimmed();
-            if(!line.isEmpty() && _ui != line)
+            QStringList parts = line.split("=");
+            if(parts.count() > 1)
             {
-                _ui = line;
-                changed = true;
+                parts.removeFirst();
+                line = parts.join("=").trimmed();
+
+                if(line.startsWith("\""))
+                    line = line.mid(1, line.length() - 2);
+
+                if(_ui != line)
+                {
+                    _ui = line;
+                    changed = true;
+                }
             }
         }
         else
         {
             QStringList parts = line.split("=");
-            if(parts.length() == 2)
+            if(parts.length() > 1)
             {
                 if(!newConfig->contains(section))
                     newConfig->insert(section, new QHash<QString, QString>);
 
-                newConfig->value(section)->insert(parts[0].trimmed(), parts[1].trimmed());
+                const QString key = parts[0].trimmed();
+                parts.removeFirst();
+                QString value = parts.join("=").trimmed();
+
+                if(value.startsWith('"'))
+                    value = value.mid(1, value.length() - 2);
+
+                newConfig->value(section)->insert(key, value);
             }
         }
     }
@@ -108,15 +133,17 @@ void Configuration::saveFile(const QString &f)
 
     QTextStream out(&file);
 
-    out << "uiDirectory = " << _uiDir << endl;
-    out << "ui = " << _ui << endl;
+    out << "uiDirectory = \"" << _uiDir << '\"' << endl;
+    out << "ui = \"" << _ui << '\"' << endl;
 
     foreach(const QString &section, _generalConfig->keys())
     {
         out << endl << "[" << section << "]" << endl;
         foreach(const QString &key, _generalConfig->value(section)->keys())
         {
-            out << key << " = " << _generalConfig->value(section)->value(key) << endl;
+            out << key << " = \""
+                    << QString(_generalConfig->value(section)->value(key)).replace('\n', ' ')
+                    << '\"' << endl;
         }
     }
 

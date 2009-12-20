@@ -23,6 +23,7 @@ HEADERS += mainwindow.h \
     iconfinder.h \
     desktopfile.h \
     applicationfiltermodel.h \
-    applicationfiltermethods.h
+    applicationfiltermethods.h \
+    constants.h
 OTHER_FILES += root.qml
 RESOURCES += default.qrc

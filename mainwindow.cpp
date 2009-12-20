@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     appsLoaded = false;
 
     //Resize the window
-    setFixedSize(800, 480);
+    setFixedSize(UI_WIDTH, UI_HEIGHT);
 
     //Create our Canvas that we'll use later for the UI
     _canvas.setParent(this);

@@ -10,6 +10,7 @@
 #include <QtDeclarative/QmlGraphicsItem>
 
 #include "appaccumulator.h"
+#include "constants.h"
 
 /**
  * The base class for all PanoramaUI instances.

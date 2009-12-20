@@ -13,7 +13,8 @@ SOURCES += main.cpp \
     iconfinder.cpp \
     desktopfile.cpp \
     applicationfiltermodel.cpp \
-    applicationfiltermethods.cpp
+    applicationfiltermethods.cpp \
+    textfile.cpp
 HEADERS += mainwindow.h \
     configuration.h \
     panoramaui.h \
@@ -23,6 +24,8 @@ HEADERS += mainwindow.h \
     iconfinder.h \
     desktopfile.h \
     applicationfiltermodel.h \
-    applicationfiltermethods.h
+    applicationfiltermethods.h \
+    constants.h
+    textfile.h
 OTHER_FILES += root.qml
 RESOURCES += default.qrc

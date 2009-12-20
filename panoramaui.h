@@ -10,6 +10,7 @@
 #include <QtDeclarative/QmlGraphicsItem>
 
 #include "appaccumulator.h"
+#include "constants.h"
 
 /**
  * The base class for all PanoramaUI instances.
@@ -78,6 +79,6 @@ private:
 };
 
 //Makes this type available in QML
-QML_DECLARE_TYPE(PanoramaUI)
+QML_DECLARE_TYPE(PanoramaUI);
 
 #endif // PANORAMASKIN_H

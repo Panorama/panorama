@@ -79,6 +79,6 @@ private:
 };
 
 //Makes this type available in QML
-QML_DECLARE_TYPE(PanoramaUI)
+QML_DECLARE_TYPE(PanoramaUI);
 
 #endif // PANORAMASKIN_H

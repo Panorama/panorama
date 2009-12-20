@@ -139,4 +139,4 @@ QVariant PanoramaUI::_apps = QVariant();
 QHash<QString, QHash<QString, QString> *> *PanoramaUI::_settings = 0;
 
 //Makes this type available in QML
-QML_DEFINE_TYPE(Panorama,1,0,PanoramaUI,PanoramaUI)
+QML_DEFINE_TYPE(Panorama,1,0,PanoramaUI,PanoramaUI);

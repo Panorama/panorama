@@ -233,6 +233,7 @@ PanoramaUI {
     property real mediaOpacity: 0
     property real favoritesOpacity: 0
     property real settingsOpacity: 0
+
     property int selectedIndex: 0
 
     Keys.onLeftPressed: {
@@ -928,16 +929,16 @@ PanoramaUI {
         clip: true
         Keys.onDigit2Pressed: { //The rightmost Pandora button
             var favorites = sharedSetting("system", "favorites");
-            var exec = appBrowser.currentItem.execLine;
-            if(favorites.indexOf(exec) == -1) {
+            var ident = appBrowser.currentItem.ident;
+            if(favorites.indexOf(ident) == -1) {
                 if(favorites.length > 0)
                     favorites += "|";
-                favorites += exec;
+                favorites += ident;
                 setSharedSetting("system", "favorites", favorites);
             }
         }
         Keys.onDigit1Pressed: {
-            execute(appBrowser.currentItem.execLine);
+            execute(appBrowser.currentItem.ident);
         }
         ListView {
             id: appBrowser
@@ -950,8 +951,8 @@ PanoramaUI {
             model: (ui.selectedIndex == 0) ? ui.applications.inCategory("Emulator").sortedBy("name", true)
                  : (ui.selectedIndex == 1) ? ui.applications.inCategory("Game").sortedBy("name", true)
                  : (ui.selectedIndex == 2) ? ui.applications.inCategory("^(?!Game|Emulator)$").sortedBy("name", true)
-                 : (ui.selectedIndex == 4) ? ui.applications.matching("exec", sharedSetting("system", "favorites")).sortedBy("name", true)
-                 : ui.applications.matching("exec", "^$") //Lists nothing
+                 : (ui.selectedIndex == 4) ? ui.applications.matching("ident", sharedSetting("system", "favorites")).sortedBy("name", true)
+                 : ui.applications.matching("ident", "^$") //Lists nothing
 
             opacity: Math.max(emusOpacity, Math.max(gamesOpacity, Math.max(miscOpacity, favoritesOpacity)))
             spacing: applicationsSpacing * 0.5
@@ -979,7 +980,8 @@ PanoramaUI {
                 id: deleg
                 width: applicationsBoxWidth
                 height: iconScaleMin
-                property string execLine: exec
+                property string friendlyName: name
+                property string ident: identifier
                 MouseRegion {
                     anchors.fill: parent
                     onClicked: appBrowser.currentIndex = index
@@ -1009,8 +1011,7 @@ PanoramaUI {
                             text: name
                         }
                         Text {
-                            color: deleg.isCurrentItem ?
-                                ui.smallFontColorHighlight : ui.smallFontColor
+                            color: deleg.isCurrentItem ? ui.smallFontColorHighlight : ui.smallFontColor
                             font.bold: smallFont.bold
                             font.italic: smallFont.italic
                             font.pixelSize: smallFont.pixelSize

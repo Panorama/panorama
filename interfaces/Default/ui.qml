@@ -100,8 +100,8 @@ PanoramaUI {
                     .matching("name", (nameFilter.length == 0) ? ".*" : ".*" + nameFilter + ".*")
                     .sortedBy("name", true)
                 onSelected: {
-                    ui.execute(execLine);
-                    ui.setSetting("lastExecuted", execLine);
+                    ui.execute(identifier);
+                    ui.setSetting("lastExecuted", identifier);
                 }
             }
         }

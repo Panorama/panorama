@@ -17,12 +17,12 @@ public:
 
     enum Roles
     {
+        Id = Qt::UserRole,
         Name = Qt::UserRole + 1,
         Comment = Qt::UserRole + 2,
         Icon = Qt::UserRole + 3,
         Version = Qt::UserRole + 4,
-        Exec = Qt::UserRole + 5,
-        Categories = Qt::UserRole + 6
+        Categories = Qt::UserRole + 5
     };
 
     /** Returns the number of items in this model */

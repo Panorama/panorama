@@ -36,7 +36,7 @@ void AppAccumulator::loadFrom(const QStringList &searchpaths)
     _watcher.addPaths(searchpaths);
 }
 
-QString AppAccumulator::getExec(const QString &key)
+QString AppAccumulator::getExecLine(const QString &key)
 {
     return _execs[key];
 }
@@ -114,7 +114,7 @@ void AppAccumulator::removeViaDesktopFile(const QString &f)
         if(app.relatedFile == f)
         {
             emit appRemoved(app);
-            _execs.remove(app.exec);
+            _execs.remove(app.id);
             _apps.removeAt(i);
             return;
         }
@@ -136,12 +136,12 @@ void AppAccumulator::addViaDesktopFile(const QString &f)
     if(shouldAddThisApp(f))
     {
         Application result = DesktopFile(f).readToApplication();
-        if(!result.name.isEmpty() && !result.exec.isEmpty())
+        if(!result.name.isEmpty() && !result.id.isEmpty())
         {
-            QString oldExec = result.exec;
-            result.exec = QCryptographicHash::hash(oldExec.toLocal8Bit(), QCryptographicHash::Sha1).toHex();
+            QString oldExec = result.id;
+            result.id = QCryptographicHash::hash(oldExec.toLocal8Bit(), QCryptographicHash::Sha1).toHex();
             _apps += result;
-            _execs[result.exec] = oldExec;
+            _execs[result.id] = oldExec;
             emit appAdded(result);
         }
     }

@@ -10,6 +10,8 @@
  */
 struct Application
 {
+    /** The SHA1 ID of this application */
+    QString id;
     /** The file that the application was loaded from */
     QString relatedFile;
     /** The human-readable name of the application */
@@ -18,8 +20,6 @@ struct Application
     QString comment;
     /** The application icon path */
     QString icon;
-    /** The command that should be executed in order to launch the application */
-    QString exec;
     /** The application's version */
     QString version;
     /** A list of Free Desktop Foundation caetgories that this application belongs to */

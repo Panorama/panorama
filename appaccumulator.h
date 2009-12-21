@@ -28,7 +28,7 @@ public:
     /** Loads all .desktop files from the specified search paths (not recursive) */
     void loadFrom(const QStringList &searchpaths);
 
-    static QString getExec(const QString &key);
+    static QString getExecLine(const QString &key);
 
 signals:
     /** An application has been found or added to one of the search paths */

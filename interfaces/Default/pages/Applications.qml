@@ -8,7 +8,7 @@ Item {
     property alias categoryFilter: catSelector.selectedCategory
     property alias nameFilter: nameField.text
     property alias appSource: appView.model
-    signal selected(string execLine)
+    signal selected(string identifier)
 
     Keys.onDownPressed: {
         appView.incrementCurrentIndex();
@@ -22,7 +22,7 @@ Item {
         id: appDelegate
         Item {
             id: wrapper
-            property string execLine: exec
+            property string identifier: identifier
             width: appView.width
             height: itemHeight
             MouseRegion {
@@ -32,7 +32,7 @@ Item {
                     appView.currentIndex = index;
                 }
                 onDoubleClicked: {
-                    selected(appView.currentItem.execLine);
+                    selected(appView.currentItem.identifier);
                 }
             }
             Row {
@@ -119,7 +119,7 @@ Item {
                 focus: true
                 //Hack so that we can intercept the "1" keypress before the TextInput grabs it
                 Keys.onDigit1Pressed: {
-                    selected(appView.currentItem.execLine);
+                    selected(appView.currentItem.identifier);
                 }
             }
             Rectangle {

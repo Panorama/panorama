@@ -41,7 +41,7 @@ Application DesktopFile::readToApplication()
                                        enComment, genericComment);
         //Exec
         else if(line.startsWith(EXEC_FIELD))
-            result.exec = readField(line, EXEC_FIELD);
+            result.id = readField(line, EXEC_FIELD); //Temporarily hold inside of id
         //Icon
         else if(line.startsWith(ICON_FIELD))
             result.icon = IconFinder::findIcon(readField(line, ICON_FIELD));

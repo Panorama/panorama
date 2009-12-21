@@ -27,9 +27,9 @@ private:
     void readLocalizedWithFallbacks(const QString &line, const QString &fieldName,
                                     QString &local, QString &us, QString &generic);
     QString readField(const QString &line, const QString &field) const;
+    static const QString EXEC_FIELD;
     static const QString NAME_FIELD;
     static const QString COMMENT_FIELD;
-    static const QString EXEC_FIELD;
     static const QString ICON_FIELD;
     static const QString VERSION_FIELD;
     static const QString CATEGORIES_FIELD;

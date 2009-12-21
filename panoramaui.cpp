@@ -5,6 +5,8 @@ PanoramaUI::PanoramaUI(QmlGraphicsItem *parent) :
 {
     setWidth(UI_WIDTH);
     setHeight(UI_HEIGHT);
+    setX(0);
+    setY(0);
 }
 
 void PanoramaUI::setName(const QString &value)
@@ -117,7 +119,7 @@ QString PanoramaUI::sharedSetting(const QString &section, const QString &key)
 
 void PanoramaUI::execute(const QString &sha1)
 {
-    QString cleanCommand(AppAccumulator::getExec(sha1));
+    QString cleanCommand(AppAccumulator::getExecLine(sha1));
     if(!cleanCommand.isEmpty())
     {
         cleanCommand.remove(QRegExp("%\\w"));

@@ -3,11 +3,11 @@
 ApplicationModel::ApplicationModel(QObject *parent) :
     QAbstractListModel(parent)
 {
+    _roles[ApplicationModel::Id]            = QString("identifier") .toLocal8Bit(); //"id" is a QML keyword...
     _roles[ApplicationModel::Name]          = QString("name")       .toLocal8Bit();
     _roles[ApplicationModel::Comment]       = QString("comment")    .toLocal8Bit();
     _roles[ApplicationModel::Icon]          = QString("icon")       .toLocal8Bit();
     _roles[ApplicationModel::Version]       = QString("version")    .toLocal8Bit();
-    _roles[ApplicationModel::Exec]          = QString("exec")       .toLocal8Bit();
     _roles[ApplicationModel::Categories]    = QString("categories") .toLocal8Bit();
     setRoleNames(_roles);
 }
@@ -61,8 +61,8 @@ QVariant ApplicationModel::data(const QModelIndex &index, int role) const
             return value.icon;
         case ApplicationModel::Version:
             return value.version;
-        case ApplicationModel::Exec:
-            return value.exec;
+        case ApplicationModel::Id:
+            return value.id;
         case ApplicationModel::Categories:
             return value.categories;
         default:
@@ -85,7 +85,7 @@ QVariant ApplicationModel::headerData(int, Qt::Orientation, int role) const
         return QString("Icon path");
     case ApplicationModel::Version:
         return QString("Version");
-    case ApplicationModel::Exec:
+    case ApplicationModel::Id:
         return QString("Command line");
     case ApplicationModel::Categories:
         return QString("FDF categories");

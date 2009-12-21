@@ -63,8 +63,6 @@ public:
 
     Q_INVOKABLE void execute(const QString &sha1);
 
-    Q_INVOKABLE QString loadFont(const QString &url, bool bold, bool italic);
-
 public slots:
     void applicationDataChanged();
     void loaded();

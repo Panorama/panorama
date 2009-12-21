@@ -7,6 +7,7 @@ PanoramaUI::PanoramaUI(QmlGraphicsItem *parent) :
     setHeight(UI_HEIGHT);
     setX(0);
     setY(0);
+    setClip(true);
 }
 
 void PanoramaUI::setName(const QString &value)
@@ -125,41 +126,6 @@ void PanoramaUI::execute(const QString &sha1)
         cleanCommand.remove(QRegExp("%\\w"));
         QProcess::startDetached(cleanCommand);
     }
-}
-
-QString PanoramaUI::loadFont(const QString &file, bool bold, bool italic)
-{
-    //TODO: support URLs!!
-    QString path(qmlContext(this)->baseUrl().toLocalFile());
-    path.resize(path.lastIndexOf("/") + 1);
-    path.append(file);
-
-    int font;
-    if(_loadedFonts.contains(path))
-        font = _loadedFonts[path];
-    else
-    {
-        font = QFontDatabase::addApplicationFont(path);
-        _loadedFonts[path] = font;
-    }
-
-    QStringList fonts = QFontDatabase::applicationFontFamilies(font);
-    foreach(const QString &font, fonts)
-    {
-        /* bo cb it ci ok
-         * 1  1  0  0  1
-         * 0  0  1  1  1
-         * 1  1  1  1  1
-         * 0  0  0  0  1
-         * *  *  *  *  0
-         */
-        if((bold == font.contains("bold", Qt::CaseInsensitive)) && (italic == font.contains("italic", Qt::CaseInsensitive)))
-            return font;
-    }
-    if(fonts.count() > 0)
-        return fonts[0];
-    else
-        return QString();
 }
 
 void PanoramaUI::applicationDataChanged()

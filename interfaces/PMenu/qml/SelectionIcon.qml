@@ -6,7 +6,7 @@ Item {
     function accessor(x) {print("not implemented");return null;}
     function styleField(x) {print("not implemented");return null;}
 
-    property TextStyle textStyle;
+    signal clicked()
 
     property real intensity: 0
 
@@ -18,6 +18,10 @@ Item {
         x: -width / 2
         y: -height / 2
         opacity: 1 - intensity
+        MouseRegion {
+            anchors.fill: parent
+            onClicked: root.clicked()
+        }
     }
     Text {
         anchors.top: icon.bottom
@@ -29,6 +33,10 @@ Item {
         font.italic: styleField("italic")
         font.pixelSize: styleField("pixelSize")
         font.family: styleField("family")
+        MouseRegion {
+            anchors.fill: parent
+            onClicked: root.clicked()
+        }
     }
     Image {
         id: iconHighlight

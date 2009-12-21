@@ -30,6 +30,8 @@ PanoramaUI {
     //Specifies which page is visible
     property int selectedIndex: 0
 
+    focus: !appBrowser.focus && !mediaBrowser.focus && !showFavDialog
+
     //Switch active page using arrow keys
     Keys.onLeftPressed: {
         if(selectedIndex > 0)
@@ -66,21 +68,27 @@ PanoramaUI {
     property int applicationsTitleDescriptionY: readField(skinCfg.data, "applications_title_description_y")
     property int maxAppsPerPage: readField(skinCfg.data, "max_app_per_page")
 
+    /* TODO: implement... but normal launchers don't really have previews??
     property int previewPicX: readField(skinCfg.data, "preview_pic_x")
     property int previewPicY: readField(skinCfg.data, "preview_pic_y")
     property int previewPicWidth: readField(skinCfg.data, "preview_pic_w")
+    */
 
     property string highlight: readField(skinCfg.data, "highlight")
     property bool highlightEnabled: (readField(skinCfg.data, "highlight_enabled") != 0)
 
+    /* TODO: implement
     property string mediaFileIcon: readField(skinCfg.data, "media_file_icon")
     property string mediaFolderIcon: readField(skinCfg.data, "media_folder_icon")
 
     property int mediaMaxFilesPerPage: readField(skinCfg.data, "media_max_files_per_page")
+    */
 
-    property bool showCategoryTitle: (readField(skinCfg.data, "show_category_title") != 0)
+    /* TODO: implement
+    property bool showCategoryTitle: (readField(skinCfg.data, "show_category_title") != 0) */
     property string noIcon: readField(skinCfg.data, "no_icon")
-    property string noPreview: readField(skinCfg.data, "no_preview")
+    /* TODO: see above
+    property string noPreview: readField(skinCfg.data, "no_preview")*/
 
     //------------------------------Backgrounds---------------------------------
 
@@ -178,10 +186,12 @@ PanoramaUI {
      * TODO: Use property bindings instead somehow?
      */
 
+    //Category buttons:
     Helpers.SelectionIcon {
         id: emulatorsIcon
         function accessor(x) { return readField(skinCfg.data, "emulators" + x); }
         function styleField(x) { return smallStyle.getField(x); }
+        onClicked: ui.selectedIndex = 0
         intensity: emulatorsOpacity
     }
 
@@ -189,6 +199,7 @@ PanoramaUI {
         id: gamesIcon
         function accessor(x) { return readField(skinCfg.data, "games" + x); }
         function styleField(x) { return smallStyle.getField(x); }
+        onClicked: ui.selectedIndex = 1
         intensity: gamesOpacity
     }
 
@@ -196,6 +207,7 @@ PanoramaUI {
         id: miscIcon
         function accessor(x) { return readField(skinCfg.data, "misc" + x); }
         function styleField(x) { return smallStyle.getField(x); }
+        onClicked: ui.selectedIndex = 2
         intensity: miscOpacity
     }
 
@@ -203,6 +215,7 @@ PanoramaUI {
         id: mediaIcon
         function accessor(x) { return readField(skinCfg.data, "media" + x); }
         function styleField(x) { return smallStyle.getField(x); }
+        onClicked: ui.selectedIndex = 3
         intensity: mediaOpacity
     }
 
@@ -210,6 +223,7 @@ PanoramaUI {
         id: favoritesIcon
         function accessor(x) { return readField(skinCfg.data, "favorites" + x); }
         function styleField(x) { return smallStyle.getField(x); }
+        onClicked: ui.selectedIndex = 4
         intensity: favoritesOpacity
     }
 
@@ -217,15 +231,19 @@ PanoramaUI {
         id: settingsIcon
         function accessor(x) { return readField(skinCfg.data, "settings" + x); }
         function styleField(x) { return smallStyle.getField(x); }
+        onClicked: ui.selectedIndex = 5
         intensity: settingsOpacity
     }
 
+    //System info icons:
     Helpers.PositionedImage {
         id: cpuIcon
+        z: 2
         function accessor(x) { return readField(skinCfg.data, "cpu_icon" + x); }
     }
     Helpers.PositionedText {
         id: cpuText
+        z: 2
         function accessor(x) { return readField(skinCfg.data, "cpu_text" + x); }
         function styleField(x) { return cpuStyle.getField(x); }
         text: clockspeed + " MHz"
@@ -233,10 +251,12 @@ PanoramaUI {
 
     Helpers.PositionedImage {
         id: sd1Icon
+        z: 2
         function accessor(x) { return readField(skinCfg.data, "sd1_icon" + x); }
     }
     Helpers.PositionedText {
         id: sd1Text
+        z: 2
         function accessor(x) { return readField(skinCfg.data, "sd1_text" + x); }
         function styleField(x) { return sd1Style.getField(x); }
         text: "1024 MiB"
@@ -244,10 +264,12 @@ PanoramaUI {
 
     Helpers.PositionedImage {
         id: sd2Icon
+        z: 2
         function accessor(x) { return readField(skinCfg.data, "sd2_icon" + x); }
     }
     Helpers.PositionedText {
         id: sd2Text
+        z: 2
         function accessor(x) { return readField(skinCfg.data, "sd2_text" + x); }
         function styleField(x) { return sd2Style.getField(x); }
         text: "1024 MiB"
@@ -255,10 +277,12 @@ PanoramaUI {
 
     Helpers.PositionedImage {
         id: clockIcon
+        z: 2
         function accessor(x) { return readField(skinCfg.data, "clock_icon" + x); }
     }
     Helpers.PositionedText {
         id: clockText
+        z: 2
         function accessor(x) { return readField(skinCfg.data, "clock_text" + x); }
         function styleField(x) { return clockStyle.getField(x); }
         text: time.hour + ":" + time.minute
@@ -289,6 +313,7 @@ PanoramaUI {
     //Highlight:
     Image {
         id: highl
+        z: 1
         opacity: SequentialAnimation {
             //Make the highlight pulsate with a cubic curve
             //(PMenu uses a simple linear curve)
@@ -313,9 +338,9 @@ PanoramaUI {
     //Dialog:
     Image {
         id: favoriteDialog
+        z: 25 //Show on top of *really* EVERYTHING!
         opacity: showFavDialog ? 1 : 0
         source: readField(skinCfg.data, "confirm_box")
-        z: 5
         x: readField(skinCfg.data, "confirm_box_x") - width / 2
         y: readField(skinCfg.data, "confirm_box_y") - height / 2
         focus: showFavDialog
@@ -330,8 +355,8 @@ PanoramaUI {
                 if(favorites.length > 0)
                     favorites += "|";
                 favorites += idf;
-                setSharedSetting("system", "favorites", favorites);
             }
+            setSharedSetting("system", "favorites", favorites);
             showFavDialog = false;
         }
         Keys.onDigit2Pressed: {
@@ -359,6 +384,7 @@ PanoramaUI {
         id: settingsPage
         x: applicationsBoxX
         y: applicationsBoxY
+        z: 20 //Show on top of EVERYTHING!
         width: applicationsBoxWidth
         height: (iconScaleMin + applicationsSpacing * 0.5) * maxAppsPerPage
         opacity: settingsOpacity
@@ -401,6 +427,7 @@ PanoramaUI {
 
     Item {
         id: mediaBrowser
+        z: 20 //Show on top of EVERYTHING!
         focus: !showFavDialog && (ui.selectedIndex == 3)
     }
 
@@ -408,6 +435,7 @@ PanoramaUI {
     Item {
         x: applicationsBoxX -5
         y: applicationsBoxY - 20
+        z: 20 //Show on top of EVERYTHING!
         width: applicationsBoxWidth + 10
         height: (iconScaleMin + applicationsSpacing * 0.5) * maxAppsPerPage + 40
         clip: true
@@ -420,11 +448,17 @@ PanoramaUI {
         Script {
             function determineModel(x) {
                 switch(x) {
-                    case 0: return ui.applications.inCategory("Emulator").sortedBy("name", true);
-                    case 1: return ui.applications.inCategory("Game").sortedBy("name", true);
-                    case 2: return ui.applications.inCategory("^(?!Game|Emulator)$").sortedBy("name", true);
-                    case 4: if(favorites.length > 0) return ui.applications.matching("identifier", favorites).sortedBy("name", true);
-                    default: return ui.applications.matching("identifier", "^$") //Lists nothing
+                    case 0:
+                        return ui.applications.inCategory("Emulator").sortedBy("name", true);
+                    case 1:
+                        return ui.applications.inCategory("Game").sortedBy("name", true);
+                    case 2:
+                        return ui.applications.inCategory("^(?!Game|Emulator)$").sortedBy("name", true);
+                    case 4:
+                        if(favorites.length > 0)
+                            return ui.applications.matching("identifier", favorites).sortedBy("name", true);
+                    default:
+                        return ui.applications.matching("identifier", "^$") //Lists nothing
                 }
             }
         }
@@ -435,9 +469,10 @@ PanoramaUI {
             anchors.leftMargin: 5
             anchors.rightMargin: 5
             anchors.bottomMargin: 20
-            focus: !showFavDialog && (ui.selectedIndex == 0 || ui.selectedIndex == 1 || ui.selectedIndex == 2 || ui.selectedIndex == 4)
+            focus: !showFavDialog && (ui.selectedIndex == 0 || ui.selectedIndex == 1
+                    || ui.selectedIndex == 2 || ui.selectedIndex == 4)
             model: determineModel(ui.selectedIndex)
-            opacity: Math.max(emusOpacity, Math.max(gamesOpacity, Math.max(miscOpacity, favoritesOpacity)))
+            opacity: Math.max(emulatorsOpacity, Math.max(gamesOpacity, Math.max(miscOpacity, favoritesOpacity)))
             spacing: applicationsSpacing * 0.5
             clip: true
             Component {
@@ -472,7 +507,7 @@ PanoramaUI {
                 Row {
                     anchors.fill: parent
                     Image {
-                        source: icon
+                        source: (icon.length > 0) ? icon : noIcon
                         width: iconScaleMin
                         height: iconScaleMin
                         smooth: true
@@ -487,7 +522,7 @@ PanoramaUI {
                         Text {
                             color: deleg.isCurrentItem ?
                                 bigStyle.getField("colorHighlight") : bigStyle.getField("color")
-                            color: bigStyle.getField("color")
+                            width: parent.width
                             font.bold: bigStyle.getField("bold")
                             font.italic: bigStyle.getField("italic")
                             font.pixelSize: bigStyle.getField("pixelSize")
@@ -495,9 +530,14 @@ PanoramaUI {
                             elide: Text.ElideRight
                             text: name
                         }
+                        Item {
+                            height: applicationsTitleDescriptionY
+                            width: parent.width
+                        }
                         Text {
                             color: deleg.isCurrentItem ?
                                 smallStyle.getField("colorHighlight") : smallStyle.getField("color")
+                            width: parent.width
                             font.bold: smallStyle.getField("bold")
                             font.italic: smallStyle.getField("italic")
                             font.pixelSize: smallStyle.getField("pixelSize")

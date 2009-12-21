@@ -125,6 +125,41 @@ void PanoramaUI::execute(const QString &sha1)
     }
 }
 
+QString PanoramaUI::loadFont(const QString &file, bool bold, bool italic)
+{
+    //TODO: support URLs!!
+    QString path(qmlContext(this)->baseUrl().toLocalFile());
+    path.resize(path.lastIndexOf("/") + 1);
+    path.append(file);
+
+    int font;
+    if(_loadedFonts.contains(path))
+        font = _loadedFonts[path];
+    else
+    {
+        font = QFontDatabase::addApplicationFont(path);
+        _loadedFonts[path] = font;
+    }
+
+    QStringList fonts = QFontDatabase::applicationFontFamilies(font);
+    foreach(const QString &font, fonts)
+    {
+        /* bo cb it ci ok
+         * 1  1  0  0  1
+         * 0  0  1  1  1
+         * 1  1  1  1  1
+         * 0  0  0  0  1
+         * *  *  *  *  0
+         */
+        if((bold == font.contains("bold", Qt::CaseInsensitive)) && (italic == font.contains("italic", Qt::CaseInsensitive)))
+            return font;
+    }
+    if(fonts.count() > 0)
+        return fonts[0];
+    else
+        return QString();
+}
+
 void PanoramaUI::applicationDataChanged()
 {
     emit applicationsUpdated(_apps);
@@ -135,7 +170,8 @@ void PanoramaUI::loaded()
     emit load();
 }
 
-QVariant PanoramaUI::_apps = QVariant();
+QVariant PanoramaUI::_apps;
+QHash<QString, int> PanoramaUI::_loadedFonts;
 QHash<QString, QHash<QString, QString> *> *PanoramaUI::_settings = 0;
 
 //Makes this type available in QML

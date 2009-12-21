@@ -60,10 +60,12 @@ PanoramaUI {
 
     Text { //prototype
         id: smallFontProto
-        font.bold: ((readField("font_small_style") & 1) == 1)
-        font.italic: ((readField("font_small_style") & 2) == 2)
+        font.bold: bold
+        property bool bold: ((readField("font_small_style") & 1) == 1)
+        font.italic: italic
+        property bool italic: ((readField("font_small_style") & 2) == 2)
         font.pixelSize: readField("font_small_size")
-        font.family: readField("font_small")
+        font.family: loadFont(readField("font_small"), bold, italic)
     }
     property alias smallFont: smallFontProto.font
     property color smallFontColor: readField("font_small_color")
@@ -71,10 +73,12 @@ PanoramaUI {
 
     Text { //prototype
         id: bigFontProto
-        font.bold: ((readField("font_big_style") & 1) == 1)
-        font.italic: ((readField("font_big_style") & 2) == 2)
+        font.bold: bold
+        property bool bold: ((readField("font_big_style") & 1) == 1)
+        font.italic: italic
+        property bool italic: ((readField("font_big_style") & 2) == 2)
         font.pixelSize: readField("font_big_size")
-        font.family: readField("font_big")
+        font.family: loadFont(readField("font_big"), bold, italic)
     }
     property alias bigFont: bigFontProto.font
     property color bigFontColor: readField("font_big_color")
@@ -119,10 +123,12 @@ PanoramaUI {
 
     Text { //prototype
         id: mediaTextFontProto
-        font.bold: ((readField("media_text_style") & 1) == 1)
-        font.italic: ((readField("media_text_style") & 2) == 2)
+        font.bold: bold
+        property bool bold: ((readField("media_text_style") & 1) == 1)
+        font.italic: italic
+        property bool italic: ((readField("media_text_style") & 2) == 2)
         font.pixelSize: readField("media_text_size")
-        font.family: readField("media_text_font")
+        font.family: loadFont(readField("media_text_font"), bold, italic)
     }
     property alias mediaTextFont: mediaTextFontProto.font
     property color mediaTextFontColor: readField("media_text_color")
@@ -150,10 +156,12 @@ PanoramaUI {
 
     Text { //prototype
         id: cpuTextFontProto
-        font.bold: ((readField("cpu_text_style") & 1) == 1)
-        font.italic: ((readField("cpu_text_style") & 2) == 2)
+        font.bold: bold
+        property bool bold: ((readField("cpu_text_style") & 1) == 1)
+        font.italic: italic
+        property bool italic: ((readField("cpu_text_style") & 2) == 2)
         font.pixelSize: readField("cpu_text_size")
-        font.family: readField("cpu_text_font")
+        font.family: loadFont(readField("cpu_text_font"), bold, italic)
     }
     property alias cpuTextFont: cpuTextFontProto.font
     property color cpuTextFontColor: readField("cpu_text_color")
@@ -166,10 +174,12 @@ PanoramaUI {
 
     Text { //prototype
         id: sd1TextFontProto
-        font.bold: ((readField("sd1_text_style") & 1) == 1)
-        font.italic: ((readField("sd1_text_style") & 2) == 2)
+        font.bold: bold
+        property bool bold: ((readField("sd1_text_style") & 1) == 1)
+        font.italic: italic
+        property bool italic: ((readField("sd1_text_style") & 2) == 2)
         font.pixelSize: readField("sd1_text_size")
-        font.family: readField("sd1_text_font")
+        font.family: loadFont(readField("sd1_text_font"), bold, italic)
     }
     property alias sd1TextFont: sd1TextFontProto.font
     property color sd1TextFontColor: readField("sd1_text_color")
@@ -182,10 +192,12 @@ PanoramaUI {
 
     Text { //prototype
         id: sd2TextFontProto
-        font.bold: ((readField("sd2_text_style") & 1) == 1)
-        font.italic: ((readField("sd2_text_style") & 2) == 2)
+        font.bold: bold
+        property bool bold: ((readField("sd2_text_style") & 1) == 1)
+        font.italic: italic
+        property bool italic: ((readField("sd2_text_style") & 2) == 2)
         font.pixelSize: readField("sd2_text_size")
-        font.family: readField("sd2_text_font")
+        font.family: loadFont(readField("sd2_text_font"), bold, italic)
     }
     property alias sd2TextFont: sd2TextFontProto.font
     property color sd2TextFontColor: readField("sd2_text_color")
@@ -198,10 +210,12 @@ PanoramaUI {
 
     Text { //prototype
         id: clockTextFontProto
-        font.bold: ((readField("clock_text_style") & 1) == 1)
-        font.italic: ((readField("clock_text_style") & 2) == 2)
+        font.bold: bold
+        property bool bold: ((readField("clock_text_style") & 1) == 1)
+        font.italic: italic
+        property bool italic: ((readField("clock_text_style") & 2) == 2)
         font.pixelSize: readField("clock_text_size")
-        font.family: readField("clock_text_font")
+        font.family: loadFont(readField("clock_text_font"), bold, italic)
     }
     property alias clockTextFont: clockTextFontProto.font
     property color clockTextFontColor: readField("clock_text_color")
@@ -801,11 +815,37 @@ PanoramaUI {
         x: sd1IconX
         y: sd1IconY
     }
+    Item {
+        id: sd1Anchor
+        y: sd1TextY
+    }
+    Text {
+        x: sd1TextX
+        anchors.baseline: sd1Anchor.top
+        font.bold: sd1TextFont.bold
+        font.italic: sd1TextFont.italic
+        font.pixelSize: sd1TextFont.pixelSize
+        color: sd1TextFontColor
+        text: "1024 MiB"
+    }
 
     Image {
         source: sd2Icon
         x: sd2IconX
         y: sd2IconY
+    }
+    Item {
+        id: sd2Anchor
+        y: sd2TextY
+    }
+    Text {
+        x: sd2TextX
+        anchors.baseline: sd2Anchor.top
+        font.bold: sd2TextFont.bold
+        font.italic: sd2TextFont.italic
+        font.pixelSize: sd2TextFont.pixelSize
+        color: sd2TextFontColor
+        text: "1024 MiB"
     }
 
     Image {

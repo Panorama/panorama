@@ -7,6 +7,8 @@
 #include <QTimer>
 #include <QProcess>
 #include <QAbstractItemModel>
+#include <QFontDatabase>
+#include <QtDeclarative/QmlContext>
 #include <QtDeclarative/QmlGraphicsItem>
 
 #include "appaccumulator.h"
@@ -61,6 +63,8 @@ public:
 
     Q_INVOKABLE void execute(const QString &sha1);
 
+    Q_INVOKABLE QString loadFont(const QString &url, bool bold, bool italic);
+
 public slots:
     void applicationDataChanged();
     void loaded();
@@ -74,6 +78,7 @@ private:
     QString _description;
     QString _author;
     QString _settingsKey;
+    static QHash<QString, int> _loadedFonts;
     static QHash<QString, QHash<QString, QString> *> *_settings;
     static QVariant _apps;
 };

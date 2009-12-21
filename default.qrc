@@ -1,6 +1,6 @@
 <!--default.qrc - Default application resources that are to be embedded into the executable -->
 <RCC>
     <qresource prefix="/">
-        <file>root.qml</file>
+        <file alias="root.qml">qrc/root.qml</file>
     </qresource>
 </RCC>

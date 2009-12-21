@@ -19,10 +19,10 @@ function readField(sourceData, field) {
             return data;
         }
         else {
-            print("Warning: Could not parse " + data);
+            print("Warning: Could not parse \"" + data + "\"");
             return "";
         }
     }
-    print("Warning: could not find field " + field);
+    print("Warning: field \"" + field + "\" not found");
     return null;
 }

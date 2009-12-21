@@ -1,24 +1,39 @@
 import Qt 4.6
 
 Item {
-    property string baseName
-    property string sourceData: skinCfg.data
-    property alias font: proto.font
-    property color color: readField(sourceData, baseName + "_color")
-    property color highlightColor: sourceData.indexOf(baseName + "_color_highlight") >= 0 ?
-        readField(sourceData, baseName + "_color_highlight")
-        : color
-    Script {
-        source: "text.js"
+    id: root
+    function accessor(x) {print("not implemented");return null;}
+    
+    function getField(x) {
+        if("color" == x)
+            return color;
+        else if("highlightColor" == x)
+            return highlightColor;
+        else if("bold" == x)
+            return bold;
+        else if("italic" == x)
+            return italic;
+        else if("pixelSize" == x)
+            return pixelSize;
+        else if("family" == x)
+            return family;
+        else {
+            print("Warning: TextStyle does not contain field \"" + x + "\"");
+            return null;
+        }
     }
-    Text { //prototype
-        id: proto
-        font.bold: bold
-        property int s: readField(sourceData, baseName + "_style")
-        property bool bold: (s & 1) == 1
-        font.italic: italic
-        property bool italic: (s & 2) == 2
-        font.pixelSize: readField(sourceData, baseName + "_size")
-        font.family: loadFont(readField(sourceData, baseName), bold, italic)
+    property bool fontify: false
+    property bool highlightify: true
+
+    property color color: root.accessor("_color")
+    property color highlightColor: highlighify ? root.accessor("_color_highlight") : color
+    property int s: accessor("_style")
+    property bool bold: (s & 1) == 1
+    property bool italic: (s & 2) == 2
+    property real pixelSize: root.accessor("_size")
+    FontLoader {
+        id: loader
+        source: "../" + root.accessor(fontify ? "_font" : "")
     }
+    property string family: loader.name
 }

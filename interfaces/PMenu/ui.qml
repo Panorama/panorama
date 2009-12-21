@@ -9,11 +9,14 @@ PanoramaUI {
     author: "dflemstr"
     settingsKey: "pmenu-colors"
 
-    TextFile { id: skinCfg; source: "skin.cfg" } //TextFile isn't standard QML, but part of Panorama 1.0
+    TextFile { //TextFile isn't standard QML, but part of Panorama 1.0
+        id: skinCfg
+        source: "skin.cfg"
+    }
 
     Script {
         //For readField()
-        source: "qml/text.js"
+        source: "qml/parser.js"
     }
 
     //Specifies the opacity for each page
@@ -27,6 +30,17 @@ PanoramaUI {
     //Specifies which page is visible
     property int selectedIndex: 0
 
+    //Switch active page using arrow keys
+    Keys.onLeftPressed: {
+        if(selectedIndex > 0)
+            selectedIndex -= 1;
+    }
+
+    Keys.onRightPressed: {
+        if(selectedIndex < 5)
+            selectedIndex += 1;
+    }
+
     //Show the "Add/remove XYZ from favorites?" dialog?
     property bool showFavDialog: false
 
@@ -34,12 +48,12 @@ PanoramaUI {
     //Stored as "id1|id2|id3" so that we can use it as a regex as well as a list
     property string favorites: sharedSetting("system", "favorites")
 
+    //The clockspeed setting, stored as an integer in MHz
     property int clockspeed: parseInt(sharedSetting("system", "clockspeed"))
 
-    //------------------------------PMenu properties------------------------------
-    property string backgroundApplications: readField(skinCfg.data, "background_applications")
-    property string backgroundMedia: readField(skinCfg.data, "background_media")
-    property string backgroundSettings: readField(skinCfg.data, "background_settings")
+    //------------------------------PMenu properties----------------------------
+
+    //Generic properties that cannot be modelled using object-oriented models
 
     property int applicationsBoxX: readField(skinCfg.data, "applications_box_x")
     property int applicationsBoxY: readField(skinCfg.data, "applications_box_y")
@@ -51,10 +65,6 @@ PanoramaUI {
     property int applicationsSpacing: readField(skinCfg.data, "applications_spacing")
     property int applicationsTitleDescriptionY: readField(skinCfg.data, "applications_title_description_y")
     property int maxAppsPerPage: readField(skinCfg.data, "max_app_per_page")
-
-    property string confirmBox: readField(skinCfg.data, "confirm_box")
-    property int confirmBoxX: readField(skinCfg.data, "confirm_box_x")
-    property int confirmBoxY: readField(skinCfg.data, "confirm_box_y")
 
     property int previewPicX: readField(skinCfg.data, "preview_pic_x")
     property int previewPicY: readField(skinCfg.data, "preview_pic_y")
@@ -72,218 +82,191 @@ PanoramaUI {
     property string noIcon: readField(skinCfg.data, "no_icon")
     property string noPreview: readField(skinCfg.data, "no_preview")
 
-    //------------------------------PMenu objects------------------------------
+    //------------------------------Backgrounds---------------------------------
+
+    //Self-explanatory. Each background has z-index -1 because it has to stay
+    //behind other objects...
+
+    Image {
+        source: readField(skinCfg.data, "background_applications")
+        x: 0
+        y: 0
+        z: -1
+    }
+
+    Image {
+        source: readField(skinCfg.data, "background_media")
+        x: 0
+        y: 0
+        z: -1
+    }
+
+    Image {
+        source: readField(skinCfg.data, "background_settings")
+        x: 0
+        y: 0
+        z: -1
+    }
+
+    //------------------------------PMenu objects-------------------------------
+
+    //Each helper object below has a function called "accessor". It uses that
+    //function internally to load resources by calling e.g. "accessor('_icon_x')"
+    //We need to override that function to point it to the right resource.
+
+    /*
+     * TextStyles:
+     *
+     * - Each text style has a "getField()" method that can be used to get a
+     *   certain style property. Normal properties cannot be used because of the
+     *   inverse initialization order of the TextFile object above
+     *
+     * - "fontify" indicates that "_font" has to be appended to get to the font
+     *   field (Cpasjuste, why are you so inconsistent? :P)
+     *
+     * - "highlightify" indicates that there's a separate highlight color in the
+     *   style
+     */
 
     Helpers.TextStyle {
         id: smallStyle
-        baseName: "font_small"
-        sourceData: skinCfg.data
+        function accessor(x) { return readField(skinCfg.data, "font_small" + x); }
     }
 
     Helpers.TextStyle {
         id: bigStyle
-        baseName: "font_big"
-        sourceData: skinCfg.data
+        function accessor(x) { return readField(skinCfg.data, "font_big" + x); }
     }
+
+    Helpers.TextStyle {
+        id: mediaStyle
+        fontify: true
+        function accessor(x) { return readField(skinCfg.data, "media_text" + x); }
+    }
+
+    Helpers.TextStyle {
+        id: cpuStyle
+        fontify: true
+        highlightify: false
+        function accessor(x) { return readField(skinCfg.data, "cpu_text" + x); }
+    }
+
+    Helpers.TextStyle {
+        id: sd1Style
+        fontify: true
+        highlightify: false
+        function accessor(x) { return readField(skinCfg.data, "sd1_text" + x); }
+    }
+
+    Helpers.TextStyle {
+        id: sd2Style
+        fontify: true
+        highlightify: false
+        function accessor(x) { return readField(skinCfg.data, "sd2_text" + x); }
+    }
+
+    Helpers.TextStyle {
+        id: clockStyle
+        fontify: true
+        highlightify: false
+        function accessor(x) { return readField(skinCfg.data, "clock_text" + x); }
+    }
+
+    /*
+     * Other objects: Text-related objects will have a "styleField()" method
+     * that must be overridden with the correct "style.getField()" method.
+     * TODO: Use property bindings instead somehow?
+     */
 
     Helpers.SelectionIcon {
         id: emulatorsIcon
-        baseName: "emulators"
-        sourceData: skinCfg.data
-
-        bold: smallStyle.bold
-        italic: smallStyle.italic
-        pixelSize: smallStyle.pixelSize
-        family: smallStyle.family
-        color: smallStyle.color
-        highlightColor: smallStyle.highlightColor
-
+        function accessor(x) { return readField(skinCfg.data, "emulators" + x); }
+        function styleField(x) { return smallStyle.getField(x); }
         intensity: emulatorsOpacity
     }
 
     Helpers.SelectionIcon {
         id: gamesIcon
-        baseName: "games"
-        sourceData: skinCfg.data
-
-        bold: smallStyle.bold
-        italic: smallStyle.italic
-        pixelSize: smallStyle.pixelSize
-        family: smallStyle.family
-        color: smallStyle.color
-        highlightColor: smallStyle.highlightColor
-
+        function accessor(x) { return readField(skinCfg.data, "games" + x); }
+        function styleField(x) { return smallStyle.getField(x); }
         intensity: gamesOpacity
     }
 
     Helpers.SelectionIcon {
         id: miscIcon
-        baseName: "misc"
-        sourceData: skinCfg.data
-
-        bold: smallStyle.bold
-        italic: smallStyle.italic
-        pixelSize: smallStyle.pixelSize
-        family: smallStyle.family
-        color: smallStyle.color
-        highlightColor: smallStyle.highlightColor
-
+        function accessor(x) { return readField(skinCfg.data, "misc" + x); }
+        function styleField(x) { return smallStyle.getField(x); }
         intensity: miscOpacity
     }
 
     Helpers.SelectionIcon {
         id: mediaIcon
-        baseName: "media"
-        sourceData: skinCfg.data
-
-        bold: smallStyle.bold
-        italic: smallStyle.italic
-        pixelSize: smallStyle.pixelSize
-        family: smallStyle.family
-        color: smallStyle.color
-        highlightColor: smallStyle.highlightColor
-
+        function accessor(x) { return readField(skinCfg.data, "media" + x); }
+        function styleField(x) { return smallStyle.getField(x); }
         intensity: mediaOpacity
-    }
-
-    Helpers.TextStyle {
-        id: mediaStyle
-        baseName: "media_text"
-        sourceData: skinCfg.data
     }
 
     Helpers.SelectionIcon {
         id: favoritesIcon
-        baseName: "favorites"
-        sourceData: skinCfg.data
-
-        bold: smallStyle.bold
-        italic: smallStyle.italic
-        pixelSize: smallStyle.pixelSize
-        family: smallStyle.family
-        color: smallStyle.color
-        highlightColor: smallStyle.highlightColor
-
+        function accessor(x) { return readField(skinCfg.data, "favorites" + x); }
+        function styleField(x) { return smallStyle.getField(x); }
         intensity: favoritesOpacity
     }
 
     Helpers.SelectionIcon {
         id: settingsIcon
-        baseName: "settings"
-        sourceData: skinCfg.data
-
-        bold: smallStyle.bold
-        italic: smallStyle.italic
-        pixelSize: smallStyle.pixelSize
-        family: smallStyle.family
-        color: smallStyle.color
-        highlightColor: smallStyle.highlightColor
-
+        function accessor(x) { return readField(skinCfg.data, "settings" + x); }
+        function styleField(x) { return smallStyle.getField(x); }
         intensity: settingsOpacity
     }
 
     Helpers.PositionedImage {
         id: cpuIcon
-        baseName: "cpu_icon"
-    }
-    Helpers.TextStyle {
-        id: cpuStyle
-        baseName: "cpu_text"
-        sourceData: skinCfg.data
+        function accessor(x) { return readField(skinCfg.data, "cpu_icon" + x); }
     }
     Helpers.PositionedText {
         id: cpuText
-        baseName: "cpu_text"
-        sourceData: skinCfg.data
-
-        bold: cpuStyle.bold
-        italic: cpuStyle.italic
-        pixelSize: cpuStyle.pixelSize
-        family: cpuStyle.family
-        color: cpuStyle.color
-        highlightColor: cpuStyle.highlightColor
-
+        function accessor(x) { return readField(skinCfg.data, "cpu_text" + x); }
+        function styleField(x) { return cpuStyle.getField(x); }
         text: clockspeed + " MHz"
     }
 
     Helpers.PositionedImage {
         id: sd1Icon
-        baseName: "sd1_icon"
-        sourceData: skinCfg.data
-    }
-    Helpers.TextStyle {
-        id: sd1Style
-        baseName: "sd1_text"
-        sourceData: skinCfg.data
+        function accessor(x) { return readField(skinCfg.data, "sd1_icon" + x); }
     }
     Helpers.PositionedText {
         id: sd1Text
-        baseName: "sd1_text"
-        sourceData: skinCfg.data
-
-        bold: sd1Style.bold
-        italic: sd1Style.italic
-        pixelSize: sd1Style.pixelSize
-        family: sd1Style.family
-        color: sd1Style.color
-        highlightColor: sd1Style.highlightColor
-
+        function accessor(x) { return readField(skinCfg.data, "sd1_text" + x); }
+        function styleField(x) { return sd1Style.getField(x); }
         text: "1024 MiB"
     }
 
     Helpers.PositionedImage {
         id: sd2Icon
-        baseName: "sd2_icon"
-        sourceData: skinCfg.data
-    }
-    Helpers.TextStyle {
-        id: sd2Style
-        baseName: "sd2_text"
-        sourceData: skinCfg.data
+        function accessor(x) { return readField(skinCfg.data, "sd2_icon" + x); }
     }
     Helpers.PositionedText {
         id: sd2Text
-        baseName: "sd2_text"
-        sourceData: skinCfg.data
-
-        bold: sd2Style.bold
-        italic: sd2Style.italic
-        pixelSize: sd2Style.pixelSize
-        family: sd2Style.family
-        color: sd2Style.color
-        highlightColor: sd2Style.highlightColor
-
+        function accessor(x) { return readField(skinCfg.data, "sd2_text" + x); }
+        function styleField(x) { return sd2Style.getField(x); }
         text: "1024 MiB"
     }
 
     Helpers.PositionedImage {
         id: clockIcon
-        baseName: "clock_icon"
-        sourceData: skinCfg.data
-    }
-    Helpers.TextStyle {
-        id: clockStyle
-        baseName: "clock_text"
-        sourceData: skinCfg.data
+        function accessor(x) { return readField(skinCfg.data, "clock_icon" + x); }
     }
     Helpers.PositionedText {
         id: clockText
-        baseName: "clock_text"
-        sourceData: skinCfg.data
-
-        bold: clockStyle.bold
-        italic: clockStyle.italic
-        pixelSize: clockStyle.pixelSize
-        family: clockStyle.family
-        color: clockStyle.color
-        highlightColor: clockStyle.highlightColor
-
+        function accessor(x) { return readField(skinCfg.data, "clock_text" + x); }
+        function styleField(x) { return clockStyle.getField(x); }
         text: time.hour + ":" + time.minute
         Timer {
             id: time
             property string hour: "00"
             property string minute: "00"
-            interval: 100
+            interval: 1000
             running: true
             repeat: true
             triggeredOnStart: true
@@ -301,28 +284,16 @@ PanoramaUI {
         }
     }
 
-    Keys.onLeftPressed: {
-        if(selectedIndex > 0) {
-            selectedIndex -= 1;
-            changeState(selectedIndex);
-        }
-    }
+    //------------------------------Dynamic objects-----------------------------
 
-    Keys.onRightPressed: {
-        if(selectedIndex < 5) {
-            selectedIndex += 1;
-            changeState(selectedIndex);
-        }
-    }
-
-    /*
     //Highlight:
     Image {
         id: highl
         opacity: SequentialAnimation {
+            //Make the highlight pulsate with a cubic curve
+            //(PMenu uses a simple linear curve)
             running: true
             repeat: true
-
             NumberAnimation {
                 from: 0
                 to: highlightEnabled ? 1 : 0
@@ -343,10 +314,10 @@ PanoramaUI {
     Image {
         id: favoriteDialog
         opacity: showFavDialog ? 1 : 0
-        source: confirmBox
+        source: readField(skinCfg.data, "confirm_box")
         z: 5
-        x: confirmBoxX - width / 2
-        y: confirmBoxY - height / 2
+        x: readField(skinCfg.data, "confirm_box_x") - width / 2
+        y: readField(skinCfg.data, "confirm_box_y") - height / 2
         focus: showFavDialog
         Keys.onDigit1Pressed: {
             var idf = appBrowser.currentItem.ident;
@@ -375,11 +346,11 @@ PanoramaUI {
                         "\" from your favorites?")
             wrap: true
 
-            color: smallFontColor
-            font.bold: smallFont.bold
-            font.italic: smallFont.italic
-            font.pixelSize: smallFont.pixelSize
-            font.family: smallFont.family
+            color: smallStyle.getField("color")
+            font.bold: smallStyle.getField("bold")
+            font.italic: smallStyle.getField("italic")
+            font.pixelSize: smallStyle.getField("pixelSize")
+            font.family: smallStyle.getField("family")
         }
     }
 
@@ -393,18 +364,16 @@ PanoramaUI {
         opacity: settingsOpacity
         focus: ui.selectedIndex == 5
 
-        property int clockspeed: ui.sharedSetting("system", "clockspeed")
-
         Keys.onUpPressed: {
-            if(settingsPage.clockspeed < 800) {
-                settingsPage.clockspeed += 10;
-                ui.setSharedSetting("system", "clockspeed", settingsPage.clockspeed);
+            if(clockspeed < 800) {
+                clockspeed += 10;
+                ui.setSharedSetting("system", "clockspeed", clockspeed); //Sync clockspeed every time we modify it
             }
         }
         Keys.onDownPressed: {
-            if(settingsPage.clockspeed > 300) {
-                settingsPage.clockspeed -= 10;
-                ui.setSharedSetting("system", "clockspeed", settingsPage.clockspeed);
+            if(clockspeed > 300) {
+                clockspeed -= 10;
+                ui.setSharedSetting("system", "clockspeed", clockspeed);
             }
         }
         Column {
@@ -412,19 +381,19 @@ PanoramaUI {
             Row {
                 Text {
                     text: "Clockspeed: "
-                    color: smallFontHighlightColor
-                    font.bold: smallFont.bold
-                    font.italic: smallFont.italic
-                    font.pixelSize: smallFont.pixelSize
-                    font.family: smallFont.family
+                    color: smallStyle.getField("highlightColor")
+                    font.bold: smallStyle.getField("bold")
+                    font.italic: smallStyle.getField("italic")
+                    font.pixelSize: smallStyle.getField("pixelSize")
+                    font.family: smallStyle.getField("family")
                 }
                 Text {
-                    text: settingsPage.clockspeed
-                    color: smallFontColor
-                    font.bold: smallFont.bold
-                    font.italic: smallFont.italic
-                    font.pixelSize: smallFont.pixelSize
-                    font.family: smallFont.family
+                    text: clockspeed
+                    color: smallStyle.getField("color")
+                    font.bold: smallStyle.getField("bold")
+                    font.italic: smallStyle.getField("italic")
+                    font.pixelSize: smallStyle.getField("pixelSize")
+                    font.family: smallStyle.getField("family")
                 }
             }
         }
@@ -448,6 +417,17 @@ PanoramaUI {
         Keys.onDigit1Pressed: {
             execute(appBrowser.currentItem.ident);
         }
+        Script {
+            function determineModel(x) {
+                switch(x) {
+                    case 0: return ui.applications.inCategory("Emulator").sortedBy("name", true);
+                    case 1: return ui.applications.inCategory("Game").sortedBy("name", true);
+                    case 2: return ui.applications.inCategory("^(?!Game|Emulator)$").sortedBy("name", true);
+                    case 4: if(favorites.length > 0) return ui.applications.matching("identifier", favorites).sortedBy("name", true);
+                    default: return ui.applications.matching("identifier", "^$") //Lists nothing
+                }
+            }
+        }
         ListView {
             id: appBrowser
             anchors.fill: parent
@@ -456,13 +436,7 @@ PanoramaUI {
             anchors.rightMargin: 5
             anchors.bottomMargin: 20
             focus: !showFavDialog && (ui.selectedIndex == 0 || ui.selectedIndex == 1 || ui.selectedIndex == 2 || ui.selectedIndex == 4)
-            model: (ui.selectedIndex == 0) ? ui.applications.inCategory("Emulator").sortedBy("name", true)
-                 : (ui.selectedIndex == 1) ? ui.applications.inCategory("Game").sortedBy("name", true)
-                 : (ui.selectedIndex == 2) ? ui.applications.inCategory("^(?!Game|Emulator)$").sortedBy("name", true)
-                 : (ui.selectedIndex == 4 && favorites.length > 0) ?
-                    ui.applications.matching("identifier", favorites).sortedBy("name", true)
-                 : ui.applications.matching("identifier", "^$") //Lists nothing
-
+            model: determineModel(ui.selectedIndex)
             opacity: Math.max(emusOpacity, Math.max(gamesOpacity, Math.max(miscOpacity, favoritesOpacity)))
             spacing: applicationsSpacing * 0.5
             clip: true
@@ -512,21 +486,22 @@ PanoramaUI {
                         anchors.verticalCenter: parent.verticalCenter
                         Text {
                             color: deleg.isCurrentItem ?
-                                ui.bigFontColorHighlight : ui.bigFontColor
-                            font.bold: bigFont.bold
-                            font.italic: bigFont.italic
-                            font.pixelSize: bigFont.pixelSize
-                            font.family: bigFont.family
+                                bigStyle.getField("colorHighlight") : bigStyle.getField("color")
+                            color: bigStyle.getField("color")
+                            font.bold: bigStyle.getField("bold")
+                            font.italic: bigStyle.getField("italic")
+                            font.pixelSize: bigStyle.getField("pixelSize")
+                            font.family: bigStyle.getField("family")
                             elide: Text.ElideRight
                             text: name
                         }
                         Text {
                             color: deleg.isCurrentItem ?
-                                ui.smallFontColorHighlight : ui.smallFontColor
-                            font.bold: smallFont.bold
-                            font.italic: smallFont.italic
-                            font.pixelSize: smallFont.pixelSize
-                            font.family: smallFont.family
+                                smallStyle.getField("colorHighlight") : smallStyle.getField("color")
+                            font.bold: smallStyle.getField("bold")
+                            font.italic: smallStyle.getField("italic")
+                            font.pixelSize: smallStyle.getField("pixelSize")
+                            font.family: smallStyle.getField("family")
                             elide: Text.ElideRight
                             text: comment
                         }
@@ -534,7 +509,7 @@ PanoramaUI {
                 }
             }
         }
-    }*/
+    }
 
     state: selectedIndex == 0 ? "emulators"
          : selectedIndex == 1 ? "games"
@@ -552,11 +527,11 @@ PanoramaUI {
                 selectedIndex: 0
                 emulatorsOpacity: 1
             }
-            /*PropertyChanges {
+            PropertyChanges {
                 target: highl
-                x: emulatorsIconX - width / 2
-                y: emulatorsIconY - height / 2
-            }*/
+                x: emulatorsIcon.x - width / 2
+                y: emulatorsIcon.y - height / 2
+            }
         },
         State {
             name: "games"
@@ -567,8 +542,8 @@ PanoramaUI {
             }
             PropertyChanges {
                 target: highl
-                x: gamesIconX - width / 2
-                y: gamesIconY - height / 2
+                x: gamesIcon.x - width / 2
+                y: gamesIcon.y - height / 2
             }
         },
         State {
@@ -580,8 +555,8 @@ PanoramaUI {
             }
             PropertyChanges {
                 target: highl
-                x: miscIconX - width / 2
-                y: miscIconY - height / 2
+                x: miscIcon.x - width / 2
+                y: miscIcon.y - height / 2
             }
         },
         State {
@@ -593,8 +568,8 @@ PanoramaUI {
             }
             PropertyChanges {
                 target: highl
-                x: mediaIconX - width / 2
-                y: mediaIconY - height / 2
+                x: mediaIcon.x - width / 2
+                y: mediaIcon.y - height / 2
             }
         },
         State {
@@ -606,8 +581,8 @@ PanoramaUI {
             }
             PropertyChanges {
                 target: highl
-                x: favoritesIconX - width / 2
-                y: favoritesIconY - height / 2
+                x: favoritesIcon.x - width / 2
+                y: favoritesIcon.y - height / 2
             }
         },
         State {
@@ -619,8 +594,8 @@ PanoramaUI {
             }
             PropertyChanges {
                 target: highl
-                x: settingsIconX - width / 2
-                y: settingsIconY - height / 2
+                x: settingsIcon.x - width / 2
+                y: settingsIcon.y - height / 2
             }
         }
     ]

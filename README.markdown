@@ -22,12 +22,12 @@ You will need the following tools and resources to compile Panorama:
 *   [Git][]
 *   Qt 4.7 or later
 
-If you for some reason don't have access to Qt 4.7 (because it hasn't been
-released yet, for instance), do the following to gain access to Qt 4.6.1
+If you for some reason don't have access to Qt 4.7 (because it doesn't exist yet,
+for instance), do the following to gain access to Qt 4.6.1
 and the Kinetic DeclarativeUI branch, which works just as well:
 
 *   Clone [the Gitorious Qt Kinetic Git repository][qtrepo].
-*   Check out the `kinetic-declarativeui` branch.
+*   Check out the `kinetic-declarativeui` branch. Try `kinetic-bauhaus` instead if `kinetic-declartiveui` won't compile.
 *   Compile the distribution via the usual `./configure; gmake -j4; gmake install`
     procedure. Note that this will take quite some time.
 

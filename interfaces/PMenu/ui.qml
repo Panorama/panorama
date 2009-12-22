@@ -34,12 +34,12 @@ PanoramaUI {
 
     //Switch active page using arrow keys
     Keys.onLeftPressed: {
-        if(selectedIndex > 0)
+        if(selectedIndex > 0 && !showFavDialog)
             selectedIndex -= 1;
     }
 
     Keys.onRightPressed: {
-        if(selectedIndex < 5)
+        if(selectedIndex < 5 && !showFavDialog)
             selectedIndex += 1;
     }
 
@@ -348,7 +348,7 @@ PanoramaUI {
             var idf = appBrowser.currentItem.ident;
             if(ui.selectedIndex == 4) {
                 favorites = favorites.replace(idf, "");
-                favorites = favorites.replace("||", "");
+                favorites = favorites.replace("||", "|");
                 favorites = favorites.replace(/\|$|^\|/, "");
             }
             else if(favorites.indexOf(idf) == -1) {
@@ -364,7 +364,8 @@ PanoramaUI {
         }
         Text {
             anchors.centerIn: parent
-            width: parent.width
+            width: parent.width - 40
+            height: parent.height - 20
             text: (ui.selectedIndex != 4) ? ("Do you want to add \"" +
                         appBrowser.currentItem.friendlyName + "\" to your favorites?")
                   : ("Do you want to remove \"" + appBrowser.currentItem.friendlyName +

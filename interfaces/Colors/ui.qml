@@ -4,7 +4,7 @@ import "qml" as Helpers
 
 PanoramaUI {
     id: ui
-    name: "PMenu compatibility user interface"
+    name: "Colors (from PMenu)"
     description: "Put this file inside of a PMenu theme to make a Panorama UI out of it!"
     author: "dflemstr"
     settingsKey: "pmenu-colors"

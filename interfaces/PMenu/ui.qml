@@ -100,6 +100,7 @@ PanoramaUI {
         x: 0
         y: 0
         z: -1
+        opacity: Math.max(Math.max(miscOpacity, favoritesOpacity), Math.max(gamesOpacity, emulatorsOpacity))
     }
 
     Image {
@@ -107,6 +108,7 @@ PanoramaUI {
         x: 0
         y: 0
         z: -1
+        opacity: mediaOpacity
     }
 
     Image {
@@ -114,6 +116,7 @@ PanoramaUI {
         x: 0
         y: 0
         z: -1
+        opacity: settingsOpacity
     }
 
     //------------------------------PMenu objects-------------------------------
@@ -661,7 +664,7 @@ PanoramaUI {
                     }
                     NumberAnimation {
                         duration: 300
-                        matchProperties: "emusOpacity,gamesOpacity,miscOpacity,mediaOpacity,favoritesOpacity"
+                        matchProperties: "emulatorsOpacity,gamesOpacity,miscOpacity,mediaOpacity,favoritesOpacity"
                         easing: "easeOutQuad"
                     }
                 }
@@ -677,7 +680,7 @@ PanoramaUI {
                 }
                 NumberAnimation {
                     duration: 200
-                    matchProperties: "emusOpacity"
+                    matchProperties: "emulatorsOpacity"
                     easing: "easeLinear"
                 }
                 SequentialAnimation {
@@ -711,7 +714,7 @@ PanoramaUI {
                     }
                     NumberAnimation {
                         duration: 300
-                        matchProperties: "settingsOpacity,emusOpacity,miscOpacity,mediaOpacity,favoritesOpacity"
+                        matchProperties: "settingsOpacity,emulatorsOpacity,miscOpacity,mediaOpacity,favoritesOpacity"
                         easing: "easeOutQuad"
                     }
                 }
@@ -736,7 +739,7 @@ PanoramaUI {
                     }
                     NumberAnimation {
                         duration: 300
-                        matchProperties: "settingsOpacity,gamesOpacity,emusOpacity,mediaOpacity,favoritesOpacity"
+                        matchProperties: "settingsOpacity,gamesOpacity,emulatorsOpacity,mediaOpacity,favoritesOpacity"
                         easing: "easeOutQuad"
                     }
                 }
@@ -761,7 +764,7 @@ PanoramaUI {
                     }
                     NumberAnimation {
                         duration: 300
-                        matchProperties: "settingsOpacity,gamesOpacity,miscOpacity,emusOpacity,favoritesOpacity"
+                        matchProperties: "settingsOpacity,gamesOpacity,miscOpacity,emulatorsOpacity,favoritesOpacity"
                         easing: "easeOutQuad"
                     }
                 }
@@ -786,7 +789,7 @@ PanoramaUI {
                     }
                     NumberAnimation {
                         duration: 300
-                        matchProperties: "settingsOpacity,gamesOpacity,miscOpacity,mediaOpacity,emusOpacity"
+                        matchProperties: "settingsOpacity,gamesOpacity,miscOpacity,mediaOpacity,emulatorsOpacity"
                         easing: "easeOutQuad"
                     }
                 }

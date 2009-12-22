@@ -76,7 +76,6 @@ private:
     QString _description;
     QString _author;
     QString _settingsKey;
-    static QHash<QString, int> _loadedFonts;
     static QHash<QString, QHash<QString, QString> *> *_settings;
     static QVariant _apps;
 };

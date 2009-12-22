@@ -139,7 +139,6 @@ void PanoramaUI::loaded()
 }
 
 QVariant PanoramaUI::_apps;
-QHash<QString, int> PanoramaUI::_loadedFonts;
 QHash<QString, QHash<QString, QString> *> *PanoramaUI::_settings = 0;
 
 //Makes this type available in QML

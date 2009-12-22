@@ -2,5 +2,8 @@
 import Qt 4.6
 
 Item {
-    anchors.fill: parent
+    height: ctxtHeight
+    width: ctxtWidth
+    x: 0
+    y: 0
 }

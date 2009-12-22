@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Create our Canvas that we'll use later for the UI
     _canvas.setParent(this);
+    _canvas.rootContext()->setContextProperty("ctxtHeight", UI_HEIGHT);
+    _canvas.rootContext()->setContextProperty("ctxtWidth", UI_WIDTH);
     _canvas.setUrl(QUrl("qrc:/root.qml"));
     _canvas.setFocusPolicy(Qt::StrongFocus);
     _canvas.execute();

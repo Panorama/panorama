@@ -22,7 +22,9 @@ public:
         Comment = Qt::UserRole + 2,
         Icon = Qt::UserRole + 3,
         Version = Qt::UserRole + 4,
-        Categories = Qt::UserRole + 5
+        Categories = Qt::UserRole + 5,
+        Preview = Qt::UserRole + 6,
+        Clockspeed = Qt::UserRole + 7
     };
 
     /** Returns the number of items in this model */

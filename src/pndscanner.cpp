@@ -1,18 +1,14 @@
 #include "pndscanner.h"
 
-PndScanner::PndScanner(QObject *parent) :
-    QObject(parent)
-{
-}
-
-QList<Pnd> PndScanner::scanPnds()
+void PndScanner::scanPnds()
 {
     QString configpath = pnd_conf_query_searchpath();
     QString appspath;
     QString overridespath;
-    QList<Pnd> result;
     pnd_box_handle applist;
     pnd_conf_handle h;
+
+    _pnds.clear();
 
     h = pnd_conf_fetch_by_id(pnd_conf_apps, configpath.toUtf8().data());
     if(h)
@@ -27,7 +23,7 @@ QList<Pnd> PndScanner::scanPnds()
     }
     else
     {
-        qWarning() << "No PND configuration file found.";
+        qWarning() << "Warning: No PND configuration file found. This means that application previews cannot be shown.";
         appspath = PND_APPS_SEARCHPATH;
         overridespath = PND_PXML_OVERRIDE_SEARCHPATH;
     }
@@ -57,10 +53,21 @@ QList<Pnd> PndScanner::scanPnds()
             else
                 translated.clockspeed = 0;
 
-            result += translated;
+            _pnds += translated;
 
             discovery = (pnd_disco_t *)pnd_box_get_next(discovery);
         }
     }
-    return result;
 }
+
+Pnd PndScanner::pndForUID(const QString &uid)
+{
+    foreach(const Pnd &pnd, _pnds)
+    {
+        if(pnd.uid == uid)
+            return pnd;
+    }
+    return Pnd();
+}
+
+QList<Pnd> PndScanner::_pnds;

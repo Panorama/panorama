@@ -65,6 +65,10 @@ QVariant ApplicationModel::data(const QModelIndex &index, int role) const
             return value.id;
         case ApplicationModel::Categories:
             return value.categories;
+        case ApplicationModel::Preview:
+            return value.preview;
+        case ApplicationModel::Clockspeed:
+            return value.clockspeed;
         default:
             return QVariant();
         }
@@ -89,6 +93,10 @@ QVariant ApplicationModel::headerData(int, Qt::Orientation, int role) const
         return QString("Command line");
     case ApplicationModel::Categories:
         return QString("FDF categories");
+    case ApplicationModel::Preview:
+        return QString("Preview image");
+    case ApplicationModel::Clockspeed:
+        return QString("Recommended clockspeed (MHz)");
     default:
         return QVariant();
     }

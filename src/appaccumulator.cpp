@@ -5,6 +5,9 @@ AppAccumulator::AppAccumulator(QObject *parent) :
 {
     //Reload any changed file in any searchpath
     connect(&_watcher, SIGNAL(directoryChanged(QString)), this, SLOT(watchedDirUpdated(QString)));
+
+    //Load PNDs preemptively
+    PndScanner::scanPnds();
 }
 
 void AppAccumulator::loadFrom(const QStringList &searchpaths)
@@ -46,6 +49,11 @@ void AppAccumulator::watchedDirUpdated(const QString &d)
     QDir dir(d);
     const QStringList files = dir.entryList(QStringList("*.desktop"));
     QStringList diff(files); //== (files - oldFiles) conceptually
+
+    //We assume that the pnd daemon has done its job and removed .desktop files
+    //after PNDs havebeen removed. We don't want to interfere *while* the PNDs
+    //are moved around...
+    PndScanner::scanPnds();
 
     QList<FileInfo*> &oldFiles = _currentFileInfos[d];
     QList<FileInfo*> toAdd;

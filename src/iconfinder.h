@@ -19,6 +19,9 @@ public:
     static QString findIcon(const QString &iconName);
 
 private:
+    IconFinder() {};
+    IconFinder(const IconFinder&);
+    IconFinder& operator=(const IconFinder&);
     static QString findIconInDir(const QString &iconName, const QDir &themeDir);
     static QString getParentTheme(const QDir &themeDir);
 

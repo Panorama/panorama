@@ -8,8 +8,10 @@
 #include <QFileSystemWatcher>
 #include <QDateTime>
 #include <QCryptographicHash>
+
 #include "application.h"
 #include "desktopfile.h"
+#include "pndscanner.h"
 
 /**
  * Scans a set of search paths, finds all of the .desktop files in those search

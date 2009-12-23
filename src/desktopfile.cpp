@@ -48,6 +48,9 @@ Application DesktopFile::readToApplication()
         //X-Desktop-File-Install-Version
         else if(line.startsWith(VERSION_FIELD))
             result.version = readField(line, VERSION_FIELD);
+        //X-Pandora-UID
+        else if(line.startsWith(PANDORA_UID_FIELD))
+            result.pandoraId = readField(line, PANDORA_UID_FIELD);
         //Categories
         else if(line.startsWith(CATEGORIES_FIELD))
         {
@@ -104,6 +107,14 @@ Application DesktopFile::readToApplication()
         else
             result.comment = enComment;
     }
+
+    if(!result.pandoraId.isEmpty())
+    {
+        Pnd pnd(PndScanner::pndForUID(result.pandoraId));
+        result.clockspeed = pnd.clockspeed;
+        result.preview = pnd.preview;
+    }
+
     result.relatedFile = _file;
     return result;
 }
@@ -186,6 +197,7 @@ const QString DesktopFile::COMMENT_FIELD    = QString("Comment");
 const QString DesktopFile::EXEC_FIELD       = QString("Exec");
 const QString DesktopFile::ICON_FIELD       = QString("Icon");
 const QString DesktopFile::VERSION_FIELD    = QString("X-Desktop-File-Install-Version");
+const QString DesktopFile::PANDORA_UID_FIELD= QString("X-Pandora-UID");
 const QString DesktopFile::CATEGORIES_FIELD = QString("Categories");
 const QString DesktopFile::TYPES_FIELD      = QString("Type");
 const QString DesktopFile::APPLICATION_TYPE = QString("Application");

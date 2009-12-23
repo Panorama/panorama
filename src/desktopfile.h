@@ -9,6 +9,8 @@
 
 #include "application.h"
 #include "iconfinder.h"
+#include "pndscanner.h"
+#include "pnd.h"
 
 /**
  * Represents a FDF .desktop file
@@ -32,6 +34,7 @@ private:
     static const QString COMMENT_FIELD;
     static const QString ICON_FIELD;
     static const QString VERSION_FIELD;
+    static const QString PANDORA_UID_FIELD;
     static const QString CATEGORIES_FIELD;
     static const QString TYPES_FIELD;
     static const QString APPLICATION_TYPE;

@@ -5,10 +5,12 @@ TEMPLATE = app
 INCLUDEPATH += lib/pandora-libraries/include
 OTHER_FILES += root.qml
 
-libpnd.target = lib/pandora-libraries/libpnd.so.1
-libpnd.commands = cd lib/pandora-libraries;make;cd ../..
+libpnd.target = lib/pandora-libraries/libpnd.a
+libpnd.commands = cd lib/pandora-libraries;\
+    make libpnd.a;\
+    cd ../..
 QMAKE_EXTRA_TARGETS += libpnd
-PRE_TARGETDEPS += lib/pandora-libraries/libpnd.so.1
+PRE_TARGETDEPS += lib/pandora-libraries/libpnd.a
 LIBS += -Llib/pandora-libraries -lpnd
 
 SOURCES += src/main.cpp \

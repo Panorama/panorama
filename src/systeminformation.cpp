@@ -11,6 +11,8 @@ SystemInformation::SystemInformation(QObject *parent) :
     _usedSd1 = 0;
     _sd2 = 0;
     _usedSd2 = 0;
+
+    update();
     connect(&_timer, SIGNAL(timeout()), this, SLOT(update()));
     _timer.setInterval(1000);
     _timer.start();

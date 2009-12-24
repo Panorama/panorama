@@ -22,7 +22,7 @@ Item {
         id: appDelegate
         Item {
             id: wrapper
-            property string identifier: identifier
+            property string ident: identifier
             width: appView.width
             height: itemHeight
             MouseRegion {
@@ -32,7 +32,7 @@ Item {
                     appView.currentIndex = index;
                 }
                 onDoubleClicked: {
-                    selected(appView.currentItem.identifier);
+                    selected(appView.currentItem.ident);
                 }
             }
             Row {
@@ -119,7 +119,7 @@ Item {
                 focus: true
                 //Hack so that we can intercept the "1" keypress before the TextInput grabs it
                 Keys.onDigit1Pressed: {
-                    selected(appView.currentItem.identifier);
+                    selected(appView.currentItem.ident);
                 }
             }
             Rectangle {

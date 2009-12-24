@@ -6,7 +6,7 @@ PanoramaUI {
     name: "Magma"
     description: "An UI that will burn your fingers"
     author: "dflemstr"
-    settingsKey: "magma"
+    settingsSection: "magma"
 
     property int level: 0
 

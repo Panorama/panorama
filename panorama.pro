@@ -50,4 +50,4 @@ HEADERS += src/mainwindow.h \
     src/sysinfo.h \
     src/systeminformation.h
 OTHER_FILES += qrc/root.qml
-RESOURCES += default.qrc
+RESOURCES += qrc/default.qrc

@@ -16,6 +16,10 @@ PanoramaUI {
         color: "#000022"
     }
 
+    SystemInformation {
+        id: sysinfo
+    }
+
     Item {
         id: background
         z: -1
@@ -84,9 +88,24 @@ PanoramaUI {
         width: parent.width
         height: parent.height
         Text {
+            anchors.top: parent.top
+            anchors.left: parent.left
             text: "My Pandora"
             color: "#000044"
             font.pixelSize: ui.height / 6
+        }
+        Column {
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: ui.height / 4
+            Text {
+                color: "white"
+                text: "RAM: " + sysinfo.usedRam + " / " + sysinfo.ram + " MiB"
+            }
+            Text {
+                color: "white"
+                text: "Swap: " + sysinfo.usedSwap + " / " + sysinfo.swap + " MiB"
+            }
         }
     }
     FocusScope {

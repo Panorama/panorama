@@ -53,14 +53,6 @@ public:
 
     static void setApplicationsSource(QAbstractItemModel *value);
 
-    static void setSettingsSource(QHash<QString, QHash<QString, QString> *> *value);
-
-    Q_INVOKABLE void setSetting(const QString &key, const QString &value);
-    Q_INVOKABLE QString setting(const QString &key);
-
-    Q_INVOKABLE void setSharedSetting(const QString &section, const QString &key, const QString &value);
-    Q_INVOKABLE QString sharedSetting(const QString &section, const QString &key);
-
     Q_INVOKABLE void execute(const QString &sha1);
 
 public slots:
@@ -75,8 +67,6 @@ private:
     QString _name;
     QString _description;
     QString _author;
-    QString _settingsKey;
-    static QHash<QString, QHash<QString, QString> *> *_settings;
     static QVariant _apps;
 };
 

@@ -3,7 +3,7 @@
 int Sysinfo::getUsedRam()
 {
     updateSys();
-    return int((_sys.totalram - _sys.freeram) * (unsigned long)(_sys.mem_unit) / (1024 * 1024));
+    return int((_sys.totalram - _sys.freeram - _sys.bufferram) * (unsigned long)(_sys.mem_unit) / (1024 * 1024));
 }
 
 int Sysinfo::getTotalRam()

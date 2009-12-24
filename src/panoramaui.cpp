@@ -40,14 +40,14 @@ QString PanoramaUI::author() const
     return _author;
 }
 
-QString PanoramaUI::settingsKey() const
+QString PanoramaUI::settingsSection() const
 {
-    return _settingsKey;
+    return Setting::defaultSection();
 }
 
-void PanoramaUI::setSettingsKey(const QString &value)
+void PanoramaUI::setSettingsSection(const QString &value)
 {
-    _settingsKey = QString(value).replace('\n', ' ');
+    Setting::setDefaultSection(value);
 }
 
 QVariant PanoramaUI::applications() const
@@ -62,14 +62,10 @@ void PanoramaUI::setApplicationsSource(QAbstractItemModel *value)
         _apps = n;
 }
 
-void PanoramaUI::setSettingsSource(QHash<QString, QHash<QString, QString> *> *value)
-{
-    _settings = value;
-}
-
 void PanoramaUI::execute(const QString &sha1)
 {
     QString cleanCommand(AppAccumulator::getExecLine(sha1));
+    qDebug() << sha1 << cleanCommand;
     if(!cleanCommand.isEmpty())
     {
         cleanCommand.remove(QRegExp("%\\w"));
@@ -88,7 +84,6 @@ void PanoramaUI::loaded()
 }
 
 QVariant PanoramaUI::_apps;
-QHash<QString, QHash<QString, QString> *> *PanoramaUI::_settings = 0;
 
 //Makes this type available in QML
 QML_DEFINE_TYPE(Panorama,1,0,PanoramaUI,PanoramaUI);

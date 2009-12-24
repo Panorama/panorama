@@ -8,7 +8,7 @@ PanoramaUI {
     name: "Default"
     description: "The default Panorama UI"
     author: "dflemstr"
-    settingsKey: "default-theme" //The [key] that this theme gets in the config file
+    settingsSection: "default-theme" //The [section] that this theme gets in the config file
 
     //Gain access to the desktop's theme colors
     SystemPalette { id: palette }
@@ -16,6 +16,9 @@ PanoramaUI {
     onLoad: { //Triggered once everything is set up
         print("Welcome to the UI named " + name + "!");
     }
+    
+    Setting { id: lastExecuted; key: "lastExecuted" }
+    Setting { id: clockspeed; section: "system"; key: "clockspeed" }
 
     Widgets.Book {
         id: pages
@@ -100,8 +103,9 @@ PanoramaUI {
                     .matching("name", (nameFilter.length == 0) ? ".*" : ".*" + nameFilter + ".*")
                     .sortedBy("name", true)
                 onSelected: {
+                    print(identifier);
                     ui.execute(identifier);
-                    ui.setSetting("lastExecuted", identifier);
+                    lastExecuted.value = identifier;
                 }
             }
         }
@@ -116,7 +120,7 @@ PanoramaUI {
             labelShadowColor: pages.labelShadowColor
             labelOutlineColor: pages.labelOutlineColor
             Text {
-                text: "<b>Clockspeed:</b> " + ui.sharedSetting("system", "clockspeed")
+                text: "<b>Clockspeed:</b> " + clockspeed.value
                 color: pages.labelColor
                 font.pixelSize: 24
             }

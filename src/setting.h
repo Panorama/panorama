@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QHash>
+#include <qml.h>
 
 class Setting : public QObject
 {
@@ -15,15 +16,17 @@ public:
     explicit Setting(QObject *parent = 0);
 
     void setSection(const QString &section);
-    QString section() const;
+    QString section() const { return _section; }
 
     void setKey(const QString &key);
-    QString key() const;
+    QString key() const { return _key; }
 
     void setValue(const QString &value);
     QString value() const;
 
-    static void setDefaultSection(const QString &section);
+    static void setDefaultSection(const QString &section) { _defaultSection = section; }
+    static QString defaultSection() { return _defaultSection; }
+
     static void setSettingsSource(QHash<QString, QHash<QString, QString> *> *value);
 
 signals:
@@ -37,5 +40,6 @@ private:
     static QString _defaultSection;
     static QHash<QString, QHash<QString, QString> *> *_settings;
 };
+QML_DECLARE_TYPE(Setting)
 
 #endif // SETTING_H

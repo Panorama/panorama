@@ -15,6 +15,7 @@
 #include "applicationmodel.h"
 #include "appaccumulator.h"
 #include "constants.h"
+#include "setting.h"
 
 /**
  * A MainWindow that is capable of displaying the Panorama's GUI

@@ -121,7 +121,7 @@ void MainWindow::continueLoadingUI()
 
 void MainWindow::useConfig(QHash<QString, QHash<QString, QString> *> *config)
 {
-    PanoramaUI::setSettingsSource(config);
+    Setting::setSettingsSource(config);
 }
 
 void MainWindow::switchToUI(const QString &uiDir, const QString &uiName)

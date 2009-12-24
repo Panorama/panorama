@@ -13,6 +13,7 @@
 
 #include "appaccumulator.h"
 #include "constants.h"
+#include "setting.h"
 
 /**
  * The base class for all PanoramaUI instances.
@@ -24,7 +25,7 @@ Q_OBJECT
 Q_PROPERTY(QString  name        READ name           WRITE setName)
 Q_PROPERTY(QString  description READ description    WRITE setDescription)
 Q_PROPERTY(QString  author      READ author         WRITE setAuthor)
-Q_PROPERTY(QString  settingsKey READ settingsKey    WRITE setSettingsKey)
+Q_PROPERTY(QString  settingsSection READ settingsSection    WRITE setSettingsSection)
 Q_PROPERTY(QVariant applications READ applications  NOTIFY applicationsUpdated)
 
 public:
@@ -46,8 +47,8 @@ public:
     /** Sets the author */
     void setAuthor(const QString&);
 
-    QString settingsKey() const;
-    void setSettingsKey(const QString &);
+    QString settingsSection() const;
+    void setSettingsSection(const QString &);
 
     QVariant applications() const;
 

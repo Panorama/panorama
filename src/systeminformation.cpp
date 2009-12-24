@@ -3,6 +3,16 @@
 SystemInformation::SystemInformation(QObject *parent) :
     QObject(parent)
 {
+    _ram = 0;
+    _usedRam = 0;
+    _swap = 0;
+    _usedSwap = 0;
+    _sd1 = 0;
+    _usedSd1 = 0;
+    _sd2 = 0;
+    _usedSd2 = 0;
+
+    update();
     connect(&_timer, SIGNAL(timeout()), this, SLOT(update()));
     _timer.setInterval(1000);
     _timer.start();

@@ -13,6 +13,7 @@
 
 #include "appaccumulator.h"
 #include "constants.h"
+#include "setting.h"
 
 /**
  * The base class for all PanoramaUI instances.
@@ -24,7 +25,7 @@ Q_OBJECT
 Q_PROPERTY(QString  name        READ name           WRITE setName)
 Q_PROPERTY(QString  description READ description    WRITE setDescription)
 Q_PROPERTY(QString  author      READ author         WRITE setAuthor)
-Q_PROPERTY(QString  settingsKey READ settingsKey    WRITE setSettingsKey)
+Q_PROPERTY(QString  settingsSection READ settingsSection    WRITE setSettingsSection)
 Q_PROPERTY(QVariant applications READ applications  NOTIFY applicationsUpdated)
 
 public:
@@ -46,20 +47,12 @@ public:
     /** Sets the author */
     void setAuthor(const QString&);
 
-    QString settingsKey() const;
-    void setSettingsKey(const QString &);
+    QString settingsSection() const;
+    void setSettingsSection(const QString &);
 
     QVariant applications() const;
 
     static void setApplicationsSource(QAbstractItemModel *value);
-
-    static void setSettingsSource(QHash<QString, QHash<QString, QString> *> *value);
-
-    Q_INVOKABLE void setSetting(const QString &key, const QString &value);
-    Q_INVOKABLE QString setting(const QString &key);
-
-    Q_INVOKABLE void setSharedSetting(const QString &section, const QString &key, const QString &value);
-    Q_INVOKABLE QString sharedSetting(const QString &section, const QString &key);
 
     Q_INVOKABLE void execute(const QString &sha1);
 
@@ -75,8 +68,6 @@ private:
     QString _name;
     QString _description;
     QString _author;
-    QString _settingsKey;
-    static QHash<QString, QHash<QString, QString> *> *_settings;
     static QVariant _apps;
 };
 

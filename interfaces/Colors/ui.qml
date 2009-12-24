@@ -7,7 +7,7 @@ PanoramaUI {
     name: "Colors (from PMenu)"
     description: "Put this file inside of a PMenu theme to make a Panorama UI out of it!"
     author: "dflemstr"
-    settingsKey: "pmenu-colors"
+    settingsSection: "pmenu-colors"
 
     TextFile { //TextFile isn't standard QML, but part of Panorama 1.0
         id: skinCfg
@@ -48,10 +48,10 @@ PanoramaUI {
 
     //A collection of application IDs representing our favorites
     //Stored as "id1|id2|id3" so that we can use it as a regex as well as a list
-    property string favorites: sharedSetting("system", "favorites")
+    Setting { id: favorites; section: "system"; key: "favorites" }
 
     //The clockspeed setting, stored as an integer in MHz
-    property int clockspeed: parseInt(sharedSetting("system", "clockspeed"))
+    Setting { id: clockspeed; section: "system"; key: "clockspeed" }
 
     //------------------------------PMenu properties----------------------------
 
@@ -350,16 +350,15 @@ PanoramaUI {
         Keys.onDigit1Pressed: {
             var idf = appBrowser.currentItem.ident;
             if(ui.selectedIndex == 4) {
-                favorites = favorites.replace(idf, "");
-                favorites = favorites.replace("||", "|");
-                favorites = favorites.replace(/\|$|^\|/, "");
+                favorites.value = favorites.value.replace(idf, "");
+                favorites.value = favorites.value.replace("||", "|");
+                favorites.value = favorites.value.replace(/\|$|^\|/, "");
             }
-            else if(favorites.indexOf(idf) == -1) {
-                if(favorites.length > 0)
-                    favorites += "|";
-                favorites += idf;
+            else if(favorites.value.indexOf(idf) == -1) {
+                if(favorites.value.length > 0)
+                    favorites.value += "|";
+                favorites.value += idf;
             }
-            setSharedSetting("system", "favorites", favorites);
             showFavDialog = false;
         }
         Keys.onDigit2Pressed: {
@@ -395,16 +394,12 @@ PanoramaUI {
         focus: ui.selectedIndex == 5
 
         Keys.onUpPressed: {
-            if(clockspeed < 800) {
-                clockspeed += 10;
-                ui.setSharedSetting("system", "clockspeed", clockspeed); //Sync clockspeed every time we modify it
-            }
+            if(clockspeed.value < 800)
+                clockspeed.value += 10;
         }
         Keys.onDownPressed: {
-            if(clockspeed > 300) {
-                clockspeed -= 10;
-                ui.setSharedSetting("system", "clockspeed", clockspeed);
-            }
+            if(clockspeed.value > 300)
+                clockspeed.value -= 10;
         }
         Column {
             anchors.fill: parent
@@ -418,7 +413,7 @@ PanoramaUI {
                     font.family: smallStyle.getField("family")
                 }
                 Text {
-                    text: clockspeed
+                    text: clockspeed.value
                     color: smallStyle.getField("color")
                     font.bold: smallStyle.getField("bold")
                     font.italic: smallStyle.getField("italic")
@@ -459,8 +454,8 @@ PanoramaUI {
                     case 2:
                         return ui.applications.inCategory("^(?!Game|Emulator)$").sortedBy("name", true);
                     case 4:
-                        if(favorites.length > 0)
-                            return ui.applications.matching("identifier", favorites).sortedBy("name", true);
+                        if(favorites.value.length > 0)
+                            return ui.applications.matching("identifier", favorites.value).sortedBy("name", true);
                     default:
                         return ui.applications.matching("identifier", "^$") //Lists nothing
                 }

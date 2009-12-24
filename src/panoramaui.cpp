@@ -40,14 +40,14 @@ QString PanoramaUI::author() const
     return _author;
 }
 
-QString PanoramaUI::settingsKey() const
+QString PanoramaUI::settingsSection() const
 {
-    return _settingsKey;
+    return Setting::defaultSection();
 }
 
-void PanoramaUI::setSettingsKey(const QString &value)
+void PanoramaUI::setSettingsSection(const QString &value)
 {
-    _settingsKey = QString(value).replace('\n', ' ');
+    Setting::setDefaultSection(value);
 }
 
 QVariant PanoramaUI::applications() const
@@ -62,65 +62,10 @@ void PanoramaUI::setApplicationsSource(QAbstractItemModel *value)
         _apps = n;
 }
 
-void PanoramaUI::setSettingsSource(QHash<QString, QHash<QString, QString> *> *value)
-{
-    _settings = value;
-}
-
-void PanoramaUI::setSetting(const QString &key, const QString &value)
-{
-    if(_settings)
-    {
-        QString escapedKey(key);
-        escapedKey.replace('\n', ' ');
-
-        if(!_settings->contains(_settingsKey))
-            _settings->insert(_settingsKey, new QHash<QString, QString>);
-        _settings->value(_settingsKey)->insert(escapedKey, value);
-    }
-}
-
-QString PanoramaUI::setting(const QString &key)
-{
-    QString escapedKey(key);
-    escapedKey.replace('\n', ' ');
-    if(_settings && _settings->contains(_settingsKey) && _settings->value(_settingsKey)->contains(escapedKey))
-        return _settings->value(_settingsKey)->value(escapedKey);
-    else
-        return QString();
-}
-
-void PanoramaUI::setSharedSetting(const QString &section, const QString &key, const QString &value)
-{
-    if(_settings)
-    {
-        QString escapedKey(key);
-        escapedKey.replace('\n', ' ');
-        QString escapedSection(section);
-        escapedSection.replace('\n', ' ');
-
-        if(!_settings->contains(escapedSection))
-            _settings->insert(escapedSection, new QHash<QString, QString>);
-        _settings->value(escapedSection)->insert(escapedKey, value);
-    }
-}
-
-QString PanoramaUI::sharedSetting(const QString &section, const QString &key)
-{
-    QString escapedKey(key);
-    escapedKey.replace('\n', ' ');
-    QString escapedSection(section);
-    escapedSection.replace('\n', ' ');
-
-    if(_settings && _settings->contains(escapedSection) && _settings->value(escapedSection)->contains(escapedKey))
-        return _settings->value(escapedSection)->value(escapedKey);
-    else
-        return QString();
-}
-
 void PanoramaUI::execute(const QString &sha1)
 {
     QString cleanCommand(AppAccumulator::getExecLine(sha1));
+    qDebug() << sha1 << cleanCommand;
     if(!cleanCommand.isEmpty())
     {
         cleanCommand.remove(QRegExp("%\\w"));
@@ -139,7 +84,6 @@ void PanoramaUI::loaded()
 }
 
 QVariant PanoramaUI::_apps;
-QHash<QString, QHash<QString, QString> *> *PanoramaUI::_settings = 0;
 
 //Makes this type available in QML
 QML_DEFINE_TYPE(Panorama,1,0,PanoramaUI,PanoramaUI);

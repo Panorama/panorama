@@ -8,6 +8,7 @@
 #include <QtDeclarative/QmlComponent>
 #include <QtDeclarative/QmlContext>
 #include <QUrl>
+#include <QFile>
 #include <QtConcurrentRun>
 
 #include "configuration.h"

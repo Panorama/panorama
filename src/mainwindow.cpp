@@ -46,7 +46,25 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(uiChanged(QString)), this, SLOT(loadUIFile(QString)));
 
     //Load our configuration file
-    _config.loadFile("settings.cfg");
+    QDir settingsDir(QDir::home());
+
+    if(!settingsDir.exists(".config"))
+        settingsDir.mkdir(".config");
+    settingsDir.cd(".config");
+
+    if(!settingsDir.exists("panorama"))
+        settingsDir.mkdir("panorama");
+    settingsDir.cd("panorama");
+
+    const QString cfgFile(settingsDir.filePath("settings.cfg"));
+    if(!QFileInfo(cfgFile).exists()) //If we don't have a config file yet,
+    {
+        QFile(":/settings.cfg").copy(cfgFile); //Copy the embedded resource file
+        //chmod 644:
+        QFile(cfgFile).setPermissions(QFile::ReadOwner | QFile::WriteOwner | QFile::ReadGroup | QFile::ReadOther);
+    }
+
+    _config.loadFile(cfgFile);
 }
 
 void MainWindow::loadUIFile(const QString &file)

@@ -45,6 +45,12 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(useConfig(QHash<QString,QHash<QString,QString>*>*)));
     connect(this, SIGNAL(uiChanged(QString)), this, SLOT(loadUIFile(QString)));
 
+    if(!QFileInfo(CONFIG_FILE).exists())
+    {
+        QFile(":/settings.cfg").copy(CONFIG_FILE);
+        //chmod 644:
+        QFile(CONFIG_FILE).setPermissions(QFile::ReadOwner | QFile::WriteOwner | QFile::ReadGroup | QFile::ReadOther);
+    }
     _config.loadFile(CONFIG_FILE);
 }
 

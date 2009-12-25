@@ -171,7 +171,7 @@ void MainWindow::loadApps() {
 
 MainWindow::~MainWindow()
 {
-    _config.saveFile("settings.cfg");
+    _config.saveFile("~/.config/panorama/settings.cfg");
 
     //QObject should do this automatically, but just to be safe...
     delete _ui;

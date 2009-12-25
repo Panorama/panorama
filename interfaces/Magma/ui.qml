@@ -9,6 +9,7 @@ PanoramaUI {
     settingsSection: "magma"
 
     property int level: 0
+    property string topSection: ""
 
     Rectangle {
         z: -2
@@ -90,6 +91,7 @@ PanoramaUI {
         Text {
             anchors.top: parent.top
             anchors.left: parent.left
+            anchors.leftMargin: 10
             text: "My Pandora"
             color: "#000044"
             font.pixelSize: ui.height / 6
@@ -98,13 +100,70 @@ PanoramaUI {
             anchors.left: parent.left
             anchors.bottom: parent.bottom
             anchors.bottomMargin: ui.height / 4
+            anchors.leftMargin: 10
             Text {
-                color: "white"
-                text: "RAM: " + sysinfo.usedRam + " / " + sysinfo.ram + " MiB"
+                color: "#111111"
+                font.pixelSize: ui.height / 16
+                text: "<table><tr><td>RAM:</td><td>" + sysinfo.usedRam + "</td>" +
+                    "<td>/</td><td>" + sysinfo.ram + "</td><td>MiB</td></tr>" +
+                    "<tr><td>Swap:</td><td>" + sysinfo.usedSwap + "</td>" +
+                    "<td>/</td><td>" + sysinfo.swap + "</td><td>MiB</td></tr></table>"
             }
-            Text {
-                color: "white"
-                text: "Swap: " + sysinfo.usedSwap + " / " + sysinfo.swap + " MiB"
+        }
+        ListModel {
+            id: menu
+            ListElement {
+                title: "Applications"
+                section: "apps"
+            }
+            ListElement {
+                title: "Favorites"
+                section: "favs"
+            }
+            ListElement {
+                title: "Settings"
+                section: "setts"
+            }
+        }
+        Script {
+            function setSection(section) {
+                topSection = section;
+                level = 1;
+            }
+        }
+        ListView {
+            id: topMenu
+            focus: true
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: ui.height / 32
+            anchors.horizontalCenter: parent.horizontalCenter
+            height: ui.height / 16
+            width: parent.width - 20
+            orientation: ListView.Horizontal
+            model: menu
+            overShoot: false
+            Keys.onDigit1Pressed: {
+                setSection(topMenu.currentItem.section);
+            }
+            delegate: Text {
+                text: title + " "
+                font.pixelSize: ui.height / 16
+                color: "#111111"
+                effect: DropShadow {
+                    xOffset: 0
+                    yOffset: 0
+                    color: "#333333"
+                    blurRadius: EaseFollow {
+                        source: ListView.isCurrentItem ? 8 : 0
+                        velocity: 50
+                    }
+                }
+                MouseRegion {
+                    anchors.fill: parent
+                    onClicked: {
+                        setSection(section);
+                    }
+                }
             }
         }
     }
@@ -129,7 +188,7 @@ PanoramaUI {
             when: ui.level == 0
             PropertyChanges {
                 target: background
-                x: 0
+                y: 0
             }
         },
         State {
@@ -137,7 +196,7 @@ PanoramaUI {
             when: ui.level == 1
             PropertyChanges {
                 target: background
-                x: -ui.height / 3
+                y: -ui.height
             }
         },
         State {
@@ -145,7 +204,16 @@ PanoramaUI {
             when: ui.level == 1
             PropertyChanges {
                 target: background
-                x: -ui.height * 2 / 3
+                y: -ui.height * 2
+            }
+        }
+    ]
+    transitions: [
+        Transition {
+            NumberAnimation {
+                matchProperties: "y"
+                duration: 500
+                easing: "easeInOutQuart"
             }
         }
     ]

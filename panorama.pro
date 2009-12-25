@@ -1,6 +1,9 @@
 # panorama.pro - Project file for the Panorama source code distribution
 QT += declarative
 TARGET = panorama
+DESTDIR = target
+OBJECTS_DIR = tmp
+MOC_DIR = tmp
 TEMPLATE = app
 INCLUDEPATH += lib/pandora-libraries/include
 OTHER_FILES += root.qml

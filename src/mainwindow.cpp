@@ -45,26 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(useConfig(QHash<QString,QHash<QString,QString>*>*)));
     connect(this, SIGNAL(uiChanged(QString)), this, SLOT(loadUIFile(QString)));
 
-    //Load our configuration file
-    QDir settingsDir(QDir::home());
-
-    if(!settingsDir.exists(".config"))
-        settingsDir.mkdir(".config");
-    settingsDir.cd(".config");
-
-    if(!settingsDir.exists("panorama"))
-        settingsDir.mkdir("panorama");
-    settingsDir.cd("panorama");
-
-    const QString cfgFile(settingsDir.filePath("settings.cfg"));
-    if(!QFileInfo(cfgFile).exists()) //If we don't have a config file yet,
-    {
-        QFile(":/settings.cfg").copy(cfgFile); //Copy the embedded resource file
-        //chmod 644:
-        QFile(cfgFile).setPermissions(QFile::ReadOwner | QFile::WriteOwner | QFile::ReadGroup | QFile::ReadOther);
-    }
-
-    _config.loadFile(cfgFile);
+    _config.loadFile(CONFIG_FILE);
 }
 
 void MainWindow::loadUIFile(const QString &file)
@@ -171,9 +152,7 @@ void MainWindow::loadApps() {
 
 MainWindow::~MainWindow()
 {
-    QStringList path;
-    path << QDir::homePath() << ".config" << "panorama" << "settings.cfg";
-    _config.saveFile(path.join(QDir::separator()));
+    _config.saveFile(CONFIG_FILE);
 
     //QObject should do this automatically, but just to be safe...
     delete _ui;

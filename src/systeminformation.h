@@ -21,13 +21,13 @@ Q_PROPERTY(int usedSd2  READ usedSd2    NOTIFY usedSd2Updated)
 public:
     explicit SystemInformation(QObject *parent = 0);
     int ram() const { return _ram; }
-    int usedRam() const { return _ram; }
-    int swap() const { return _ram; }
-    int usedSwap() const { return _ram; }
-    int sd1() const { return _ram; }
-    int usedSd1() const { return _ram; }
-    int sd2() const { return _ram; }
-    int usedSd2() const { return _ram; }
+    int usedRam() const { return _usedRam; }
+    int swap() const { return _swap; }
+    int usedSwap() const { return _usedSwap; }
+    int sd1() const { return _sd1; }
+    int usedSd1() const { return _usedSd1; }
+    int sd2() const { return _sd2; }
+    int usedSd2() const { return _usedSd2; }
 
 signals:
     void ramUpdated(int value);

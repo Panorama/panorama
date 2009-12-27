@@ -31,7 +31,6 @@ Item {
             width: apps.itemWidth
             height: apps.itemHeight
             MouseRegion {
-                id: delegMouse
                 anchors.fill: parent
                 onClicked: {
                     appView.currentIndex = index;
@@ -39,9 +38,16 @@ Item {
                 }
             }
             Image {
+                id: favIcon
                 anchors.top: parent.top
                 anchors.right: parent.right
                 source: favorites.value.indexOf(identifier) == -1 ? "../images/favorite-disabled.png" : "../images/favorite-enabled.png"
+                MouseRegion {
+                    anchors.fill: parent
+                    onClicked: {
+                        favStarClicked(identifier);
+                    }
+                }
             }
             Row {
                 width: apps.itemWidth
@@ -53,13 +59,17 @@ Item {
                     width: apps.itemHeight
                     height: apps.itemHeight
                 }
+                Item { //separator
+                    width: 5
+                    height: parent.height
+                }
                 Column {
                     width: parent.width - iconField.height - 5
                     height: parent.height
                     Text {
                         id: nameLabel
                         text: name
-                        width: parent.width
+                        width: parent.width - favIcon.width
                         anchors.top: parent.top
                         font.pixelSize: apps.itemHeight / 3
                         color: "white"
@@ -103,8 +113,8 @@ Item {
         id: appView
         focus: true
         anchors.fill: parent
-        cellWidth: apps.itemWidth
-        cellHeight: apps.itemHeight
+        cellWidth: apps.itemWidth + 5 //for some spacing
+        cellHeight: apps.itemHeight + 5
         highlight: highl
         highlightFollowsCurrentItem: false
         delegate: appDelegate

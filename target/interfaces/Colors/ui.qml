@@ -350,9 +350,9 @@ PanoramaUI {
         Keys.onDigit1Pressed: {
             var idf = appBrowser.currentItem.ident;
             if(ui.selectedIndex == 4) {
-                favorites.value = favorites.value.replace(idf, "");
-                favorites.value = favorites.value.replace("||", "|");
-                favorites.value = favorites.value.replace(/\|$|^\|/, "");
+                var nf = favorites.value.replace(idf, "");
+                nf = nf.replace("||", "|");
+                favorites.value = nf.replace(/\|$|^\|/, "");
             }
             else if(favorites.value.indexOf(idf) == -1) {
                 if(favorites.value.length > 0)

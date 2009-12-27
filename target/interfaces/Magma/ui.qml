@@ -224,6 +224,31 @@ PanoramaUI {
             level = 0;
         }
         
+        Text {
+            z: 6
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.leftMargin: 8
+            font.pixelSize: ui.height / 30
+            font.bold: true
+            color: "white"
+            text: "Back"
+            MouseRegion {
+                anchors.fill: parent
+                onClicked: level = 0;
+            }
+            Rectangle {
+                z: -1
+                anchors.fill: parent
+                anchors.topMargin: -2
+                anchors.bottomMargin: -2
+                anchors.leftMargin: -2
+                anchors.rightMargin: -2
+                color: "gray"
+                radius: 2
+            }
+        }
+        
         Item {
             anchors.fill: parent
             anchors.topMargin: 16
@@ -238,26 +263,31 @@ PanoramaUI {
                 focus: level == 1 && topSection == "apps"
                 opacity: topSection == "apps" ? 1 : 0
                 
-                Keys.onDigit3Pressed: {
-                    var idf = appsViewer.currentItem.ident;
-                    if(favorites.value.indexOf(idf) == -1) {
-                        //Add favorite
-                        if(favorites.value.length > 0)
-                            favorites.value += "|";
-                        favorites.value += idf;
-                    }
-                    else { //Remove favorite if it exists
-                        favorites.value = favorites.value.replace(idf, "");
-                        favorites.value = favorites.value.replace("||", "|");
-                        favorites.value = favorites.value.replace(/\|$|^\|/, "");
+                Script {
+                    function toggleFavorite(idf) {
+                        if(favorites.value.indexOf(idf) == -1) {
+                            //Add favorite
+                            if(favorites.value.length > 0)
+                                favorites.value += "|";
+                            favorites.value += idf;
+                        }
+                        else //Remove favorite if it already exists
+                        {
+                            var nf = favorites.value.replace(idf, "");
+                            nf = nf.replace("||", "|");
+                            favorites.value = nf.replace(/\|$|^\|/, "");
+                        }
                     }
                 }
+                
+                Keys.onDigit3Pressed: toggleFavorite(appsViewer.currentItem.ident);
                 
                 Extensions.ApplicationViewer {
                     id: appsViewer
                     anchors.fill: parent
                     model: ui.applications.sortedBy("name", true)
                     onSelected: ui.execute(id);
+                    onFavStarClicked: toggleFavorite(id);
                 }
             }
             
@@ -268,10 +298,33 @@ PanoramaUI {
                 focus: level == 1 && topSection == "favs"
                 opacity: topSection == "favs" ? 1 : 0
                 
+                Script {
+                    function removeFavorite(idf) {
+                        var nf = favorites.value.replace(idf, "");
+                        nf = nf.replace("||", "|");
+                        favorites.value = nf.replace(/\|$|^\|/, "");
+                        if(favorites.value.length == 0)
+                            level = 0;
+                    }
+                }
+                
+                Keys.onDigit3Pressed: removeFavorite(favsViewer.currentItem.ident);
+                
                 Extensions.ApplicationViewer {
+                    id: favsViewer
                     anchors.fill: parent
-                    model: ui.applications.matching("identifier", favorites.value).sortedBy("name", true)
+                    model: ui.applications.matching("identifier", "^" + favorites.value + "$").sortedBy("name", true)
                     onSelected: ui.execute(id);
+                    onFavStarClicked: removeFavorite(id);
+                    focus: true
+                }
+                Text {
+                    anchors.centerIn: parent
+                    z: 5
+                    text: "Use the bottom action button (or the 3 key) to add an application to your favorites"
+                    color: "white"
+                    font.pointSize: 12
+                    opacity: favorites.value.length == 0 ? 1 : 0
                 }
             }
             

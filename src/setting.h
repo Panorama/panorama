@@ -6,6 +6,17 @@
 #include <QHash>
 #include <qml.h>
 
+
+class PrivatePropagator : public QObject {
+    Q_OBJECT
+public:
+    explicit PrivatePropagator(QObject *parent = 0);
+public slots:
+    void changeField(const QString &section, const QString &key, const QString &value);
+signals:
+    void fieldChanged(const QString &section, const QString &key, const QString &value);
+};
+
 class Setting : public QObject
 {
 Q_OBJECT
@@ -34,9 +45,13 @@ signals:
     void keyChanged(const QString &key);
     void valueChanged(const QString &value);
 
+private slots:
+    void handleFieldChange(const QString &section, const QString &key, const QString &value);
+
 private:
     QString _section;
     QString _key;
+    static PrivatePropagator _prop;
     static QString _defaultSection;
     static QHash<QString, QHash<QString, QString> *> *_settings;
 };

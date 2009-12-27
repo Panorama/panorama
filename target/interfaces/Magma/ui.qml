@@ -1,5 +1,6 @@
 import Qt 4.6
 import Panorama 1.0
+import "qml" as Extensions
 
 PanoramaUI {
     id: ui
@@ -10,6 +11,12 @@ PanoramaUI {
 
     property int level: 0
     property string topSection: ""
+    
+    Setting {
+        id: favorites
+        section: "system"
+        key: "favorites"
+    }
 
     Rectangle {
         z: -2
@@ -17,15 +24,11 @@ PanoramaUI {
         color: "#000022"
     }
 
-    SystemInformation {
-        id: sysinfo
-    }
-
     Item {
         id: background
         z: -1
         width: parent.width
-        height: parent.height * 3
+        height: parent.height * 2
         Timer {
             interval: 200
             running: level == 0
@@ -80,6 +83,49 @@ PanoramaUI {
             z: 1
             source: "overlays/mask.png"
         }
+        Rectangle {
+            x: 0
+            y: ui.height
+            width: ui.width
+            height: ui.height
+            z: -1
+            color: "black"
+            clip: true
+        }
+        Item {
+            anchors.horizontalCenter: flow.horizontalCenter
+            y: ui.height
+            width: 132
+            height: ui.height
+            clip: true
+            /* Not yet implemented in QML
+            effect: Bloom {
+                blurHint: Qt.PerformanceHint
+                blurRadius: 8
+            }*/
+            Image {
+                id: stream
+                y: SequentialAnimation {
+                    id: seq
+                    running: level == 1
+                    repeat: true
+                    NumberAnimation {
+                        from: 0
+                        to: -413
+                        duration: 5000
+                    }
+                }
+                height: ui.height + 413
+                fillMode: Image.TileVertically
+                source: "images/stream.png"
+            }
+            Image {
+                z: 1
+                height: ui.height
+                fillMode: Image.Stretch
+                source: "overlays/fragments.png"
+            }
+        }
     }
 
     FocusScope {
@@ -88,6 +134,7 @@ PanoramaUI {
         anchors.top: background.top
         width: parent.width
         height: parent.height
+        clip: true
         Text {
             anchors.top: parent.top
             anchors.left: parent.left
@@ -95,20 +142,6 @@ PanoramaUI {
             text: "My Pandora"
             color: "#000044"
             font.pixelSize: ui.height / 6
-        }
-        Column {
-            anchors.left: parent.left
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: ui.height / 4
-            anchors.leftMargin: 10
-            Text {
-                color: "#111111"
-                font.pixelSize: ui.height / 16
-                text: "<table><tr><td>RAM:</td><td>" + sysinfo.usedRam + "</td>" +
-                    "<td>/</td><td>" + sysinfo.ram + "</td><td>MiB</td></tr>" +
-                    "<tr><td>Swap:</td><td>" + sysinfo.usedSwap + "</td>" +
-                    "<td>/</td><td>" + sysinfo.swap + "</td><td>MiB</td></tr></table>"
-            }
         }
         ListModel {
             id: menu
@@ -119,6 +152,10 @@ PanoramaUI {
             ListElement {
                 title: "Favorites"
                 section: "favs"
+            }
+            ListElement {
+                title: "System info"
+                section: "sys"
             }
             ListElement {
                 title: "Settings"
@@ -142,44 +179,135 @@ PanoramaUI {
             orientation: ListView.Horizontal
             model: menu
             overShoot: false
+            spacing: 6
             Keys.onDigit1Pressed: {
-                setSection(topMenu.currentItem.section);
+                setSection(topMenu.currentItem.sect);
+            }
+            Keys.onSpacePressed: {
+                setSection(topMenu.currentItem.sect);
             }
             delegate: Text {
+                property string sect: section
                 text: title + " "
                 font.pixelSize: ui.height / 16
-                color: "#111111"
-                effect: DropShadow {
-                    xOffset: 0
-                    yOffset: 0
-                    color: "#333333"
-                    blurRadius: EaseFollow {
-                        source: ListView.isCurrentItem ? 8 : 0
-                        velocity: 50
-                    }
+                color: "#222222"
+                Rectangle {
+                    z: -1
+                    anchors.fill: parent
+                    anchors.topMargin: -2
+                    anchors.bottomMargin: -2
+                    anchors.leftMargin: -2
+                    anchors.rightMargin: -2
+                    radius: 2
+                    color: ListView.isCurrentItem ? "#111111" : "black"
                 }
                 MouseRegion {
                     anchors.fill: parent
                     onClicked: {
+                        topMenu.currentIndex = index;
                         setSection(section);
                     }
                 }
             }
         }
     }
-    FocusScope {
+    Item {
         id: level1
-        focus: level == 1
         anchors.top: level0.bottom
         width: parent.width
         height: parent.height
-    }
-    FocusScope {
-        id: level2
-        focus: level == 2
-        anchors.top: level1.bottom
-        width: parent.width
-        height: parent.height
+        clip: true
+        Keys.onDigit2Pressed: {
+            level = 0;
+        }
+        Keys.onEscapePressed: {
+            level = 0;
+        }
+        
+        Item {
+            anchors.fill: parent
+            anchors.topMargin: 16
+            anchors.bottomMargin: 16
+            anchors.leftMargin: 16
+            anchors.rightMargin: 16
+            
+            //Applications:
+            FocusScope {
+                id: apps
+                anchors.fill: parent
+                focus: level == 1 && topSection == "apps"
+                opacity: topSection == "apps" ? 1 : 0
+                
+                Keys.onDigit3Pressed: {
+                    var idf = appsViewer.currentItem.ident;
+                    if(favorites.value.indexOf(idf) == -1) {
+                        //Add favorite
+                        if(favorites.value.length > 0)
+                            favorites.value += "|";
+                        favorites.value += idf;
+                    }
+                    else { //Remove favorite if it exists
+                        favorites.value = favorites.value.replace(idf, "");
+                        favorites.value = favorites.value.replace("||", "|");
+                        favorites.value = favorites.value.replace(/\|$|^\|/, "");
+                    }
+                }
+                
+                Extensions.ApplicationViewer {
+                    id: appsViewer
+                    anchors.fill: parent
+                    model: ui.applications.sortedBy("name", true)
+                    onSelected: ui.execute(id);
+                }
+            }
+            
+            //Favorites:
+            FocusScope {
+                id: favs
+                anchors.fill: parent
+                focus: level == 1 && topSection == "favs"
+                opacity: topSection == "favs" ? 1 : 0
+                
+                Extensions.ApplicationViewer {
+                    anchors.fill: parent
+                    model: ui.applications.matching("identifier", favorites.value).sortedBy("name", true)
+                    onSelected: ui.execute(id);
+                }
+            }
+            
+            //System information:
+            FocusScope {
+                anchors.fill: parent
+                focus: level == 1 && topSection == "sys"
+                opacity: topSection == "sys" ? 1 : 0
+                SystemInformation {
+                    id: sysinfo
+                }
+                Text {
+                    color: "gray"
+                    font.pixelSize: ui.height / 16
+                    text: "<table><tr><th>Resource</th><th>Used</th>" + 
+                        "<th></th><th>Total</th><th></th></tr>" +
+                        "<tr><td>RAM</td><td>" + sysinfo.usedRam + "</td>" +
+                        "<td>/</td><td>" + sysinfo.ram + "</td><td>MiB</td></tr>" +
+                        "<tr><td>Swap</td><td>" + sysinfo.usedSwap + "</td>" +
+                        "<td>/</td><td>" + sysinfo.swap + "</td><td>MiB</td></tr>" +
+                        "<tr><td>SD 1</td><td>" + sysinfo.usedSd1 + "</td>" +
+                        "<td>/</td><td>" + sysinfo.sd1 + "</td><td>MiB</td></tr>" +
+                        "<tr><td>SD 2</td><td>" + sysinfo.usedSd2 + "</td>" +
+                        "<td>/</td><td>" + sysinfo.sd2 + "</td><td>MiB</td></tr>" + 
+                        "</table>"
+                }
+            }
+            
+            //Settings:
+            FocusScope {
+                id: setts
+                anchors.fill: parent
+                focus: level == 1 && topSection == "setts"
+                opacity: topSection == "setts" ? 1 : 0
+            }
+        }
     }
 
     states: [
@@ -197,14 +325,6 @@ PanoramaUI {
             PropertyChanges {
                 target: background
                 y: -ui.height
-            }
-        },
-        State {
-            name: "level2"
-            when: ui.level == 1
-            PropertyChanges {
-                target: background
-                y: -ui.height * 2
             }
         }
     ]

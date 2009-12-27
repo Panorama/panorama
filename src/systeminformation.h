@@ -60,6 +60,9 @@ private:
 
     QTimer _timer;
 
+    long long _lastUsedCpuTime;
+    long long _lastCpuTime;
+
     int _cpu;
     int _usedCpu;
     int _ram;

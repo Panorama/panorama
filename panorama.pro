@@ -33,7 +33,6 @@ SOURCES += src/main.cpp \
     src/pndscanner.cpp \
     src/pnd.cpp \
     src/setting.cpp \
-    src/sysinfo.cpp \
     src/systeminformation.cpp
 HEADERS += src/mainwindow.h \
     src/configuration.h \
@@ -50,7 +49,6 @@ HEADERS += src/mainwindow.h \
     src/pndscanner.h \
     src/pnd.h \
     src/setting.h \
-    src/sysinfo.h \
     src/systeminformation.h
 OTHER_FILES += qrc/root.qml
 RESOURCES += qrc/default.qrc

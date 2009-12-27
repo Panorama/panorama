@@ -337,8 +337,47 @@ PanoramaUI {
                     id: sysinfo
                 }
                 Text {
-                    color: "gray"
-                    font.pixelSize: ui.height / 16
+                    id: ramText
+                    text: "RAM:"
+                    height: ui.height / 16
+                    width: parent.width
+                    color: "white"
+                    font.bold: true
+                    font.pixelSize: height * 0.8
+                }
+                Extensions.ProgressBar {
+                    id: ramBar
+                    anchors.top: ramText.bottom
+                    width: parent.width
+                    maximum: sysinfo.ram
+                    value: sysinfo.usedRam
+                    unit: "MiB"
+                    color: "steelblue"
+                    secondColor: "blue"
+                }
+                Text {
+                    id: swapText
+                    anchors.top: ramBar.bottom
+                    text: "Swap:"
+                    height: ui.height / 16
+                    width: parent.width
+                    color: "white"
+                    font.bold: true
+                    font.pixelSize: height * 0.8
+                }
+                Extensions.ProgressBar {
+                    id: swapBar
+                    anchors.top: swapText.bottom
+                    width: parent.width
+                    maximum: sysinfo.swap
+                    value: sysinfo.usedSwap
+                    unit: "MiB"
+                    color: "red"
+                    secondColor: "darkred"
+                }
+                /*Text {
+                    color: "white"
+                    font.pixelSize: ui.height / 30
                     text: "<table><tr><th>Resource</th><th>Used</th>" + 
                         "<th></th><th>Total</th><th></th></tr>" +
                         "<tr><td>RAM</td><td>" + sysinfo.usedRam + "</td>" +
@@ -350,7 +389,7 @@ PanoramaUI {
                         "<tr><td>SD 2</td><td>" + sysinfo.usedSd2 + "</td>" +
                         "<td>/</td><td>" + sysinfo.sd2 + "</td><td>MiB</td></tr>" + 
                         "</table>"
-                }
+                }*/
             }
             
             //Settings:

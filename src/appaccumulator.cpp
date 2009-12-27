@@ -39,9 +39,14 @@ void AppAccumulator::loadFrom(const QStringList &searchpaths)
     _watcher.addPaths(searchpaths);
 }
 
-QString AppAccumulator::getExecLine(const QString &key)
+QString AppAccumulator::getExecLine(const QString &id)
 {
-    return _execs[key];
+    return _execs[id];
+}
+
+Application AppAccumulator::getApplication(const QString &id)
+{
+    return _apps[id];
 }
 
 void AppAccumulator::watchedDirUpdated(const QString &d)
@@ -116,14 +121,14 @@ void AppAccumulator::watchedDirUpdated(const QString &d)
 void AppAccumulator::removeViaDesktopFile(const QString &f)
 {
     //Find the app to remove by file name and remove it
-    for(int i = 0; i < _apps.count(); i++)
+    foreach(const QString &key, _apps.keys())
     {
-        const Application &app(_apps.at(i));
+        const Application &app(_apps[key]);
         if(app.relatedFile == f)
         {
             emit appRemoved(app);
             _execs.remove(app.id);
-            _apps.removeAt(i);
+            _apps.remove(key);
             return;
         }
     }
@@ -131,7 +136,7 @@ void AppAccumulator::removeViaDesktopFile(const QString &f)
 
 bool AppAccumulator::shouldAddThisApp(const QString &f) const
 {
-    foreach(const Application &app, _apps)
+    foreach(const Application &app, _apps.values())
     {
         if(app.relatedFile == f)
             return false;
@@ -148,11 +153,13 @@ void AppAccumulator::addViaDesktopFile(const QString &f)
         {
             QString oldExec = result.id;
             result.id = QCryptographicHash::hash(oldExec.toLocal8Bit(), QCryptographicHash::Sha1).toHex();
-            _apps += result;
+            _apps[result.id] = result;
             _execs[result.id] = oldExec;
+
             emit appAdded(result);
         }
     }
 }
 
-QHash<QString, QString>AppAccumulator::_execs;
+QHash<QString, QString> AppAccumulator::_execs;
+QHash<QString, Application> AppAccumulator::_apps;

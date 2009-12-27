@@ -30,7 +30,8 @@ public:
     /** Loads all .desktop files from the specified search paths (not recursive) */
     void loadFrom(const QStringList &searchpaths);
 
-    static QString getExecLine(const QString &key);
+    static QString getExecLine(const QString &id);
+    static Application getApplication(const QString &id);
 
 signals:
     /** An application has been found or added to one of the search paths */
@@ -53,8 +54,8 @@ private:
     bool shouldAddThisApp(const QString &file) const;
 
     static QHash<QString, QString> _execs;
+    static QHash<QString, Application> _apps;
     QFileSystemWatcher _watcher;
-    QList<Application> _apps;
     QHash<QString, QList<FileInfo *> > _currentFileInfos;
 };
 

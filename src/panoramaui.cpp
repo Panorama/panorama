@@ -64,12 +64,16 @@ void PanoramaUI::setApplicationsSource(QAbstractItemModel *value)
 
 void PanoramaUI::execute(const QString &sha1)
 {
-    QString cleanCommand(AppAccumulator::getExecLine(sha1));
-    qDebug() << sha1 << cleanCommand;
-    if(!cleanCommand.isEmpty())
+    QString command(AppAccumulator::getExecLine(sha1));
+    if(!command.isEmpty())
     {
-        cleanCommand.remove(QRegExp("%\\w"));
-        QProcess::startDetached(cleanCommand);
+        Application app(AppAccumulator::getApplication(sha1));
+        command.replace("%c", app.name);
+        if(!app.icon.isEmpty())
+            command.replace("%i", app.icon);
+        command.replace("%k", app.relatedFile);
+        command.remove(QRegExp("%\\w"));
+        QProcess::startDetached(command);
     }
 }
 

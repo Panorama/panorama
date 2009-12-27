@@ -20,58 +20,100 @@ SystemInformation::SystemInformation(QObject *parent) :
 
 void SystemInformation::update()
 {
-    int tmp;
+    int newUsedRam, newUsedSwap;
+    int freeRam = 0, bufferRam = 0, cacheRam = 0, freeSwap = 0;
+    int newRam = 0, newSwap = 0;
+    QFile meminfo("/proc/meminfo");
 
-    tmp = Sysinfo::getTotalRam();
-    if(_ram != tmp)
+    if(!meminfo.open(QFile::Text | QFile::ReadOnly | QFile::Unbuffered))
+        return;
+
+    QTextStream memIn(&meminfo);
+    QString line;
+    unsigned long long value;
+    bool ok;
+
+    while(!(newRam && freeRam && bufferRam && cacheRam && newSwap && freeSwap))
     {
-        _ram = tmp;
+        line = memIn.readLine();
+        if(line.isNull())
+            break;
+
+        //TODO: optimize this:
+        value = line.split(QRegExp("\\s+"))[1].toInt(&ok, 10);
+        if(ok)
+        {
+            if(line.startsWith("MemTotal:"))
+                newRam = int(value / 1024L);
+            else if(line.startsWith("MemFree:"))
+                freeRam = int(value / 1024L);
+            else if(line.startsWith("Buffers:"))
+                bufferRam = int(value / 1024L);
+            else if(line.startsWith("Cached:"))
+                cacheRam = int(value / 1024L);
+            else if(line.startsWith("SwapTotal:"))
+                newSwap = int(value / 1024L);
+            else if(line.startsWith("SwapFree:"))
+                freeSwap = int(value / 1024L);
+        }
+    }
+    meminfo.close();
+
+    newUsedSwap = newSwap - freeSwap;
+    newUsedRam = newRam - freeRam - bufferRam - cacheRam;
+
+    if(_ram != newRam)
+    {
+        _ram = newRam;
         emit ramUpdated(_ram);
     }
 
-    tmp = Sysinfo::getUsedRam();
-    if(_usedRam != tmp)
+    if(_usedRam != newUsedRam)
     {
-        _usedRam = tmp;
+        _usedRam = newUsedRam;
         emit usedRamUpdated(_usedRam);
     }
 
-    tmp = Sysinfo::getTotalSwap();
-    if(_swap != tmp)
+    if(_swap != newSwap)
     {
-        _swap = tmp;
+        _swap = newSwap;
         emit swapUpdated(_swap);
     }
 
-    tmp = Sysinfo::getUsedSwap();
-    if(_usedSwap != tmp)
+    if(_usedSwap != newUsedSwap)
     {
-        _usedSwap = tmp;
+        _usedSwap = newUsedSwap;
         emit usedSwapUpdated(_usedSwap);
     }
 
-    tmp = Sysinfo::getSd1Size();
+    struct statvfs fs;
+    int tmp;
+    statvfs("/mnt/sd1", &fs);
+
+    tmp = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
     if(_sd1 != tmp)
     {
         _sd1 = tmp;
         emit sd1Updated(_sd1);
     }
 
-    tmp = Sysinfo::getSd1Usage();
+    tmp = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
     if(_usedSd1 != tmp)
     {
         _usedSd1 = tmp;
         emit usedSd1Updated(_usedSd1);
     }
 
-    tmp = Sysinfo::getSd2Size();
+    statvfs("/mnt/sd2", &fs);
+
+    tmp = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
     if(_sd2 != tmp)
     {
         _sd2 = tmp;
         emit sd2Updated(_sd2);
     }
 
-    tmp = Sysinfo::getSd2Usage();
+    tmp = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
     if(_usedSd2 != tmp)
     {
         _usedSd2 = tmp;

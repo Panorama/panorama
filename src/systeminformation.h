@@ -4,8 +4,13 @@
 #include <QObject>
 #include <qml.h>
 #include <QTimer>
+#include <QFile>
+#include <QTextStream>
 
-#include "sysinfo.h"
+extern "C"
+{
+    #include <sys/statvfs.h>
+}
 
 class SystemInformation : public QObject
 {

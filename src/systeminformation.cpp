@@ -12,6 +12,9 @@ SystemInformation::SystemInformation(QObject *parent) :
     _sd2 = 0;
     _usedSd2 = 0;
 
+    _lastCpuTime = 0;
+    _lastUsedCpuTime = 0;
+
     update();
     connect(&_timer, SIGNAL(timeout()), this, SLOT(update()));
     _timer.setInterval(1000);
@@ -46,19 +49,30 @@ void SystemInformation::updateCpu()
         idle   = components[3].toInt(&ok, 10);
         if(!ok) return;
 
+
         int tmp = user + system + nice + idle;
-        if(_cpu != tmp)
+        if(_lastCpuTime)
         {
-            _cpu = tmp;
-            emit cpuUpdated(_cpu);
+            int value = tmp - _lastCpuTime;
+            if(_cpu != value)
+            {
+                _cpu = value;
+                emit cpuUpdated(_cpu);
+            }
         }
+        _lastCpuTime = tmp;
 
         tmp = user + system;
-        if(_usedCpu != tmp)
+        if(_lastUsedCpuTime)
         {
-            _usedCpu = tmp;
-            emit usedCpuUpdated(_usedCpu);
+            int value = tmp - _lastUsedCpuTime;
+            if(_usedCpu != value)
+            {
+                _usedCpu = value;
+                emit usedCpuUpdated(_usedCpu);
+            }
         }
+        _lastUsedCpuTime = tmp;
     }
 }
 

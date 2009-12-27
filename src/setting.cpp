@@ -3,6 +3,7 @@
 Setting::Setting(QObject *parent) :
     QObject(parent)
 {
+    connect(&_prop, SIGNAL(fieldChanged(QString,QString,QString)), this, SLOT(handleFieldChange(QString,QString,QString)));
 }
 
 void Setting::setSettingsSource(QHash<QString, QHash<QString, QString> *> *value)
@@ -43,7 +44,7 @@ void Setting::setValue(const QString &value)
         if(_settings->value(section)->value(key) != value)
         {
             _settings->value(section)->insert(key, value);
-            emit valueChanged(value);
+            _prop.changeField(_section, _key, value);
         }
     }
 }
@@ -61,6 +62,22 @@ QString Setting::value() const
         return QString();
 }
 
+void Setting::handleFieldChange(const QString &section, const QString &key, const QString &value)
+{
+    if(_section == section && _key == key)
+        emit valueChanged(value);
+}
+
+PrivatePropagator::PrivatePropagator(QObject *parent) :
+   QObject(parent)
+{}
+
+void PrivatePropagator::changeField(const QString &section, const QString &key, const QString &value)
+{
+    emit fieldChanged(section, key, value);
+}
+
+PrivatePropagator Setting::_prop;
 QString Setting::_defaultSection;
 QHash<QString, QHash<QString, QString> *> *Setting::_settings;
 

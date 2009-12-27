@@ -15,6 +15,8 @@ extern "C"
 class SystemInformation : public QObject
 {
 Q_OBJECT
+Q_PROPERTY(int cpu      READ cpu        NOTIFY cpuUpdated)
+Q_PROPERTY(int usedCpu  READ usedCpu    NOTIFY usedCpuUpdated)
 Q_PROPERTY(int ram      READ ram        NOTIFY ramUpdated)
 Q_PROPERTY(int usedRam  READ usedRam    NOTIFY usedRamUpdated)
 Q_PROPERTY(int swap     READ swap       NOTIFY swapUpdated)
@@ -25,6 +27,8 @@ Q_PROPERTY(int sd2      READ sd2        NOTIFY sd2Updated)
 Q_PROPERTY(int usedSd2  READ usedSd2    NOTIFY usedSd2Updated)
 public:
     explicit SystemInformation(QObject *parent = 0);
+    int cpu() const { return _cpu; }
+    int usedCpu() const { return _usedCpu; }
     int ram() const { return _ram; }
     int usedRam() const { return _usedRam; }
     int swap() const { return _swap; }
@@ -35,6 +39,8 @@ public:
     int usedSd2() const { return _usedSd2; }
 
 signals:
+    void cpuUpdated(int value);
+    void usedCpuUpdated(int value);
     void ramUpdated(int value);
     void usedRamUpdated(int value);
     void swapUpdated(int value);
@@ -48,8 +54,14 @@ private slots:
     void update();
 
 private:
+    void updateMem();
+    void updateCpu();
+    void updateSd();
+
     QTimer _timer;
 
+    int _cpu;
+    int _usedCpu;
     int _ram;
     int _usedRam;
     int _swap;

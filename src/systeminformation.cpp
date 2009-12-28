@@ -80,36 +80,39 @@ void SystemInformation::updateSd()
 {
     struct statvfs fs;
     int tmp;
-    statvfs("/mnt/sd1", &fs);
 
-    tmp = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
-    if(_sd1 != tmp)
+    if(statvfs("/mnt/sd1", &fs) > -1)
     {
-        _sd1 = tmp;
-        emit sd1Updated(_sd1);
+        tmp = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
+        if(_sd1 != tmp)
+        {
+            _sd1 = tmp;
+            emit sd1Updated(_sd1);
+        }
+
+        tmp = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
+        if(_usedSd1 != tmp)
+        {
+            _usedSd1 = tmp;
+            emit usedSd1Updated(_usedSd1);
+        }
     }
 
-    tmp = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
-    if(_usedSd1 != tmp)
+    if(statvfs("/mnt/sd2", &fs) > -1)
     {
-        _usedSd1 = tmp;
-        emit usedSd1Updated(_usedSd1);
-    }
+        tmp = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
+        if(_sd2 != tmp)
+        {
+            _sd2 = tmp;
+            emit sd2Updated(_sd2);
+        }
 
-    statvfs("/mnt/sd2", &fs);
-
-    tmp = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
-    if(_sd2 != tmp)
-    {
-        _sd2 = tmp;
-        emit sd2Updated(_sd2);
-    }
-
-    tmp = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
-    if(_usedSd2 != tmp)
-    {
-        _usedSd2 = tmp;
-        emit usedSd2Updated(_usedSd2);
+        tmp = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
+        if(_usedSd2 != tmp)
+        {
+            _usedSd2 = tmp;
+            emit usedSd2Updated(_usedSd2);
+        }
     }
 }
 

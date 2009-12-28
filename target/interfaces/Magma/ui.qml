@@ -11,11 +11,23 @@ PanoramaUI {
 
     property int level: 0
     property string topSection: ""
-    
+
     Setting {
         id: favorites
         section: "system"
         key: "favorites"
+    }
+    
+    Setting {
+        id: magmaStream
+        key: "magmaStream"
+        defaultValue: "true"
+    }
+    
+    Setting {
+        id: volcano
+        key: "volcano"
+        defaultValue: "true"
     }
 
     Rectangle {
@@ -31,7 +43,7 @@ PanoramaUI {
         height: parent.height * 2
         Timer {
             interval: 200
-            running: level == 0
+            running: level == 0 && volcano.value == "true"
             repeat: true
             onTriggered: {
                 flow.burst(5);
@@ -81,6 +93,7 @@ PanoramaUI {
             width: ui.width
             height: ui.height
             z: 1
+            
             source: "overlays/mask.png"
         }
         Rectangle {
@@ -98,6 +111,7 @@ PanoramaUI {
             width: 132
             height: ui.height
             clip: true
+            opacity: magmaStream.value == "true" ? 1 : 0
             /* Not yet implemented in QML
             effect: Bloom {
                 blurHint: Qt.PerformanceHint
@@ -107,7 +121,7 @@ PanoramaUI {
                 id: stream
                 y: SequentialAnimation {
                     id: seq
-                    running: level == 1
+                    running: level == 1 && magmaStream.value == "true"
                     repeat: true
                     NumberAnimation {
                         from: 0
@@ -139,7 +153,27 @@ PanoramaUI {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.leftMargin: 10
-            text: "My Pandora"
+            text: time.hour + ":" + time.minute
+            Timer {
+                id: time
+                property string hour: "00"
+                property string minute: "00"
+                interval: 1000
+                running: true
+                repeat: true
+                triggeredOnStart: true
+                onTriggered: {
+                    var date = new Date;
+                    var h = date.getHours().toString();
+                    if(h.length == 1)
+                        h = "0" + h;
+                    hour = h;
+                    var m = date.getMinutes().toString();
+                    if(m.length == 1)
+                        m = "0" + m;
+                    minute = m;
+                }
+            }
             color: "#000044"
             font.pixelSize: ui.height / 6
         }
@@ -223,46 +257,47 @@ PanoramaUI {
         Keys.onEscapePressed: {
             level = 0;
         }
-        
-        Text {
-            z: 6
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.leftMargin: 8
-            font.pixelSize: ui.height / 30
-            font.bold: true
-            color: "white"
-            text: "Back"
-            MouseRegion {
-                anchors.fill: parent
-                onClicked: level = 0;
-            }
-            Rectangle {
-                z: -1
-                anchors.fill: parent
-                anchors.topMargin: -2
-                anchors.bottomMargin: -2
-                anchors.leftMargin: -2
-                anchors.rightMargin: -2
-                color: "gray"
-                radius: 2
-            }
-        }
-        
+
         Item {
             anchors.fill: parent
-            anchors.topMargin: 16
+            anchors.topMargin: 32
             anchors.bottomMargin: 16
             anchors.leftMargin: 16
             anchors.rightMargin: 16
-            
+
+            Text {
+                z: 6
+                anchors.top: parent.top
+                anchors.topMargin: -32
+                anchors.left: parent.left
+                anchors.leftMargin: 8
+                font.pixelSize: Math.max(1, parent.height / 30)
+                font.bold: true
+                color: "white"
+                text: "Back"
+                MouseRegion {
+                    anchors.fill: parent
+                    onClicked: level = 0;
+                }
+                Rectangle {
+                    z: -1
+                    anchors.fill: parent
+                    anchors.topMargin: -2
+                    anchors.bottomMargin: -2
+                    anchors.leftMargin: -2
+                    anchors.rightMargin: -2
+                    color: "#900000"
+                    radius: 2
+                }
+            }
+
             //Applications:
             FocusScope {
                 id: apps
                 anchors.fill: parent
                 focus: level == 1 && topSection == "apps"
                 opacity: topSection == "apps" ? 1 : 0
-                
+
                 Script {
                     function toggleFavorite(idf) {
                         if(favorites.value.indexOf(idf) == -1) {
@@ -279,25 +314,25 @@ PanoramaUI {
                         }
                     }
                 }
-                
-                Keys.onDigit3Pressed: toggleFavorite(appsViewer.currentItem.ident);
-                
+
                 Extensions.ApplicationViewer {
                     id: appsViewer
                     anchors.fill: parent
-                    model: ui.applications.sortedBy("name", true)
+                    model: ui.applications.matching("name", nameFilter).sortedBy("name", true)
                     onSelected: ui.execute(id);
                     onFavStarClicked: toggleFavorite(id);
+                    onPressed2: level = 0;
+                    onPressed3: toggleFavorite(appsViewer.currentItem.ident);
                 }
             }
-            
+
             //Favorites:
             FocusScope {
                 id: favs
                 anchors.fill: parent
                 focus: level == 1 && topSection == "favs"
                 opacity: topSection == "favs" ? 1 : 0
-                
+
                 Script {
                     function removeFavorite(idf) {
                         var nf = favorites.value.replace(idf, "");
@@ -307,27 +342,27 @@ PanoramaUI {
                             level = 0;
                     }
                 }
-                
-                Keys.onDigit3Pressed: removeFavorite(favsViewer.currentItem.ident);
-                
+
                 Extensions.ApplicationViewer {
                     id: favsViewer
                     anchors.fill: parent
-                    model: ui.applications.matching("identifier", "^" + favorites.value + "$").sortedBy("name", true)
+                    model: ui.applications.matching("name", nameFilter).matching("identifier", "^" + favorites.value + "$").sortedBy("name", true)
                     onSelected: ui.execute(id);
                     onFavStarClicked: removeFavorite(id);
                     focus: true
+                    onPressed2: level = 0;
+                    onPressed3: removeFavorite(favsViewer.currentItem.ident);
                 }
                 Text {
                     anchors.centerIn: parent
                     z: 5
                     text: "Use the bottom action button (or the 3 key) to add an application to your favorites"
-                    color: "white"
+                    color: "gray"
                     font.pointSize: 12
                     opacity: favorites.value.length == 0 ? 1 : 0
                 }
             }
-            
+
             //System information:
             FocusScope {
                 anchors.fill: parent
@@ -336,68 +371,125 @@ PanoramaUI {
                 SystemInformation {
                     id: sysinfo
                 }
-                Text {
-                    id: ramText
-                    text: "RAM:"
-                    height: ui.height / 16
-                    width: parent.width
-                    color: "white"
-                    font.bold: true
-                    font.pixelSize: height * 0.8
+                Column {
+                    anchors.fill: parent
+                    Text {
+                        text: "CPU:"
+                        height: ui.height / 30
+                        width: parent.width - 10
+                        color: "#f7c767"
+                        font.bold: true
+                        font.pixelSize: height * 0.8
+                        verticalAlignment: Text.AlignBottom
+                    }
+                    Extensions.ProgressBar {
+                        width: parent.width - 10
+                        maximum: sysinfo.cpu
+                        value: sysinfo.usedCpu
+                        unit: "%"
+                        color: "#f7c767"
+                        secondColor: "#ed8d06"
+                        textColor: "#f7c767"
+                        style: Text.Outline
+                        styleColor: "#300000"
+                        displayInPercent: true
+                    }
+                    Text {
+                        text: "RAM:"
+                        height: ui.height / 30
+                        width: parent.width - 10
+                        color: "#f7c767"
+                        font.bold: true
+                        font.pixelSize: height * 0.8
+                        verticalAlignment: Text.AlignBottom
+                    }
+                    Extensions.ProgressBar {
+                        width: parent.width - 10
+                        maximum: sysinfo.ram
+                        value: sysinfo.usedRam
+                        unit: "MiB"
+                        color: "#ed8d06"
+                        secondColor: "#d84800"
+                        textColor: "#f7c767"
+                        style: Text.Outline
+                        styleColor: "#300000"
+                    }
+                    Text {
+                        text: "Swap:"
+                        height: ui.height / 30
+                        width: parent.width - 10
+                        color: "#f7c767"
+                        font.bold: true
+                        font.pixelSize: height * 0.8
+                        verticalAlignment: Text.AlignBottom
+                    }
+                    Extensions.ProgressBar {
+                        width: parent.width - 10
+                        maximum: sysinfo.swap
+                        value: sysinfo.usedSwap
+                        unit: "MiB"
+                        color: "#d84800"
+                        secondColor: "#900000"
+                        textColor: "#f7c767"
+                        style: Text.Outline
+                        styleColor: "#300000"
+                    }
+                    Text {
+                        text: "Disk usage - SD1:"
+                        height: ui.height / 30
+                        width: parent.width - 10
+                        color: "#f7c767"
+                        font.bold: true
+                        font.pixelSize: height * 0.8
+                        verticalAlignment: Text.AlignBottom
+                    }
+                    Extensions.ProgressBar {
+                        width: parent.width - 10
+                        maximum: sysinfo.sd1
+                        value: sysinfo.usedSd1
+                        unit: "MiB"
+                        color: "#900000"
+                        secondColor: "#300000"
+                        textColor: "#f7c767"
+                        style: Text.Outline
+                        styleColor: "#300000"
+                    }
+                    Text {
+                        text: "Disk usage - SD2:"
+                        height: ui.height / 30
+                        width: parent.width - 10
+                        color: "#f7c767"
+                        font.bold: true
+                        font.pixelSize: height * 0.8
+                        verticalAlignment: Text.AlignBottom
+                    }
+                    Extensions.ProgressBar {
+                        width: parent.width - 10
+                        maximum: sysinfo.sd2
+                        value: sysinfo.usedSd2
+                        unit: "MiB"
+                        color: "#6F0B00"
+                        secondColor: "#370400"
+                        textColor: "#f7c767"
+                        style: Text.Outline
+                        styleColor: "#300000"
+                    }
                 }
-                Extensions.ProgressBar {
-                    id: ramBar
-                    anchors.top: ramText.bottom
-                    width: parent.width
-                    maximum: sysinfo.ram
-                    value: sysinfo.usedRam
-                    unit: "MiB"
-                    color: "steelblue"
-                    secondColor: "blue"
-                }
-                Text {
-                    id: swapText
-                    anchors.top: ramBar.bottom
-                    text: "Swap:"
-                    height: ui.height / 16
-                    width: parent.width
-                    color: "white"
-                    font.bold: true
-                    font.pixelSize: height * 0.8
-                }
-                Extensions.ProgressBar {
-                    id: swapBar
-                    anchors.top: swapText.bottom
-                    width: parent.width
-                    maximum: sysinfo.swap
-                    value: sysinfo.usedSwap
-                    unit: "MiB"
-                    color: "red"
-                    secondColor: "darkred"
-                }
-                /*Text {
-                    color: "white"
-                    font.pixelSize: ui.height / 30
-                    text: "<table><tr><th>Resource</th><th>Used</th>" + 
-                        "<th></th><th>Total</th><th></th></tr>" +
-                        "<tr><td>RAM</td><td>" + sysinfo.usedRam + "</td>" +
-                        "<td>/</td><td>" + sysinfo.ram + "</td><td>MiB</td></tr>" +
-                        "<tr><td>Swap</td><td>" + sysinfo.usedSwap + "</td>" +
-                        "<td>/</td><td>" + sysinfo.swap + "</td><td>MiB</td></tr>" +
-                        "<tr><td>SD 1</td><td>" + sysinfo.usedSd1 + "</td>" +
-                        "<td>/</td><td>" + sysinfo.sd1 + "</td><td>MiB</td></tr>" +
-                        "<tr><td>SD 2</td><td>" + sysinfo.usedSd2 + "</td>" +
-                        "<td>/</td><td>" + sysinfo.sd2 + "</td><td>MiB</td></tr>" + 
-                        "</table>"
-                }*/
             }
-            
+
             //Settings:
             FocusScope {
                 id: setts
                 anchors.fill: parent
                 focus: level == 1 && topSection == "setts"
                 opacity: topSection == "setts" ? 1 : 0
+                Text {
+                    anchors.centerIn: parent
+                    z: 5
+                    text: "Nothing to see here, move along :-)"
+                    color: "gray"
+                    font.pointSize: 12
+                }
             }
         }
     }

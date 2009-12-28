@@ -23,6 +23,7 @@ Q_OBJECT
 Q_PROPERTY(QString section READ section WRITE setSection NOTIFY sectionChanged)
 Q_PROPERTY(QString key READ key WRITE setKey NOTIFY keyChanged)
 Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
+Q_PROPERTY(QString defaultValue READ defaultValue WRITE setDefaultValue NOTIFY defaultValueChanged)
 public:
     explicit Setting(QObject *parent = 0);
 
@@ -31,6 +32,9 @@ public:
 
     void setKey(const QString &key);
     QString key() const { return _key; }
+
+    void setDefaultValue(const QString &value);
+    QString defaultValue() const { return _default; }
 
     void setValue(const QString &value);
     QString value() const;
@@ -43,14 +47,17 @@ public:
 signals:
     void sectionChanged(const QString &section);
     void keyChanged(const QString &key);
+    void defaultValueChanged(const QString &value);
     void valueChanged(const QString &value);
 
 private slots:
     void handleFieldChange(const QString &section, const QString &key, const QString &value);
 
 private:
+    void maybeInsertDefault();
     QString _section;
     QString _key;
+    QString _default;
     static PrivatePropagator _prop;
     static QString _defaultSection;
     static QHash<QString, QHash<QString, QString> *> *_settings;

@@ -18,17 +18,29 @@
 class DesktopFile
 {
 public:
-    /** Constructs a new DesktopFile instance, using the specified .desktop file */
+    /**
+     * Constructs a new DesktopFile instance, using the specified .desktop
+     * file
+     */
     DesktopFile(const QString &file);
 
-    /** Reads the contents of the attached .desktop file into an Application instance */
+    /**
+     * Reads the contents of the attached .desktop file into an Application
+     * instance
+     */
     Application readToApplication();
 
 private:
-    QString _file;
-    void readLocalizedWithFallbacks(const QString &line, const QString &fieldName,
-                                    QString &local, QString &us, QString &generic);
+    void readLocalizedWithFallbacks(const QString &line,
+                                    const QString &fieldName,
+                                    QString &local,
+                                    QString &us,
+                                    QString &generic);
+
     QString readField(const QString &line, const QString &field) const;
+
+    QString _file;
+
     static const QString EXEC_FIELD;
     static const QString NAME_FIELD;
     static const QString COMMENT_FIELD;

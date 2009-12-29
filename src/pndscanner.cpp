@@ -23,12 +23,14 @@ void PndScanner::scanPnds()
     }
     else
     {
-        qWarning() << "Warning: No PND configuration file found. This means that application previews cannot be shown.";
+        qWarning() << "Warning: No PND configuration file found. "
+                "This means that application previews cannot be shown.";
         appspath = PND_APPS_SEARCHPATH;
         overridespath = PND_PXML_OVERRIDE_SEARCHPATH;
     }
 
-    applist = pnd_disco_search(appspath.toUtf8().data(), overridespath.toUtf8().data());
+    applist = pnd_disco_search(appspath.toUtf8().data(),
+                               overridespath.toUtf8().data());
     if(applist)
     {
         pnd_disco_t *discovery = (pnd_disco_t *)pnd_box_get_head(applist);

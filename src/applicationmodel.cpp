@@ -3,12 +3,14 @@
 ApplicationModel::ApplicationModel(QObject *parent) :
     QAbstractListModel(parent)
 {
-    _roles[ApplicationModel::Id]            = QString("identifier") .toLocal8Bit(); //"id" is a QML keyword...
-    _roles[ApplicationModel::Name]          = QString("name")       .toLocal8Bit();
-    _roles[ApplicationModel::Comment]       = QString("comment")    .toLocal8Bit();
-    _roles[ApplicationModel::Icon]          = QString("icon")       .toLocal8Bit();
-    _roles[ApplicationModel::Version]       = QString("version")    .toLocal8Bit();
-    _roles[ApplicationModel::Categories]    = QString("categories") .toLocal8Bit();
+    //"id" is a QML keyword, so we use "identifier" instead.
+    _roles[ApplicationModel::Id]          = QString("identifier").toLocal8Bit();
+    _roles[ApplicationModel::Name]        = QString("name")      .toLocal8Bit();
+    _roles[ApplicationModel::Comment]     = QString("comment")   .toLocal8Bit();
+    _roles[ApplicationModel::Icon]        = QString("icon")      .toLocal8Bit();
+    _roles[ApplicationModel::Version]     = QString("version")   .toLocal8Bit();
+    _roles[ApplicationModel::Categories]  = QString("categories").toLocal8Bit();
+
     setRoleNames(_roles);
 }
 

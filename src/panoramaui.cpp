@@ -68,23 +68,26 @@ void PanoramaUI::execute(const QString &sha1)
     if(!command.isEmpty())
     {
         Application app(AppAccumulator::getApplication(sha1));
+
+        //Fill in FDF fields
         command.replace("%c", app.name);
         if(!app.icon.isEmpty())
             command.replace("%i", app.icon);
         command.replace("%k", app.relatedFile);
         command.remove(QRegExp("%\\w"));
+
         QProcess::startDetached(command);
     }
 }
 
-void PanoramaUI::applicationDataChanged()
+void PanoramaUI::propagateApplicationDataChange()
 {
     emit applicationsUpdated(_apps);
 }
 
-void PanoramaUI::loaded()
+void PanoramaUI::indicateLoadFinished()
 {
-    emit load();
+    emit loaded();
 }
 
 QVariant PanoramaUI::_apps;

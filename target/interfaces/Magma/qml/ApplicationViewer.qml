@@ -13,20 +13,20 @@ Item {
     property alias model: appView.model
     property alias currentItem: appView.currentItem
     property alias nameFilter: nameField.text
-    
+
     Keys.onDigit1Pressed: {
         selected(appView.currentItem.ident);
     }
     Keys.onSpacePressed: {
         selected(appView.currentItem.ident);
     }
-    
+
     Setting {
         id: favorites
         section: "system"
         key: "favorites"
     }
-    
+
     Component {
         id: appDelegate
         Item {

@@ -28,6 +28,7 @@ class MainWindow : public QMainWindow
 public:
     /** Constructs a new MainWindow instance */
     MainWindow(QWidget *parent = 0);
+
     /** Destroys this MainWindow */
     ~MainWindow();
 
@@ -38,25 +39,26 @@ signals:
 public slots:
     /** Load the specified UI file */
     void loadUIFile(const QString &file);
+
     /** Change to the UI in the specified directory */
     void switchToUI(const QString &uiDir, const QString &uiName);
 
 private slots:
     void continueLoadingUI();
+
     void useConfig(QHash<QString, QHash<QString, QString> *> *config);
 
 private:
     void printError(const QmlComponent *obj) const;
+
     void loadApps();
 
     volatile bool appsLoaded;
-
     QmlEngine _engine;
     QmlView _canvas;
     QmlComponent *_component;
     PanoramaUI *_ui;
     Configuration _config;
-
     ApplicationModel _model;
     AppAccumulator _accumulator;
 };

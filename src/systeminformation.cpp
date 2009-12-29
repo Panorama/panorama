@@ -37,7 +37,7 @@ void SystemInformation::updateCpu()
     stat.close();
     if(!line.isNull() && line.startsWith("cpu  "))
     {
-        QStringList components = line.right(line.length() - 5).split(" "); //5 == length of "cpu  "
+        QStringList components = line.right(line.length() - 5).split(" ");
         bool ok;
         int user, nice, system, idle;
         user   = components[0].toInt(&ok, 10);
@@ -185,4 +185,4 @@ void SystemInformation::updateMem()
     }
 }
 
-QML_DEFINE_TYPE(Panorama,1,0,SystemInformation,SystemInformation)
+QML_DEFINE_TYPE(Panorama,1,0,SystemInformation,SystemInformation);

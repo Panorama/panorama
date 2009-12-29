@@ -116,7 +116,8 @@ QStringList IconFinder::getIconSuffixes()
     return result;
 }
 
-QList<QDir> IconFinder::indexForTheme(const QString &name, const QStringList &paths,
+QList<QDir> IconFinder::indexForTheme(const QString &name,
+                                      const QStringList &paths,
                                       const QStringList &suffixes)
 {
     QStringList filters;
@@ -126,13 +127,15 @@ QList<QDir> IconFinder::indexForTheme(const QString &name, const QStringList &pa
     return indexAllThemes(name, paths, filters);
 }
 
-QList<QDir> IconFinder::indexAllThemes(const QString &name, const QStringList &paths,
+QList<QDir> IconFinder::indexAllThemes(const QString &name,
+                                       const QStringList &paths,
                                        const QStringList &filters)
 {
     QList<QDir> result;
 
     QStringList tmp;
-    tmp << QDir::root().filePath("tmp") << QString("panorama-iconindex-").append(name);
+    tmp << QDir::root().filePath("tmp") << QString("panorama-iconindex-")
+            .append(name);
 
     const QString cacheFileName(tmp.join(QDir::separator()));
     bool rebuildCache(true);
@@ -200,6 +203,8 @@ void IconFinder::indexSubdir(const QDir &dir, const QStringList &filters,
 {
     QStringList subdirs = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot,
                                         QDir::Name | QDir::Reversed);
+
+    //Let's do some magic to get the icons we need
     QMap<int, QStringList> costs;
     foreach(const QString &d, subdirs)
     {
@@ -209,7 +214,7 @@ void IconFinder::indexSubdir(const QDir &dir, const QStringList &filters,
             bool ok;
             int dim = dimStr.toInt(&ok, 10);
             if(ok)
-                costs[abs(64 - dim)] += d; //We want 64x64 icons... prefer "scalable" if they are larger than that
+                costs[abs(64 - dim)] += d;
             else
                 costs[0] += d;
         }
@@ -235,4 +240,5 @@ void IconFinder::indexSubdir(const QDir &dir, const QStringList &filters,
 QString IconFinder::_themeName = findSystemTheme();
 QStringList IconFinder::_themePaths = getDefaultThemePaths();
 QStringList IconFinder::_iconSuffixes = getIconSuffixes();
-QList<QDir> IconFinder::_searchIndex = indexForTheme(_themeName, _themePaths, _iconSuffixes);
+QList<QDir> IconFinder::_searchIndex = indexForTheme(_themeName, _themePaths,
+                                                     _iconSuffixes);

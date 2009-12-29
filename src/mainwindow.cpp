@@ -30,26 +30,32 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Set up the application loading/unloading procedure
     _accumulator.setParent(this);
-    connect(&_accumulator, SIGNAL(appAdded(Application)), &_model, SLOT(addApp(Application)));
-    connect(&_accumulator, SIGNAL(appRemoved(Application)), &_model, SLOT(removeApp(Application)));
+    connect(&_accumulator, SIGNAL(appAdded(Application)),
+            &_model, SLOT(addApp(Application)));
+    connect(&_accumulator, SIGNAL(appRemoved(Application)),
+            &_model, SLOT(removeApp(Application)));
 
     qRegisterMetaType<Application>("Application");
 
     //Load some actual applications from paths
     QtConcurrent::run(this, &MainWindow::loadApps);
 
-    //Set up UI loading and channel quit() events from QML so that they end the application
+    //Set up UI loading and channel quit() events from QML
     connect(&_engine, SIGNAL(quit()), this, SLOT(close()));
-    connect(&_config, SIGNAL(uiChanged(QString,QString)), this, SLOT(switchToUI(QString,QString)));
-    connect(&_config, SIGNAL(generalConfigChanged(QHash<QString,QHash<QString,QString>*>*)),
-            this, SLOT(useConfig(QHash<QString,QHash<QString,QString>*>*)));
+    connect(&_config, SIGNAL(uiChanged(QString,QString)),
+            this, SLOT(switchToUI(QString,QString)));
+    connect(&_config,
+            SIGNAL(generalConfigChanged(QHash<QString,QHash<QString,QString>*>*)),
+            this,
+            SLOT(useConfig(QHash<QString,QHash<QString,QString>*>*)));
     connect(this, SIGNAL(uiChanged(QString)), this, SLOT(loadUIFile(QString)));
 
     if(!QFileInfo(CONFIG_FILE).exists())
     {
         QFile(":/settings.cfg").copy(CONFIG_FILE);
         //chmod 644:
-        QFile(CONFIG_FILE).setPermissions(QFile::ReadOwner | QFile::WriteOwner | QFile::ReadGroup | QFile::ReadOther);
+        QFile(CONFIG_FILE).setPermissions(QFile::ReadOwner | QFile::WriteOwner |
+                                          QFile::ReadGroup | QFile::ReadOther);
     }
     _config.loadFile(CONFIG_FILE);
 }
@@ -66,11 +72,13 @@ void MainWindow::loadUIFile(const QString &file)
     //Check if the component has errors and print them
     printError(_component);
 
-    //Try to load the component immediately, or delay the load until when it has finished loading
+    //Try to load the component immediately, or delay the load until when it
+    //has finished loading
     if(_component->isReady() && !_component->isError())
         continueLoadingUI();
     else if(!_component->isError())
-        connect(_component, SIGNAL(statusChanged(QmlComponent::Status)), this, SLOT(continueLoadingUI()));
+        connect(_component, SIGNAL(statusChanged(QmlComponent::Status)),
+                this, SLOT(continueLoadingUI()));
 }
 
 void MainWindow::printError(const QmlComponent *c) const
@@ -87,7 +95,8 @@ void MainWindow::printError(const QmlComponent *c) const
 void MainWindow::continueLoadingUI()
 {
     //If this is a delayed load, remove the old connection
-    disconnect(_component, SIGNAL(statusChanged(QmlComponent::Status)), this, SLOT(continueLoadingUI()));
+    disconnect(_component, SIGNAL(statusChanged(QmlComponent::Status)),
+               this, SLOT(continueLoadingUI()));
 
     //Cehck errors again (now that the component is loaded)
     printError(_component);
@@ -117,10 +126,11 @@ void MainWindow::continueLoadingUI()
                 connect(&_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
                         _ui, SLOT(applicationDataChanged()));
             }
-            _ui->loaded();
+            _ui->indicateLoadFinished();
         }
         else
-            qWarning() << "The specified UI file does not contain a Panorama UI";
+            qWarning() << "The specified UI file does not contain"
+                    "a Panorama UI";
     }
 }
 
@@ -152,7 +162,7 @@ void MainWindow::loadApps() {
     {
         connect(&_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
                 _ui, SLOT(applicationDataChanged()));
-        _ui->applicationDataChanged();
+        _ui->propagateApplicationDataChange();
     }
 }
 

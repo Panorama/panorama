@@ -22,7 +22,7 @@
  */
 class AppAccumulator : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     /** Constructs a new AppAccumulator instance */
     explicit AppAccumulator(QObject *parent = 0);
@@ -30,7 +30,10 @@ public:
     /** Loads all .desktop files from the specified search paths (not recursive) */
     void loadFrom(const QStringList &searchpaths);
 
+    /** Gets the exec line for the given application's id */
     static QString getExecLine(const QString &id);
+
+    /** Gets the application data structure for the given id */
     static Application getApplication(const QString &id);
 
 signals:
@@ -55,6 +58,7 @@ private:
 
     static QHash<QString, QString> _execs;
     static QHash<QString, Application> _apps;
+
     QFileSystemWatcher _watcher;
     QHash<QString, QList<FileInfo *> > _currentFileInfos;
 };

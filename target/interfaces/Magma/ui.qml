@@ -17,13 +17,13 @@ PanoramaUI {
         section: "system"
         key: "favorites"
     }
-    
+
     Setting {
         id: magmaStream
         key: "magmaStream"
         defaultValue: "true"
     }
-    
+
     Setting {
         id: volcano
         key: "volcano"
@@ -93,7 +93,7 @@ PanoramaUI {
             width: ui.width
             height: ui.height
             z: 1
-            
+
             source: "overlays/mask.png"
         }
         Rectangle {

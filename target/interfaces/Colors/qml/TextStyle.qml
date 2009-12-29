@@ -3,7 +3,7 @@ import Qt 4.6
 Item {
     id: root
     function accessor(x) {print("not implemented");return null;}
-    
+
     function getField(x) {
         if("color" == x)
             return color;

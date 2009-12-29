@@ -12,10 +12,10 @@ Item {
     property alias styleColor: label.styleColor
     property bool displayInPercent: false
     property string unit: "%"
-    
+
     height: 48
     clip: true
-    
+
     Rectangle {
         id: fill
         radius: 5

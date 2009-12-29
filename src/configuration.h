@@ -25,24 +25,34 @@ public:
 
     /** Sets the UI name field */
     void setUI(const QString &);
+
     /** Gets the UI name field */
     QString ui() const;
 
     /** Sets the UI search directory */
     void setUIDir(const QString &);
+
     /** Gets the UI search directory */
     QString uiDir() const;
 
+    /**
+     * Gets a pointer to the raw setting registry.
+     * This will be saved when the config file is saved
+     */
     QHash<QString, QHash<QString, QString> *> *generalConfig() const;
 
 signals:
     /** The UI configuration has been changed */
     void uiChanged(const QString &uiDir, const QString &uiName);
+
+    /** The settings registry has changed */
     void generalConfigChanged(QHash<QString, QHash<QString, QString> *> *value);
+    //TODO: reload config registry when config file changes, too
 
 public slots:
     /** Load the following file and replace the current values */
     void loadFile(const QString &file);
+
     /** Save the current configuration values to this file */
     void saveFile(const QString &file);
 

@@ -4,7 +4,8 @@ AppAccumulator::AppAccumulator(QObject *parent) :
     QObject(parent)
 {
     //Reload any changed file in any searchpath
-    connect(&_watcher, SIGNAL(directoryChanged(QString)), this, SLOT(watchedDirUpdated(QString)));
+    connect(&_watcher, SIGNAL(directoryChanged(QString)),
+            this, SLOT(watchedDirUpdated(QString)));
 
     //Load PNDs preemptively
     PndScanner::scanPnds();
@@ -29,7 +30,8 @@ void AppAccumulator::loadFrom(const QStringList &searchpaths)
 
         //Scan recursively
         QStringList subPaths;
-        foreach(const QString &subdir, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+        foreach(const QString &subdir, dir.entryList(QDir::Dirs |
+                                                     QDir::NoDotAndDotDot))
         {
             subPaths += dir.filePath(subdir);
         }
@@ -70,7 +72,8 @@ void AppAccumulator::watchedDirUpdated(const QString &d)
     {
         if(files.contains(oldFile->file)) //File existed and still exists
         {
-            QDateTime lm = QFileInfo(dir.filePath(oldFile->file)).lastModified();
+            QDateTime lm =
+                    QFileInfo(dir.filePath(oldFile->file)).lastModified();
             if(oldFile->lastModified < lm)
             {
                 //Mark for update
@@ -155,7 +158,14 @@ void AppAccumulator::addViaDesktopFile(const QString &f)
             result.id = QCryptographicHash::hash(oldExec.toLocal8Bit()
                                                  .append(result.pandoraId)
                                                  .append(result.relatedFile)
-                                                 .append(result.name), QCryptographicHash::Sha1).toHex();
+                                                 .append(result.name),
+                                                 QCryptographicHash::Sha1)
+                                                     .toHex();
+
+            //Enables us to filter out applications without categories
+            if(result.categories.isEmpty())
+                result.categories.append("NoCategory");
+
             _apps[result.id] = result;
             _execs[result.id] = oldExec;
 

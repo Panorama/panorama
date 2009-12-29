@@ -34,40 +34,56 @@ public:
 
     /** Gets the name */
     QString name() const;
+
     /** Sets the name */
     void setName(const QString&);
 
     /** Gets the description */
     QString description() const;
+
     /** Sets the description */
     void setDescription(const QString&);
 
     /** Gets the author */
     QString author() const;
+
     /** Sets the author */
     void setAuthor(const QString&);
 
+    /** Gets the default settings section */
     QString settingsSection() const;
+
+    /** Sets the default settings section */
     void setSettingsSection(const QString &);
 
+    /** Gets the current application model */
     QVariant applications() const;
 
+    /** Sets the application model source */
     static void setApplicationsSource(QAbstractItemModel *value);
 
+    /** QML helpe rmethod for executing the application with the given id */
     Q_INVOKABLE void execute(const QString &sha1);
 
 public slots:
-    void applicationDataChanged();
-    void loaded();
+    /** Called when application data has changed */
+    void propagateApplicationDataChange();
+
+    /** Called when this instance has been loaded */
+    void indicateLoadFinished();
 
 signals:
+    /** The application source has been updated */
     void applicationsUpdated(QVariant value);
-    void load();
+
+    /** This UI has finished loading */
+    void loaded();
 
 private:
     QString _name;
     QString _description;
     QString _author;
+
     static QVariant _apps;
 };
 

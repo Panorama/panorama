@@ -20,14 +20,16 @@ void Configuration::loadFile(const QString &f)
     if(!_watcher.files().contains(f) && QFileInfo(f).exists())
         _watcher.addPath(f);
 
-    connect(&_watcher, SIGNAL(fileChanged(QString)), this, SLOT(readFile(QString)));
+    connect(&_watcher, SIGNAL(fileChanged(QString)),
+            this, SLOT(readFile(QString)));
 }
 
 void Configuration::readFile(const QString &f)
 {
     QString line;
     QString section;
-    QHash<QString, QHash<QString, QString> *> *newConfig = new QHash<QString, QHash<QString, QString> *>;
+    QHash<QString, QHash<QString, QString> *> *newConfig =
+            new QHash<QString, QHash<QString, QString> *>;
     QFile file(f);
     bool changed(false);
 
@@ -142,7 +144,8 @@ void Configuration::saveFile(const QString &f)
         foreach(const QString &key, _generalConfig->value(section)->keys())
         {
             out << key << " = \""
-                    << QString(_generalConfig->value(section)->value(key)).replace('\n', ' ')
+                    << QString(_generalConfig->value(section)->value(key))
+                        .replace('\n', ' ')
                     << '\"' << endl;
         }
     }

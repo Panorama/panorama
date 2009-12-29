@@ -41,7 +41,7 @@ Application DesktopFile::readToApplication()
                                        enComment, genericComment);
         //Exec
         else if(line.startsWith(EXEC_FIELD))
-            result.id = readField(line, EXEC_FIELD); //Temporarily hold inside of id
+            result.id = readField(line, EXEC_FIELD); //Temporarily use id
         //Icon
         else if(line.startsWith(ICON_FIELD))
             result.icon = IconFinder::findIcon(readField(line, ICON_FIELD));
@@ -66,7 +66,8 @@ Application DesktopFile::readToApplication()
         }
         //Type
         //(We don't want to load this application if its Type isn't Application)
-        else if(line.startsWith(TYPES_FIELD) && !line.contains(APPLICATION_TYPE))
+        else if(line.startsWith(TYPES_FIELD)
+            && !line.contains(APPLICATION_TYPE))
         {
             file.close();
             return Application();
@@ -119,8 +120,11 @@ Application DesktopFile::readToApplication()
     return result;
 }
 
-void DesktopFile::readLocalizedWithFallbacks(const QString &line, const QString &fieldName,
-                                             QString &local, QString &en, QString &generic)
+void DesktopFile::readLocalizedWithFallbacks(const QString &line,
+                                             const QString &fieldName,
+                                             QString &local,
+                                             QString &en,
+                                             QString &generic)
 {
     //XXX This could be done much more efficiently
     QString tmp;
@@ -185,8 +189,9 @@ QString DesktopFile::readField(const QString &line, const QString &field) const
     start.append("=");
     if(line.startsWith(start))
     {
-        //Don't do 'split("=")' here; it's against the standard and leads to bugs elsewhere
-        return line.right(line.length() - field.length() -1).split("#")[0].trimmed();
+        //Don't do 'split("=")' here; it's against the standard
+        return line.right(line.length() - field.length() -1)
+                .split("#")[0].trimmed();
     }
     else
         return QString();
@@ -196,7 +201,8 @@ const QString DesktopFile::NAME_FIELD       = QString("Name");
 const QString DesktopFile::COMMENT_FIELD    = QString("Comment");
 const QString DesktopFile::EXEC_FIELD       = QString("Exec");
 const QString DesktopFile::ICON_FIELD       = QString("Icon");
-const QString DesktopFile::VERSION_FIELD    = QString("X-Desktop-File-Install-Version");
+const QString DesktopFile::VERSION_FIELD    =
+        QString("X-Desktop-File-Install-Version");
 const QString DesktopFile::PANDORA_UID_FIELD= QString("X-Pandora-UID");
 const QString DesktopFile::CATEGORIES_FIELD = QString("Categories");
 const QString DesktopFile::TYPES_FIELD      = QString("Type");

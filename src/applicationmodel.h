@@ -4,10 +4,14 @@
 #include <QObject>
 #include <QAbstractItemModel>
 #include <qml.h>
+
 #include "appaccumulator.h"
 #include "application.h"
 #include "applicationfiltermethods.h"
 
+/**
+ * A model for modelling a source of launchable applications.
+ */
 class ApplicationModel : public QAbstractListModel
 {
 Q_OBJECT
@@ -15,6 +19,7 @@ public:
     /** Constructs a new ApplicationModel instance */
     explicit ApplicationModel(QObject *parent = 0);
 
+    /** The roles that an ApplicationModel accepts */
     enum Roles
     {
         Id = Qt::UserRole,
@@ -36,13 +41,19 @@ public:
     /** Returns the header for each role */
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
-    Q_INVOKABLE QVariant inCategory(const QString &category); //TODO: Remove code duplication!!
+    /** QML helper method that applies a filter to this model */
+    Q_INVOKABLE QVariant inCategory(const QString &category);
+
+    /** QML helper method that applies a filter to this model */
     Q_INVOKABLE QVariant matching(const QString &role, const QString &value);
+
+    /** QML helper method that sorts this model */
     Q_INVOKABLE QVariant sortedBy(const QString &role, bool ascending);
 
 public slots:
     /** An Application should be added */
     void addApp(const Application &app);
+
     /** An Application should be removed, if it exists */
     void removeApp(const Application &app);
 

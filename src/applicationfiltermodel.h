@@ -3,20 +3,41 @@
 
 #include <QSortFilterProxyModel>
 #include <qml.h>
+
 #include "applicationfiltermethods.h"
 #include "applicationmodel.h"
 
+/**
+ * A proxy model for filtering an ApplicationModel
+ */
 class ApplicationFilterModel : public QSortFilterProxyModel
 {
 Q_OBJECT
 public:
+    /** Constructs a new ApplicationFilterModel instance */
     explicit ApplicationFilterModel(QObject *parent = 0);
-    explicit ApplicationFilterModel(QAbstractItemModel *sourceModel, QObject *parent = 0);
 
-    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+    /**
+     * Constructs a new ApplicationFilterModel instance with the given source
+     * model
+     */
+    explicit ApplicationFilterModel(QAbstractItemModel *sourceModel,
+                                    QObject *parent = 0);
 
+    /**
+     * Checks if the row with the given index should be filtered. The "parent"
+     * parameter is ignored.
+     */
+    bool filterAcceptsRow(int source_row,
+                          const QModelIndex &source_parent) const;
+
+    /** QML helper method that applies a filter to this model */
     Q_INVOKABLE QVariant inCategory(const QString &category);
+
+    /** QML helper method that applies a filter to this model */
     Q_INVOKABLE QVariant matching(const QString &role, const QString &value);
+
+    /** QML helper method that sorts this model */
     Q_INVOKABLE QVariant sortedBy(const QString &role, bool ascending);
 };
 

@@ -13,10 +13,10 @@ PanoramaUI {
     //Gain access to the desktop's theme colors
     SystemPalette { id: palette }
 
-    onLoad: { //Triggered once everything is set up
+    onLoaded: { //Triggered once everything is set up
         print("Welcome to the UI named " + name + "!");
     }
-    
+
     Setting { id: lastExecuted; key: "lastExecuted" }
     Setting { id: clockspeed; section: "system"; key: "clockspeed" }
 

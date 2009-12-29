@@ -161,7 +161,7 @@ void MainWindow::loadApps() {
     if(_ui)
     {
         connect(&_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
-                _ui, SLOT(applicationDataChanged()));
+                _ui, SLOT(propagateApplicationDataChange()));
         _ui->propagateApplicationDataChange();
     }
 }

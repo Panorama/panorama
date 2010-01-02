@@ -33,7 +33,8 @@ SOURCES += src/main.cpp \
     src/pndscanner.cpp \
     src/pnd.cpp \
     src/setting.cpp \
-    src/systeminformation.cpp
+    src/systeminformation.cpp \
+    src/settingshive.cpp
 HEADERS += src/mainwindow.h \
     src/configuration.h \
     src/panoramaui.h \
@@ -49,6 +50,7 @@ HEADERS += src/mainwindow.h \
     src/pndscanner.h \
     src/pnd.h \
     src/setting.h \
-    src/systeminformation.h
+    src/systeminformation.h \
+    src/settingshive.h
 OTHER_FILES += qrc/root.qml
 RESOURCES += qrc/default.qrc

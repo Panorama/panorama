@@ -1,9 +1,18 @@
 #include "configuration.h"
 
 Configuration::Configuration(QObject *parent) :
-    QObject(parent)
+    QObject(parent), _dirty(false)
 {
-    _generalConfig = 0;
+    _hive = new SettingsHive(this);
+    _timer.setInterval(60000);
+
+    connect(&_watcher, SIGNAL(fileChanged(QString)),
+            this, SLOT(readFile(QString)));
+    connect(_hive, SIGNAL(settingChanged(QString,QString,QString)),
+            this, SLOT(markDirty()));
+    connect(&_timer, SIGNAL(timeout()), this, SLOT(saveFile()));
+
+    _timer.start();
 }
 
 void Configuration::loadFile(const QString &f)
@@ -19,17 +28,12 @@ void Configuration::loadFile(const QString &f)
     //Only add the file to the watcher if it exists
     if(!_watcher.files().contains(f) && QFileInfo(f).exists())
         _watcher.addPath(f);
-
-    connect(&_watcher, SIGNAL(fileChanged(QString)),
-            this, SLOT(readFile(QString)));
 }
 
 void Configuration::readFile(const QString &f)
 {
     QString line;
     QString section;
-    QHash<QString, QHash<QString, QString> *> *newConfig =
-            new QHash<QString, QHash<QString, QString> *>;
     QFile file(f);
     bool changed(false);
 
@@ -96,62 +100,49 @@ void Configuration::readFile(const QString &f)
             QStringList parts = line.split("=");
             if(parts.length() > 1)
             {
-                if(!newConfig->contains(section))
-                    newConfig->insert(section, new QHash<QString, QString>);
-
                 const QString key = parts[0].trimmed();
                 parts.removeFirst();
                 QString value = parts.join("=").trimmed();
 
                 if(value.startsWith('"'))
                     value = value.mid(1, value.length() - 2);
-
-                newConfig->value(section)->insert(key, value);
+                _hive->setSetting(section, key, value);
             }
         }
     }
     file.close();
 
-    if(!_generalConfig) //We do NOT want to overwrite the config at runtime!
-    {
-        _generalConfig = newConfig;
-        emit generalConfigChanged(_generalConfig);
-    }
-    else
-        delete newConfig;
-
     if(changed)
         emit uiChanged(_uiDir, _ui);
 }
 
-void Configuration::saveFile(const QString &f)
+void Configuration::markDirty()
 {
-    QFile file(f);
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    _dirty = true;
+}
+
+void Configuration::saveFile()
+{
+    if(_dirty)
     {
-        qWarning() << "Could not open file " << _file;
-        return;
-    }
-
-    QTextStream out(&file);
-
-    out << "uiDirectory = \"" << _uiDir << '\"' << endl;
-    out << "ui = \"" << _ui << '\"' << endl;
-
-    foreach(const QString &section, _generalConfig->keys())
-    {
-        out << endl << "[" << section << "]" << endl;
-        foreach(const QString &key, _generalConfig->value(section)->keys())
+        QFile file(_file);
+        if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
         {
-            out << key << " = \""
-                    << QString(_generalConfig->value(section)->value(key))
-                        .replace('\n', ' ')
-                    << '\"' << endl;
+            qWarning() << "Could not open file " << _file;
+            return;
         }
-    }
 
-    file.flush();
-    file.close();
+        QTextStream out(&file);
+
+        out << "uiDirectory = \"" << _uiDir << '\"' << endl;
+        out << "ui = \"" << _ui << '\"' << endl;
+
+        _hive->writeIni(out);
+
+        file.flush();
+        file.close();
+        _dirty = false;
+    }
 }
 
 QString Configuration::ui() const
@@ -164,9 +155,9 @@ QString Configuration::uiDir() const
     return _uiDir;
 }
 
-QHash<QString, QHash<QString, QString> *> *Configuration::generalConfig() const
+SettingsHive *Configuration::generalConfig() const
 {
-    return _generalConfig;
+    return _hive;
 }
 
 void Configuration::setUI(const QString &value)
@@ -181,14 +172,4 @@ void Configuration::setUI(const QString &value)
 void Configuration::setUIDir(const QString &value)
 {
     _uiDir = value;
-}
-
-Configuration::~Configuration()
-{
-    if(_generalConfig)
-    {
-        foreach(const QString &key, _generalConfig->keys())
-            delete _generalConfig->value(key);
-        delete _generalConfig;
-    }
 }

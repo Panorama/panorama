@@ -9,6 +9,9 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <QFileSystemWatcher>
+#include <QTimer>
+
+#include "settingshive.h"
 
 /**
  * Represents a configuration file for the Panorama application
@@ -21,7 +24,6 @@ Q_PROPERTY(QString uiDir    READ uiDir  WRITE setUIDir)
 public:
     /** Constructs a new Configuration instance */
     explicit Configuration(QObject *parent = 0);
-    ~Configuration();
 
     /** Sets the UI name field */
     void setUI(const QString &);
@@ -35,36 +37,32 @@ public:
     /** Gets the UI search directory */
     QString uiDir() const;
 
-    /**
-     * Gets a pointer to the raw setting registry.
-     * This will be saved when the config file is saved
-     */
-    QHash<QString, QHash<QString, QString> *> *generalConfig() const;
+    /** Gets a pointer to the raw setting registry. */
+    SettingsHive *generalConfig() const;
 
 signals:
     /** The UI configuration has been changed */
     void uiChanged(const QString &uiDir, const QString &uiName);
 
-    /** The settings registry has changed */
-    void generalConfigChanged(QHash<QString, QHash<QString, QString> *> *value);
-    //TODO: reload config registry when config file changes, too
-
 public slots:
     /** Load the following file and replace the current values */
     void loadFile(const QString &file);
 
-    /** Save the current configuration values to this file */
-    void saveFile(const QString &file);
+    /** Save the current configuration values to the current file */
+    void saveFile();
 
 private slots:
     void readFile(const QString &file);
+    void markDirty();
 
 private:
     QString _file;
     QString _ui;
     QString _uiDir;
     QFileSystemWatcher _watcher;
-    QHash<QString, QHash<QString, QString> *> *_generalConfig;
+    QTimer _timer;
+    bool _dirty;
+    SettingsHive *_hive;
 };
 
 #endif // CONFIGURATION_H

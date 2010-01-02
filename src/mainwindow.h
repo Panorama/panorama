@@ -46,8 +46,6 @@ public slots:
 private slots:
     void continueLoadingUI();
 
-    void useConfig(QHash<QString, QHash<QString, QString> *> *config);
-
 private:
     void printError(const QmlComponent *obj) const;
 

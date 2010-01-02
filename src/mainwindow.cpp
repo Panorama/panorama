@@ -44,11 +44,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&_engine, SIGNAL(quit()), this, SLOT(close()));
     connect(&_config, SIGNAL(uiChanged(QString,QString)),
             this, SLOT(switchToUI(QString,QString)));
-    connect(&_config,
-            SIGNAL(generalConfigChanged(QHash<QString,QHash<QString,QString>*>*)),
-            this,
-            SLOT(useConfig(QHash<QString,QHash<QString,QString>*>*)));
     connect(this, SIGNAL(uiChanged(QString)), this, SLOT(loadUIFile(QString)));
+    Setting::setSettingsSource(_config.generalConfig());
 
     if(!QFileInfo(CONFIG_FILE).exists())
     {
@@ -124,7 +121,7 @@ void MainWindow::continueLoadingUI()
             if(appsLoaded)
             {
                 connect(&_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
-                        _ui, SLOT(applicationDataChanged()));
+                        _ui, SLOT(propagateApplicationDataChange()));
             }
             _ui->indicateLoadFinished();
         }
@@ -132,11 +129,6 @@ void MainWindow::continueLoadingUI()
             qWarning() << "The specified UI file does not contain"
                     "a Panorama UI";
     }
-}
-
-void MainWindow::useConfig(QHash<QString, QHash<QString, QString> *> *config)
-{
-    Setting::setSettingsSource(config);
 }
 
 void MainWindow::switchToUI(const QString &uiDir, const QString &uiName)
@@ -168,7 +160,7 @@ void MainWindow::loadApps() {
 
 MainWindow::~MainWindow()
 {
-    _config.saveFile(CONFIG_FILE);
+    _config.saveFile();
 
     //QObject should do this automatically, but just to be safe...
     delete _ui;

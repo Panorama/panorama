@@ -3,12 +3,11 @@
 Setting::Setting(QObject *parent) :
     QObject(parent)
 {
-    connect(&_prop, SIGNAL(fieldChanged(QString,QString,QString)),
+    connect(_settings, SIGNAL(settingChanged(QString,QString,QString)),
             this, SLOT(handleFieldChange(QString,QString,QString)));
 }
 
-void Setting::setSettingsSource(
-        QHash<QString, QHash<QString, QString> *> *value)
+void Setting::setSettingsSource(SettingsHive *value)
 {
     _settings = value;
 }
@@ -47,32 +46,17 @@ void Setting::setValue(const QString &value)
 {
     if(_settings)
     {
-        QString section(_section.isEmpty() ? _defaultSection : _section);
-        section.replace('\n', ' ');
-        QString key(_key);
-        key.replace('\n', ' ');
-
-        if(!_settings->contains(section))
-            _settings->insert(section, new QHash<QString, QString>);
-
-        if(_settings->value(section)->value(key) != value)
-        {
-            _settings->value(section)->insert(key, value);
-            _prop.changeField(_section, _key, value);
-        }
+        const QString &section(_section.isEmpty() ? _defaultSection : _section);
+        _settings->setSetting(section, _key, value);
     }
 }
 
 QString Setting::value() const
 {
-    QString section(_section.isEmpty() ? _defaultSection : _section);
-    section.replace('\n', ' ');
-    QString key(_key);
-    key.replace('\n', ' ');
+    const QString &section(_section.isEmpty() ? _defaultSection : _section);
 
-    if(_settings && _settings->contains(section) &&
-       _settings->value(section)->contains(key))
-        return _settings->value(section)->value(key);
+    if(_settings)
+        return _settings->setting(section, _key);
     else
         return QString();
 }
@@ -80,44 +64,24 @@ QString Setting::value() const
 void Setting::handleFieldChange(const QString &section, const QString &key,
                                 const QString &value)
 {
-    if(_section == section && _key == key)
+    const QString &s(_section.isEmpty() ? _defaultSection : _section);
+    if(s == section && _key == key)
         emit valueChanged(value);
 }
 
 void Setting::maybeInsertDefault()
 {
-    QString section(_section.isEmpty() ? _defaultSection : _section);
-    if(section.isEmpty())
-        return;
-    section.replace('\n', ' ');
+    const QString &section(_section.isEmpty() ? _defaultSection : _section);
 
-    QString key(_key);
-    if(key.isEmpty())
-        return;
-    key.replace('\n', ' ');
-
-    if(!_settings->contains(section))
-        _settings->insert(section, new QHash<QString, QString>);
-
-    if(_settings && !_settings->value(section)->contains(key))
+    if(!section.isEmpty() && !_key.isEmpty() && _settings &&
+       _settings->setting(section, _key).length() == 0 &&
+       _default.length() != 0)
     {
-        _settings->value(section)->insert(key, _default);
-        _prop.changeField(_section, _key, _default);
+        _settings->setSetting(section, _key, _default);
     }
 }
 
-PrivatePropagator::PrivatePropagator(QObject *parent) :
-   QObject(parent)
-{}
-
-void PrivatePropagator::changeField(const QString &section, const QString &key,
-                                    const QString &value)
-{
-    emit fieldChanged(section, key, value);
-}
-
-PrivatePropagator Setting::_prop;
 QString Setting::_defaultSection;
-QHash<QString, QHash<QString, QString> *> *Setting::_settings;
+SettingsHive *Setting::_settings;
 
 QML_DEFINE_TYPE(Panorama,1,0,Setting,Setting);

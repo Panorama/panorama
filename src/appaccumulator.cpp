@@ -5,7 +5,7 @@ AppAccumulator::AppAccumulator(QObject *parent) :
 {
     //Reload any changed file in any searchpath
     connect(&_watcher, SIGNAL(directoryChanged(QString)),
-            this, SLOT(watchedDirUpdated(QString)));
+            this, SLOT(rescanDir(QString)));
 
     //Load PNDs preemptively
     PndScanner::scanPnds();
@@ -51,7 +51,7 @@ Application AppAccumulator::getApplication(const QString &id)
     return _apps[id];
 }
 
-void AppAccumulator::watchedDirUpdated(const QString &d)
+void AppAccumulator::rescanDir(const QString &d)
 {
     QDir dir(d);
     const QStringList files = dir.entryList(QStringList("*.desktop"));

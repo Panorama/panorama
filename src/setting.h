@@ -6,20 +6,7 @@
 #include <QHash>
 #include <qml.h>
 
-/**
- * A small helper class for the Setting class
- */ //TODO: move to private header
-class PrivatePropagator : public QObject {
-    Q_OBJECT
-public:
-    explicit PrivatePropagator(QObject *parent = 0);
-
-public slots:
-    void changeField(const QString &section, const QString &key, const QString &value);
-
-signals:
-    void fieldChanged(const QString &section, const QString &key, const QString &value);
-};
+#include "settingshive.h"
 
 /**
  * A QML object for accessing the settings API
@@ -80,8 +67,7 @@ public:
     }
 
     /** Sets the settings source for the settings API */
-    static void setSettingsSource(
-            QHash<QString, QHash<QString, QString> *> *value);
+    static void setSettingsSource(SettingsHive *value);
 
 signals:
     /** This setting has a new section */
@@ -107,9 +93,8 @@ private:
     QString _key;
     QString _default;
 
-    static PrivatePropagator _prop;
     static QString _defaultSection;
-    static QHash<QString, QHash<QString, QString> *> *_settings;
+    static SettingsHive *_settings;
 };
 
 QML_DECLARE_TYPE(Setting);

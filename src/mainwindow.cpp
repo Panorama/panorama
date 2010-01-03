@@ -101,7 +101,7 @@ void MainWindow::continueLoadingUI()
     //Create an instance of the component
     QObject *obj(_component->create());
 
-    //Cehck errors again (now that the component is created)
+    //Check errors again (now that the component is created)
     printError(_component);
 
     if(!_component->isError())
@@ -133,7 +133,8 @@ void MainWindow::continueLoadingUI()
 
 void MainWindow::switchToUI(const QString &uiDir, const QString &uiName)
 {
-    emit uiChanged(QString(uiDir).append("/").append(uiName).append("/ui.qml"));
+    emit uiChanged(QString(uiDir).append(QDir::separator()).append(uiName)
+                   .append(QDir::separator()).append("ui.qml"));
 }
 
 void MainWindow::loadApps() {
@@ -161,8 +162,4 @@ void MainWindow::loadApps() {
 MainWindow::~MainWindow()
 {
     _config.saveFile();
-
-    //QObject should do this automatically, but just to be safe...
-    delete _ui;
-    delete _component;
 }

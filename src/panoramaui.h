@@ -3,12 +3,8 @@
 
 #include <QObject>
 #include <QString>
-#include <QTime>
-#include <QTimer>
 #include <QProcess>
 #include <QAbstractItemModel>
-#include <QFontDatabase>
-#include <QtDeclarative/QmlContext>
 #include <QtDeclarative/QmlGraphicsItem>
 
 #include "appaccumulator.h"
@@ -25,7 +21,7 @@ Q_OBJECT
 Q_PROPERTY(QString  name        READ name           WRITE setName)
 Q_PROPERTY(QString  description READ description    WRITE setDescription)
 Q_PROPERTY(QString  author      READ author         WRITE setAuthor)
-Q_PROPERTY(QString  settingsSection READ settingsSection    WRITE setSettingsSection)
+Q_PROPERTY(QString settingsSection READ settingsSection WRITE setSettingsSection)
 Q_PROPERTY(QVariant applications READ applications  NOTIFY applicationsUpdated)
 
 public:
@@ -62,7 +58,7 @@ public:
     /** Sets the application model source */
     static void setApplicationsSource(QAbstractItemModel *value);
 
-    /** QML helpe rmethod for executing the application with the given id */
+    /** QML helper method for executing the application with the given id */
     Q_INVOKABLE void execute(const QString &sha1);
 
 public slots:

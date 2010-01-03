@@ -55,7 +55,7 @@ void PndScanner::scanPnds()
             else
                 translated.clockspeed = 0;
 
-            _pnds += translated;
+            _pnds[translated.uid] = translated;
 
             discovery = (pnd_disco_t *)pnd_box_get_next(discovery);
         }
@@ -64,12 +64,7 @@ void PndScanner::scanPnds()
 
 Pnd PndScanner::pndForUID(const QString &uid)
 {
-    foreach(const Pnd &pnd, _pnds)
-    {
-        if(pnd.uid == uid)
-            return pnd;
-    }
-    return Pnd();
+    return _pnds[uid];
 }
 
-QList<Pnd> PndScanner::_pnds;
+QHash<QString, Pnd> PndScanner::_pnds;

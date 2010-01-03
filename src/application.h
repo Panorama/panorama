@@ -1,7 +1,6 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include <QMetaType>
 #include <QString>
 #include <QStringList>
 
@@ -37,7 +36,10 @@ struct Application
     /** The recommended clockspeed for the applicaiton */
     int clockspeed;
 
-    /** A list of Free Desktop Foundation caetgories that this application belongs to */
+    /**
+     * A list of Free Desktop Foundation caetgories that this application
+     * belongs to
+     */
     QStringList categories;
 
     /** Compares one Application instance to another */

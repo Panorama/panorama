@@ -39,7 +39,8 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
     /** Returns the header for each role */
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QVariant headerData(int section, Qt::Orientation orientation,
+                        int role = Qt::DisplayRole) const;
 
     /** QML helper method that applies a filter to this model */
     Q_INVOKABLE QVariant inCategory(const QString &category);

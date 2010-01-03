@@ -1,18 +1,14 @@
 #include "configuration.h"
 
 Configuration::Configuration(QObject *parent) :
-    QObject(parent), _dirty(false)
+    QObject(parent)
 {
     _hive = new SettingsHive(this);
-    _timer.setInterval(60000);
 
     connect(&_watcher, SIGNAL(fileChanged(QString)),
             this, SLOT(readFile(QString)));
-    connect(_hive, SIGNAL(settingChanged(QString,QString,QString)),
-            this, SLOT(markDirty()));
-    connect(&_timer, SIGNAL(timeout()), this, SLOT(saveFile()));
-
-    _timer.start();
+    connect(_hive, SIGNAL(settingChanged(QString,QString,QString,ChangeSource)),
+            this, SLOT(saveFile()));
 }
 
 void Configuration::loadFile(const QString &f)
@@ -106,7 +102,7 @@ void Configuration::readFile(const QString &f)
 
                 if(value.startsWith('"'))
                     value = value.mid(1, value.length() - 2);
-                _hive->setSetting(section, key, value);
+                _hive->setSetting(section, key, value, SettingsHive::File);
             }
         }
     }
@@ -115,34 +111,33 @@ void Configuration::readFile(const QString &f)
     if(changed)
         emit uiChanged(_uiDir, _ui);
 }
-
-void Configuration::markDirty()
+void Configuration::reactToChange(const QString&,
+                                  const QString&,
+                                  const QString&,
+                                  SettingsHive::ChangeSource source)
 {
-    _dirty = true;
+    if(source != SettingsHive::File)
+        saveFile();
 }
 
 void Configuration::saveFile()
 {
-    if(_dirty)
+    QFile file(_file);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        QFile file(_file);
-        if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
-        {
-            qWarning() << "Could not open file " << _file;
-            return;
-        }
-
-        QTextStream out(&file);
-
-        out << "uiDirectory = \"" << _uiDir << '\"' << endl;
-        out << "ui = \"" << _ui << '\"' << endl;
-
-        _hive->writeIni(out);
-
-        file.flush();
-        file.close();
-        _dirty = false;
+        qWarning() << "Could not open file " << _file;
+        return;
     }
+
+    QTextStream out(&file);
+
+    out << "uiDirectory = \"" << _uiDir << '\"' << endl;
+    out << "ui = \"" << _ui << '\"' << endl;
+
+    _hive->writeIni(out);
+
+    file.flush();
+    file.close();
 }
 
 QString Configuration::ui() const

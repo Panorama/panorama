@@ -29,9 +29,6 @@ public:
     /** Constructs a new MainWindow instance */
     MainWindow(QWidget *parent = 0);
 
-    /** Destroys this MainWindow */
-    ~MainWindow();
-
 signals:
     /** A new UI file should be loaded */
     void uiChanged(const QString &uiFile);

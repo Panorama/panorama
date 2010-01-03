@@ -158,8 +158,3 @@ void MainWindow::loadApps() {
         _ui->propagateApplicationDataChange();
     }
 }
-
-MainWindow::~MainWindow()
-{
-    _config.saveFile();
-}

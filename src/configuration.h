@@ -9,7 +9,6 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <QFileSystemWatcher>
-#include <QTimer>
 
 #include "settingshive.h"
 
@@ -53,15 +52,15 @@ public slots:
 
 private slots:
     void readFile(const QString &file);
-    void markDirty();
+
+    void reactToChange(const QString&, const QString&, const QString&,
+                       SettingsHive::ChangeSource source);
 
 private:
     QString _file;
     QString _ui;
     QString _uiDir;
     QFileSystemWatcher _watcher;
-    QTimer _timer;
-    bool _dirty;
     SettingsHive *_hive;
 };
 

@@ -38,7 +38,8 @@ QString SettingsHive::setting(const QString &section, const QString &key) const
 }
 
 void SettingsHive::setSetting(const QString &section, const QString &key,
-                const QString &value)
+                              const QString &value,
+                              SettingsHive::ChangeSource source)
 {
     if(_store)
     {
@@ -48,7 +49,7 @@ void SettingsHive::setSetting(const QString &section, const QString &key,
         if(_store->value(section)->value(key) != value)
         {
             _store->value(section)->insert(key, value);
-            emit settingChanged(section, key, value);
+            emit settingChanged(section, key, value, source);
         }
     }
 }

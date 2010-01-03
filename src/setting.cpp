@@ -3,7 +3,7 @@
 Setting::Setting(QObject *parent) :
     QObject(parent)
 {
-    connect(_settings, SIGNAL(settingChanged(QString,QString,QString)),
+    connect(_settings, SIGNAL(settingChanged(QString,QString,QString,ChangeSource)),
             this, SLOT(handleFieldChange(QString,QString,QString)));
 }
 
@@ -47,7 +47,7 @@ void Setting::setValue(const QString &value)
     if(_settings)
     {
         const QString &section(_section.isEmpty() ? _defaultSection : _section);
-        _settings->setSetting(section, _key, value);
+        _settings->setSetting(section, _key, value, SettingsHive::External);
     }
 }
 
@@ -77,7 +77,7 @@ void Setting::maybeInsertDefault()
        _settings->setting(section, _key).length() == 0 &&
        _default.length() != 0)
     {
-        _settings->setSetting(section, _key, _default);
+        _settings->setSetting(section, _key, _default, SettingsHive::External);
     }
 }
 

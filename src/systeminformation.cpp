@@ -81,37 +81,75 @@ void SystemInformation::updateSd()
     struct statvfs fs;
     int tmp;
 
-    if(statvfs("/mnt/sd1", &fs) > -1)
+    QFile mounts("/proc/mounts");
+    if(!mounts.open(QFile::Text | QFile::ReadOnly | QFile::Unbuffered))
+        return;
+    QString mountTab = QTextStream(&mounts).readAll();
+    mounts.close();
+
+    if(mountTab.contains(" /mnt/sd1 "))
     {
-        tmp = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
-        if(_sd1 != tmp)
+        if(statvfs("/mnt/sd1", &fs) > -1)
         {
-            _sd1 = tmp;
+            tmp = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
+            if(_sd1 != tmp)
+            {
+                _sd1 = tmp;
+                emit sd1Updated(_sd1);
+            }
+
+            tmp = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
+            if(_usedSd1 != tmp)
+            {
+                _usedSd1 = tmp;
+                emit usedSd1Updated(_usedSd1);
+            }
+        }
+    }
+    else
+    {
+        if(_sd1 != 0)
+        {
+            _sd1 = 0;
             emit sd1Updated(_sd1);
         }
-
-        tmp = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
-        if(_usedSd1 != tmp)
+        if(_usedSd1 != 0)
         {
-            _usedSd1 = tmp;
+            _usedSd1 = 0;
             emit usedSd1Updated(_usedSd1);
         }
     }
 
-    if(statvfs("/mnt/sd2", &fs) > -1)
+    if(mountTab.contains(" /mnt/sd2 "))
     {
-        tmp = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
-        if(_sd2 != tmp)
+        if(statvfs("/mnt/sd2", &fs) > -1)
         {
-            _sd2 = tmp;
+            tmp = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
+            if(_sd2 != tmp)
+            {
+                _sd2 = tmp;
+                emit sd2Updated(_sd2);
+            }
+
+            tmp = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
+            if(_usedSd2 != tmp)
+            {
+                _usedSd2 = tmp;
+                emit usedSd2Updated(_usedSd2);
+            }
+        }
+    }
+    else
+    {
+        if(_sd2 != 0)
+        {
+            _sd2 = 0;
             emit sd2Updated(_sd2);
         }
-
-        tmp = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
-        if(_usedSd2 != tmp)
+        if(_usedSd2 != 0)
         {
-            _usedSd2 = tmp;
-            emit usedSd2Updated(_usedSd2);
+            _usedSd2 = 0;
+            emit usedSd1Updated(_usedSd2);
         }
     }
 }

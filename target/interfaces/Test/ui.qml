@@ -5,10 +5,10 @@ import "pages" as Pages         //Import page prototypes from "pages/"
 
 PanoramaUI {
     id: ui
-    name: "Default"
-    description: "The default Panorama UI"
+    name: "Test"
+    description: "A test Panorama UI that shows what Panorama is capable of"
     author: "dflemstr"
-    settingsSection: "default-theme" //The [section] that this theme gets in the config file
+    settingsSection: "test-theme" //The [section] that this theme gets in the config file
 
     //Gain access to the desktop's theme colors
     SystemPalette { id: palette }

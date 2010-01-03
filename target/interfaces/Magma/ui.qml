@@ -21,7 +21,7 @@ PanoramaUI {
     Setting {
         id: magmaStream
         key: "magmaStream"
-        defaultValue: "true"
+        defaultValue: "false"
     }
 
     Setting {

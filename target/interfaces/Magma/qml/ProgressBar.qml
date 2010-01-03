@@ -59,6 +59,6 @@ Item {
         font.bold: true
         font.pixelSize: progressbar.height * 0.8
         text: (displayInPercent ? (progressbar.ratio * 100).toFixed(2)
-            : value + "/" + maximum) + " " + unit
+            : value + "/" + maximum + " ") + unit
     }
 }

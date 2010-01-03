@@ -239,6 +239,10 @@ PanoramaUI {
     }
 
     //System info icons:
+    SystemInformation {
+        id: sysinfo
+    }
+    
     Helpers.PositionedImage {
         id: cpuIcon
         z: 2
@@ -249,7 +253,7 @@ PanoramaUI {
         z: 2
         function accessor(x) { return readField(skinCfg.data, "cpu_text" + x); }
         function styleField(x) { return cpuStyle.getField(x); }
-        text: clockspeed + " MHz"
+        text: (sysinfo.usedCpu * 100 / sysinfo.cpu).toFixed(2) + "%"
     }
 
     Helpers.PositionedImage {
@@ -262,7 +266,7 @@ PanoramaUI {
         z: 2
         function accessor(x) { return readField(skinCfg.data, "sd1_text" + x); }
         function styleField(x) { return sd1Style.getField(x); }
-        text: "1024 MiB"
+        text: (sysinfo.sd1 - sysinfo.usedSd1) + " MiB"
     }
 
     Helpers.PositionedImage {
@@ -275,7 +279,7 @@ PanoramaUI {
         z: 2
         function accessor(x) { return readField(skinCfg.data, "sd2_text" + x); }
         function styleField(x) { return sd2Style.getField(x); }
-        text: "1024 MiB"
+        text: (sysinfo.sd2 - sysinfo.usedSd2) + " MiB"
     }
 
     Helpers.PositionedImage {
@@ -394,12 +398,12 @@ PanoramaUI {
         focus: ui.selectedIndex == 5
 
         Keys.onUpPressed: {
-            if(clockspeed.value < 800)
-                clockspeed.value += 10;
+            if(parseInt(clockspeed.value) < 800)
+                clockspeed.value = parseInt(clockspeed.value) + 10;
         }
         Keys.onDownPressed: {
-            if(clockspeed.value > 300)
-                clockspeed.value -= 10;
+            if(parseInt(clockspeed.value) > 300)
+                clockspeed.value = parseInt(clockspeed.value) - 10;
         }
         Column {
             anchors.fill: parent

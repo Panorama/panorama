@@ -157,7 +157,6 @@ void AppAccumulator::addViaDesktopFile(const QString &f)
             QString oldExec = result.id;
             result.id = QCryptographicHash::hash(oldExec.toLocal8Bit()
                                                  .append(result.pandoraId)
-                                                 .append(result.relatedFile)
                                                  .append(result.name),
                                                  QCryptographicHash::Sha1)
                                                      .toHex();

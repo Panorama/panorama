@@ -12,7 +12,7 @@ Item {
     property alias styleColor: label.styleColor
     property bool displayInPercent: false
     property string unit: ""
-    
+
     property real ratio: (value - minimum) / (maximum - minimum)
 
     height: 48
@@ -26,11 +26,11 @@ Item {
         property real b2: Math.sqrt((r * h / 2 * ((Math.PI - 4) * h / 2 + 2 * w)) / Math.PI) * 2
         property real b: (b2 > h) ? b1 : b2
         b: Behavior { NumberAnimation { duration: 300; easing: "OutQuad" } }
-        
+
         radius: Math.min(b2, h / 2)
         width: b
         height: Math.min(b, h)
-        
+
         smooth: true
         anchors.verticalCenter: parent.verticalCenter
         gradient: Gradient {

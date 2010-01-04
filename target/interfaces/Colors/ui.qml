@@ -242,7 +242,7 @@ PanoramaUI {
     SystemInformation {
         id: sysinfo
     }
-    
+
     Helpers.PositionedImage {
         id: cpuIcon
         z: 2

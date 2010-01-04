@@ -31,6 +31,10 @@ public:
     bool filterAcceptsRow(int source_row,
                           const QModelIndex &source_parent) const;
 
+    void setDrop(int value) { _drop = value; }
+
+    void setTake(int value) { _take = value; }
+
     /** QML helper method that applies a filter to this model */
     Q_INVOKABLE QVariant inCategory(const QString &category);
 
@@ -39,6 +43,14 @@ public:
 
     /** QML helper method that sorts this model */
     Q_INVOKABLE QVariant sortedBy(const QString &role, bool ascending);
+
+    Q_INVOKABLE QVariant drop(int count);
+
+    Q_INVOKABLE QVariant take(int count);
+
+private:
+    int _drop;
+    int _take;
 };
 
 #endif // CATEGORYFILTERMODEL_H

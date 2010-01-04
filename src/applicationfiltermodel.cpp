@@ -1,12 +1,12 @@
 #include "applicationfiltermodel.h"
 
 ApplicationFilterModel::ApplicationFilterModel(QObject *parent) :
-    QSortFilterProxyModel(parent)
+    QSortFilterProxyModel(parent), _drop(0), _take(0)
 {}
 
 ApplicationFilterModel::ApplicationFilterModel(QAbstractItemModel *sourceModel,
                                                QObject *parent) :
-    QSortFilterProxyModel(parent)
+    QSortFilterProxyModel(parent), _drop(0), _take(0)
 {
     setSourceModel(sourceModel);
     setRoleNames(sourceModel->roleNames());
@@ -16,6 +16,9 @@ bool ApplicationFilterModel::filterAcceptsRow(int sourceRow,
                                               const QModelIndex &sourceParent)
     const
 {
+    if(sourceRow < _drop || (_take && (sourceRow >= _drop + _take)))
+        return false;
+
     if(filterRole() == ApplicationModel::Categories)
     {
         const QModelIndex idx = sourceModel()->index(sourceRow, 0,
@@ -48,4 +51,14 @@ QVariant ApplicationFilterModel::matching(const QString &role,
 QVariant ApplicationFilterModel::sortedBy(const QString &role, bool ascending)
 {
     return ApplicationFilterMethods::sortedBy(this, role, ascending);
+}
+
+QVariant ApplicationFilterModel::drop(int count)
+{
+    return ApplicationFilterMethods::drop(this, count);
+}
+
+QVariant ApplicationFilterModel::take(int count)
+{
+    return ApplicationFilterMethods::take(this, count);
 }

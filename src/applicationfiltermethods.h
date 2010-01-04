@@ -41,6 +41,10 @@ public:
     static QVariant sortedBy(QAbstractItemModel *source, const QString &role,
                              bool ascending);
 
+    static QVariant drop(QAbstractItemModel *source, int count);
+
+    static QVariant take(QAbstractItemModel *source, int count);
+
 private:
     ApplicationFilterMethods() {};
 

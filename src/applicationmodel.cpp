@@ -119,3 +119,13 @@ QVariant ApplicationModel::sortedBy(const QString &role, bool ascending)
 {
     return ApplicationFilterMethods::sortedBy(this, role, ascending);
 }
+
+QVariant ApplicationModel::drop(int count)
+{
+    return ApplicationFilterMethods::drop(this, count);
+}
+
+QVariant ApplicationModel::take(int count)
+{
+    return ApplicationFilterMethods::take(this, count);
+}

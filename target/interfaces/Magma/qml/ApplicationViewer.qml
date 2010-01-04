@@ -54,8 +54,7 @@ Item {
                 }
             }
             Row {
-                width: apps.itemWidth
-                height: apps.itemHeight
+                anchors.fill: parent
                 Image {
                     id: iconField
                     source: icon
@@ -80,14 +79,36 @@ Item {
                         elide: Text.ElideRight
                         font.bold: true
                     }
-                    Text {
-                        text: comment
+                    Item {
+                        id: commentContainer
                         width: parent.width
                         anchors.top: nameLabel.bottom
                         anchors.bottom: parent.bottom
-                        font.pixelSize: apps.itemHeight / 5
-                        color: "#ed8d06"
-                        wrap: true
+                        clip: true
+                        Text {
+                            id: commentLabel
+                            text: comment
+                            width: parent.width
+                            font.pixelSize: apps.itemHeight / 5
+                            color: "#ed8d06"
+                            wrap: true
+                            y: SequentialAnimation {
+                                running: true
+                                repeat: true
+                                PauseAnimation {
+                                    duration: 1000
+                                }
+                                NumberAnimation {
+                                    from: 0
+                                    to: Math.min(0, commentContainer.height - commentLabel.height)
+                                    duration: 1000
+                                }
+                                PauseAnimation {
+                                    duration: 1000
+                                }
+                                NumberAnimation { to: 0; duration: 100 }
+                            }
+                        }
                     }
                 }
             }

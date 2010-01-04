@@ -111,8 +111,13 @@ QStringList IconFinder::getDefaultThemePaths()
 
 QStringList IconFinder::getIconSuffixes()
 {
-    QStringList result;
-    result << ".svg" << ".png"/* << ".xpm"*/; //Qt doesn't support XPM in WebKit
+    QStringList result, accepted;
+    accepted << "png" << "svg" << "xpm";
+
+    foreach(const QString &format, QImageReader::supportedImageFormats ())
+        if(accepted.contains(format))
+            result += QString(format).prepend(".");
+
     return result;
 }
 

@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QStringList>
 #include <QProcess>
+#include <QImageReader>
 #include <QDebug>
 
 /**

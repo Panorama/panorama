@@ -79,78 +79,64 @@ void SystemInformation::updateCpu()
 void SystemInformation::updateSd()
 {
     struct statvfs fs;
-    int tmp;
+    int newSd1(0), newUsedSd1(0), newSd2(0), newUsedSd2(0);
 
     QFile mounts("/proc/mounts");
     if(!mounts.open(QFile::Text | QFile::ReadOnly | QFile::Unbuffered))
         return;
-    QString mountTab = QTextStream(&mounts).readAll();
+
+    QTextStream in(&mounts);
+
+    while(!(newSd1 && newSd2))
+    {
+        QString line = in.readLine();
+
+        if(line.isNull())
+            break;
+
+        QStringList parts = line.split(' ');
+
+        if(parts.length() < 2)
+            continue;
+
+        QString source(parts[0]);
+
+        //Note that the mount point will have e.g. spaces escaped as \040:
+        QString mountPoint(parts[1]);
+
+        if(source == "/dev/mmcblk0p1" && statvfs(mountPoint.toLocal8Bit(), &fs) > -1)
+        {
+            newSd1 = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
+            newUsedSd1 = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
+        }
+        else if(source == "/dev/mmcblk1p1" && statvfs(mountPoint.toLocal8Bit(), &fs) > -1)
+        {
+            newSd2 = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
+            newUsedSd2 = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
+        }
+    }
     mounts.close();
 
-    if(mountTab.contains(" /mnt/sd1 "))
+    if(_sd1 != newSd1)
     {
-        if(statvfs("/mnt/sd1", &fs) > -1)
-        {
-            tmp = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
-            if(_sd1 != tmp)
-            {
-                _sd1 = tmp;
-                emit sd1Updated(_sd1);
-            }
-
-            tmp = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
-            if(_usedSd1 != tmp)
-            {
-                _usedSd1 = tmp;
-                emit usedSd1Updated(_usedSd1);
-            }
-        }
+        _sd1 = newSd1;
+        emit sd1Updated(_sd1);
     }
-    else
+    if(_usedSd1 != newUsedSd1)
     {
-        if(_sd1 != 0)
-        {
-            _sd1 = 0;
-            emit sd1Updated(_sd1);
-        }
-        if(_usedSd1 != 0)
-        {
-            _usedSd1 = 0;
-            emit usedSd1Updated(_usedSd1);
-        }
+        _usedSd1 = newUsedSd1;
+        emit usedSd1Updated(_usedSd1);
     }
 
-    if(mountTab.contains(" /mnt/sd2 "))
+    if(_sd2 != newSd2)
     {
-        if(statvfs("/mnt/sd2", &fs) > -1)
-        {
-            tmp = int(fs.f_blocks * fs.f_frsize / (1024L * 1024L));
-            if(_sd2 != tmp)
-            {
-                _sd2 = tmp;
-                emit sd2Updated(_sd2);
-            }
-
-            tmp = int((fs.f_blocks - fs.f_bfree) * fs.f_frsize / (1024L * 1024L));
-            if(_usedSd2 != tmp)
-            {
-                _usedSd2 = tmp;
-                emit usedSd2Updated(_usedSd2);
-            }
-        }
+        _sd2 = newSd2;
+        emit sd2Updated(_sd2);
     }
-    else
+    if(_usedSd2 != newUsedSd2)
     {
-        if(_sd2 != 0)
-        {
-            _sd2 = 0;
-            emit sd2Updated(_sd2);
-        }
-        if(_usedSd2 != 0)
-        {
-            _usedSd2 = 0;
-            emit usedSd1Updated(_usedSd2);
-        }
+        _usedSd2 = newUsedSd2;
+        emit usedSd2Updated(_usedSd2);
     }
 }
 

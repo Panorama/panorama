@@ -99,10 +99,10 @@ void SystemInformation::updateSd()
         if(parts.length() < 2)
             continue;
 
-        QString source(parts[0]);
+        const QString &source = parts[0];
 
         //Note that the mount point will have e.g. spaces escaped as \040:
-        QString mountPoint(parts[1]);
+        const QString &mountPoint = parts[1];
 
         if(source == "/dev/mmcblk0p1" && statvfs(mountPoint.toLocal8Bit(), &fs) > -1)
         {

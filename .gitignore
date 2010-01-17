@@ -17,10 +17,10 @@ Makefile
 *.o
 moc_*
 qrc_*
-panorama
+panorama/target/panorama
 
 # Ignore project-related user-generated files
 *.user
 
 # Ignore that #¤#% config file that is modified every time we test the application
-target/settings.cfg
+panorama/target/settings.cfg

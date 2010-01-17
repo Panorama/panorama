@@ -1,4 +1,4 @@
-#pandora-libraries.pro - The qmake master project for pandora-libraries
+#panorama.pro - The qmake master project for panorama
 TEMPLATE = subdirs
 SUBDIRS = panorama \
     pandora-libraries

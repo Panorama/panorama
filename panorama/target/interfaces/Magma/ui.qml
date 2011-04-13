@@ -297,22 +297,22 @@ PanoramaUI {
                 focus: level == 1 && topSection == "apps"
                 opacity: topSection == "apps" ? 1 : 0
 
-                function toggleFavorite(idf) {
-                    if(favorites.value.indexOf(idf) == -1) {
-                        //Add favorite
-                        if(favorites.value.length > 0)
-                            favorites.value += "|";
-                        favorites.value += idf;
-                    }
-                    else //Remove favorite if it already exists
-                    {
-                        var nf = favorites.value.replace(idf, "");
-                        nf = nf.replace("||", "|");
-                        favorites.value = nf.replace(/\|$|^\|/, "");
-                    }
-                }
-
                 Extensions.ApplicationViewer {
+                    function toggleFavorite(idf) {
+                        if(favorites.value.indexOf(idf) == -1) {
+                            //Add favorite
+                            if(favorites.value.length > 0)
+                                favorites.value += "|";
+                            favorites.value += idf;
+                        }
+                        else //Remove favorite if it already exists
+                        {
+                            var nf = favorites.value.replace(idf, "");
+                            nf = nf.replace("||", "|");
+                            favorites.value = nf.replace(/\|$|^\|/, "");
+                        }
+                    }
+
                     id: appsViewer
                     anchors.fill: parent
                     model: ui.applications.matching("name", nameFilter).sortedBy("name", true)
@@ -330,15 +330,15 @@ PanoramaUI {
                 focus: level == 1 && topSection == "favs"
                 opacity: topSection == "favs" ? 1 : 0
 
-                function removeFavorite(idf) {
-                    var nf = favorites.value.replace(idf, "");
-                    nf = nf.replace("||", "|");
-                    favorites.value = nf.replace(/\|$|^\|/, "");
-                    if(favorites.value.length == 0)
-                        level = 0;
-                }
-
                 Extensions.ApplicationViewer {
+                    function removeFavorite(idf) {
+                        var nf = favorites.value.replace(idf, "");
+                        nf = nf.replace("||", "|");
+                        favorites.value = nf.replace(/\|$|^\|/, "");
+                        if(favorites.value.length == 0)
+                            level = 0;
+                    }
+
                     id: favsViewer
                     anchors.fill: parent
                     model: ui.applications.matching("name", nameFilter).matching("identifier", "^" + favorites.value + "$").sortedBy("name", true)

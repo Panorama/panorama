@@ -113,23 +113,19 @@ PanoramaUI {
             height: ui.height
             clip: true
             opacity: magmaStream.value == "true" ? 1 : 0
-            /* Not yet implemented in QML
-            effect: Bloom {
-                blurHint: Qt.PerformanceHint
-                blurRadius: 8
-            }*/
+
             Image {
                 id: stream
-                Behavior on y {
-                    SequentialAnimation {
-                        id: seq
-                        running: level == 1 && magmaStream.value == "true"
-                        //repeat: true
-                        NumberAnimation {
-                            from: 0
-                            to: -413
-                            duration: 5000
-                        }
+                SequentialAnimation {
+                    id: seq
+                    running: level == 1 && magmaStream.value == "true"
+                    loops: Animation.Infinite
+                    NumberAnimation {
+                        target: stream
+                        property: "y"
+                        from: 0
+                        to: -413
+                        duration: 5000
                     }
                 }
                 height: ui.height + 413

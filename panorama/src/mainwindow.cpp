@@ -32,7 +32,15 @@ MainWindow::MainWindow(QWidget *parent) :
 #ifndef DISABLE_OPENGL
     _canvas.setViewport(new QGLWidget());
 #endif
+    _canvas.setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
+    _canvas.setOptimizationFlag(QGraphicsView::DontSavePainterState);
+    
 
+    _canvas.viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+    _canvas.viewport()->setAttribute(Qt::WA_NoSystemBackground);
+    _canvas.viewport()->setAttribute(Qt::WA_PaintUnclipped);
+    _canvas.viewport()->setAttribute(Qt::WA_TranslucentBackground, false);
+    
     _model.setParent(this);
     PanoramaUI::setApplicationsSource(&_model);
 

@@ -18,8 +18,9 @@
 class Configuration : public QObject
 {
 Q_OBJECT
-Q_PROPERTY(QString ui       READ ui     WRITE setUI)
-Q_PROPERTY(QString uiDir    READ uiDir  WRITE setUIDir)
+Q_PROPERTY(QString ui         READ ui         WRITE setUI)
+Q_PROPERTY(QString uiDir      READ uiDir      WRITE setUIDir)
+Q_PROPERTY(bool    fullscreen READ fullscreen WRITE setFullscreen)
 public:
     /** Constructs a new Configuration instance */
     explicit Configuration(QObject *parent = 0);
@@ -35,6 +36,12 @@ public:
 
     /** Gets the UI search directory */
     QString uiDir() const;
+
+    /** Sets start in fullscreen */
+    void setFullscreen(const bool &);
+
+    /** Gets start in fullscreen */
+    bool fullscreen() const;
 
     /** Gets a pointer to the raw setting registry. */
     SettingsHive *generalConfig() const;
@@ -60,6 +67,7 @@ private:
     QString _file;
     QString _ui;
     QString _uiDir;
+    bool _fullscreen;
     QFileSystemWatcher _watcher;
     SettingsHive *_hive;
 };

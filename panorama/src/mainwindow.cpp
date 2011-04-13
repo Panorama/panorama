@@ -40,10 +40,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _canvas.viewport()->setAttribute(Qt::WA_PaintUnclipped);
     _canvas.viewport()->setAttribute(Qt::WA_TranslucentBackground, false);
     
-#ifdef FULLSCREEN
-    _canvas.showFullScreen();
-#endif
-
     _canvas.setStyleSheet( "QGraphicsView { border-style: none; }" );
     _canvas.setFrameStyle(0);
     _canvas.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -79,6 +75,9 @@ MainWindow::MainWindow(QWidget *parent) :
                                           QFile::ReadGroup | QFile::ReadOther);
     }
     _config.loadFile(CONFIG_FILE);
+
+    if(_config.fullscreen())
+        showFullScreen();
 }
 
 void MainWindow::loadUIFile(const QString &file)
@@ -170,9 +169,13 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
     else if(e->key() == Qt::Key_F && e->modifiers() & Qt::ControlModifier)
     {
         if(isFullScreen())
+        {
             showNormal();
+        }
         else
+        {
             showFullScreen();
+        }
     }
 }
 

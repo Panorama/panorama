@@ -1,7 +1,7 @@
 #include "configuration.h"
 
 Configuration::Configuration(QObject *parent) :
-    QObject(parent)
+    QObject(parent), _fullscreen(false)
 {
     _hive = new SettingsHive(this);
 
@@ -91,6 +91,30 @@ void Configuration::readFile(const QString &f)
                 }
             }
         }
+        else if(section.isEmpty() && line.startsWith("fullscreen"))
+        {
+            QStringList parts = line.split("=");
+            if(parts.count() > 1)
+            {
+                parts.removeFirst();
+                line = parts.join("=").simplified();
+
+                if(line == "\"true\"" && !_fullscreen)
+                {
+                    changed = true;
+                    _fullscreen = true;
+                }
+                else if(_fullscreen)
+                {
+                    _fullscreen = false;
+                    changed = true;
+                }
+                else
+                {
+                    _fullscreen = false;
+                }
+            }
+        }
         else
         {
             QStringList parts = line.split("=");
@@ -133,6 +157,7 @@ void Configuration::saveFile()
 
     out << "uiDirectory = \"" << _uiDir << '\"' << endl;
     out << "ui = \"" << _ui << '\"' << endl;
+    out << "fullscreen = " << (_fullscreen ? "\"true\"" : "\"false\"") << endl;
 
     _hive->writeIni(out);
 
@@ -148,6 +173,11 @@ QString Configuration::ui() const
 QString Configuration::uiDir() const
 {
     return _uiDir;
+}
+
+bool Configuration::fullscreen() const
+{
+    return _fullscreen;
 }
 
 SettingsHive *Configuration::generalConfig() const
@@ -167,4 +197,9 @@ void Configuration::setUI(const QString &value)
 void Configuration::setUIDir(const QString &value)
 {
     _uiDir = value;
+}
+
+void Configuration::setFullscreen(const bool &value)
+{
+    _fullscreen = value;
 }

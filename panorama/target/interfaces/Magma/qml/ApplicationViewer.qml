@@ -1,4 +1,4 @@
-import Qt 4.6
+import Qt 4.7
 import Panorama 1.0
 
 Item {
@@ -34,7 +34,7 @@ Item {
             property string ident: identifier
             width: apps.itemWidth
             height: apps.itemHeight
-            MouseRegion {
+            MouseArea {
                 anchors.fill: parent
                 onClicked: {
                     appView.currentIndex = index;
@@ -46,7 +46,7 @@ Item {
                 anchors.top: parent.top
                 anchors.right: parent.right
                 source: favorites.value.indexOf(identifier) == -1 ? "../images/favorite-disabled.png" : "../images/favorite-enabled.png"
-                MouseRegion {
+                MouseArea {
                     anchors.fill: parent
                     onClicked: {
                         favStarClicked(identifier);
@@ -66,7 +66,7 @@ Item {
                     width: 5
                     height: parent.height
                 }
-                Column {
+                Item {
                     width: parent.width - iconField.height - 5
                     height: parent.height
                     Text {
@@ -91,22 +91,24 @@ Item {
                             width: parent.width
                             font.pixelSize: apps.itemHeight / 5
                             color: "#ed8d06"
-                            wrap: true
-                            y: SequentialAnimation {
-                                running: true
-                                repeat: true
-                                PauseAnimation {
-                                    duration: 1000
+                            wrapMode: Text.Wrap
+                            Behavior on y {
+                                SequentialAnimation {
+                                    running: true
+                                    //repeat: true
+                                    PauseAnimation {
+                                        duration: 1000
+                                    }
+                                    NumberAnimation {
+                                        from: 0
+                                        to: Math.min(0, commentContainer.height - commentLabel.height)
+                                        duration: 1000
+                                    }
+                                    PauseAnimation {
+                                        duration: 1000
+                                    }
+                                    NumberAnimation { to: 0; duration: 100 }
                                 }
-                                NumberAnimation {
-                                    from: 0
-                                    to: Math.min(0, commentContainer.height - commentLabel.height)
-                                    duration: 1000
-                                }
-                                PauseAnimation {
-                                    duration: 1000
-                                }
-                                NumberAnimation { to: 0; duration: 100 }
                             }
                         }
                     }
@@ -122,15 +124,19 @@ Item {
             radius: apps.itemHeight / 8
             width: apps.itemWidth
             height: apps.itemHeight
-            x: SpringFollow {
-                source: appView.currentItem.x
-                spring: 3
-                damping: 0.2
+            x: appView.currentItem.x
+            Behavior on x {
+                SpringAnimation {
+                    spring: 3
+                    damping: 0.2
+                }
             }
-            y: SpringFollow {
-                source: appView.currentItem.y
-                spring: 3
-                damping: 0.2
+            y: appView.currentItem.y
+            Behavior on y {
+                SpringAnimation {
+                    spring: 3
+                    damping: 0.2
+                }
             }
         }
     }
@@ -154,9 +160,11 @@ Item {
         width: parent.width * 0.3
         height: apps.itemHeight / 3
         z: 6
-        opacity: EaseFollow {
-            velocity: 2
-            source: nameField.text.length > 0 ? 1 : 0
+        opacity: nameField.text.length > 0 ? 1 : 0
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 500
+            }
         }
         Rectangle {
             anchors.fill: parent
@@ -183,7 +191,7 @@ Item {
             height: parent.height
             color: "white"
             font.pixelSize: Math.max(1, parent.height)
-            focusOnPress: false
+            activeFocusOnPress: false
             cursorVisible: keyInterceptor.focus
             Item {
                 id: keyInterceptor
@@ -198,7 +206,6 @@ Item {
     }
     GridView {
         id: appView
-        anchors.fill: parent
         cellWidth: apps.itemWidth + 5 //for some spacing
         cellHeight: apps.itemHeight + 5
         highlight: highl

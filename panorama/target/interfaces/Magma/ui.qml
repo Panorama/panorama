@@ -1,6 +1,7 @@
-import Qt 4.6
+import Qt 4.7
 import Panorama 1.0
 import "qml" as Extensions
+import Qt.labs.particles 1.0
 
 PanoramaUI {
     id: ui
@@ -119,14 +120,16 @@ PanoramaUI {
             }*/
             Image {
                 id: stream
-                y: SequentialAnimation {
-                    id: seq
-                    running: level == 1 && magmaStream.value == "true"
-                    repeat: true
-                    NumberAnimation {
-                        from: 0
-                        to: -413
-                        duration: 5000
+                Behavior on y {
+                    SequentialAnimation {
+                        id: seq
+                        running: level == 1 && magmaStream.value == "true"
+                        //repeat: true
+                        NumberAnimation {
+                            from: 0
+                            to: -413
+                            duration: 5000
+                        }
                     }
                 }
                 height: ui.height + 413
@@ -196,13 +199,12 @@ PanoramaUI {
                 section: "setts"
             }
         }
-        Script {
+        ListView {
             function setSection(section) {
                 topSection = section;
                 level = 1;
             }
-        }
-        ListView {
+            
             id: topMenu
             focus: true
             anchors.bottom: parent.bottom
@@ -212,7 +214,7 @@ PanoramaUI {
             width: parent.width - 20
             orientation: ListView.Horizontal
             model: menu
-            overShoot: false
+            //overShoot: false
             spacing: 6
             Keys.onDigit1Pressed: {
                 setSection(topMenu.currentItem.sect);
@@ -235,7 +237,7 @@ PanoramaUI {
                     radius: 2
                     color: ListView.isCurrentItem ? "#111111" : "black"
                 }
-                MouseRegion {
+                MouseArea {
                     anchors.fill: parent
                     onClicked: {
                         topMenu.currentIndex = index;
@@ -275,7 +277,7 @@ PanoramaUI {
                 font.bold: true
                 color: "white"
                 text: "Back"
-                MouseRegion {
+                MouseArea {
                     anchors.fill: parent
                     onClicked: level = 0;
                 }
@@ -298,20 +300,18 @@ PanoramaUI {
                 focus: level == 1 && topSection == "apps"
                 opacity: topSection == "apps" ? 1 : 0
 
-                Script {
-                    function toggleFavorite(idf) {
-                        if(favorites.value.indexOf(idf) == -1) {
-                            //Add favorite
-                            if(favorites.value.length > 0)
-                                favorites.value += "|";
-                            favorites.value += idf;
-                        }
-                        else //Remove favorite if it already exists
-                        {
-                            var nf = favorites.value.replace(idf, "");
-                            nf = nf.replace("||", "|");
-                            favorites.value = nf.replace(/\|$|^\|/, "");
-                        }
+                function toggleFavorite(idf) {
+                    if(favorites.value.indexOf(idf) == -1) {
+                        //Add favorite
+                        if(favorites.value.length > 0)
+                            favorites.value += "|";
+                        favorites.value += idf;
+                    }
+                    else //Remove favorite if it already exists
+                    {
+                        var nf = favorites.value.replace(idf, "");
+                        nf = nf.replace("||", "|");
+                        favorites.value = nf.replace(/\|$|^\|/, "");
                     }
                 }
 
@@ -333,14 +333,12 @@ PanoramaUI {
                 focus: level == 1 && topSection == "favs"
                 opacity: topSection == "favs" ? 1 : 0
 
-                Script {
-                    function removeFavorite(idf) {
-                        var nf = favorites.value.replace(idf, "");
-                        nf = nf.replace("||", "|");
-                        favorites.value = nf.replace(/\|$|^\|/, "");
-                        if(favorites.value.length == 0)
-                            level = 0;
-                    }
+                function removeFavorite(idf) {
+                    var nf = favorites.value.replace(idf, "");
+                    nf = nf.replace("||", "|");
+                    favorites.value = nf.replace(/\|$|^\|/, "");
+                    if(favorites.value.length == 0)
+                        level = 0;
                 }
 
                 Extensions.ApplicationViewer {
@@ -515,9 +513,9 @@ PanoramaUI {
     transitions: [
         Transition {
             NumberAnimation {
-                matchProperties: "y"
+                properties: "y"
                 duration: 500
-                easing: "easeInOutQuart"
+                easing.type: Easing.InOutQuart
             }
         }
     ]

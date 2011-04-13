@@ -1,7 +1,7 @@
-import Qt 4.6
+import Qt 4.7
 import Panorama 1.0
 import "qml" as Helpers
-
+import "qml/parser.js" as Parser
 PanoramaUI {
     id: ui
     name: "Colors (from PMenu)"
@@ -12,11 +12,6 @@ PanoramaUI {
     TextFile { //TextFile isn't standard QML, but part of Panorama 1.0
         id: skinCfg
         source: "skin.cfg"
-    }
-
-    Script {
-        //For readField()
-        source: "qml/parser.js"
     }
 
     //Specifies the opacity for each page
@@ -57,16 +52,16 @@ PanoramaUI {
 
     //Generic properties that cannot be modelled using object-oriented models
 
-    property int applicationsBoxX: readField(skinCfg.data, "applications_box_x")
-    property int applicationsBoxY: readField(skinCfg.data, "applications_box_y")
-    property int applicationsBoxWidth: readField(skinCfg.data, "applications_box_w")
-    property string applicationHighlight: readField(skinCfg.data, "application_highlight")
+    property int applicationsBoxX: Parser.readField(skinCfg.data, "applications_box_x")
+    property int applicationsBoxY: Parser.readField(skinCfg.data, "applications_box_y")
+    property int applicationsBoxWidth: Parser.readField(skinCfg.data, "applications_box_w")
+    property string applicationHighlight: Parser.readField(skinCfg.data, "application_highlight")
 
-    property int iconScaleMax: readField(skinCfg.data, "icon_scale_max")
-    property int iconScaleMin: readField(skinCfg.data, "icon_scale_min")
-    property int applicationsSpacing: readField(skinCfg.data, "applications_spacing")
-    property int applicationsTitleDescriptionY: readField(skinCfg.data, "applications_title_description_y")
-    property int maxAppsPerPage: readField(skinCfg.data, "max_app_per_page")
+    property int iconScaleMax: Parser.readField(skinCfg.data, "icon_scale_max")
+    property int iconScaleMin: Parser.readField(skinCfg.data, "icon_scale_min")
+    property int applicationsSpacing: Parser.readField(skinCfg.data, "applications_spacing")
+    property int applicationsTitleDescriptionY: Parser.readField(skinCfg.data, "applications_title_description_y")
+    property int maxAppsPerPage: Parser.readField(skinCfg.data, "max_app_per_page")
 
     /* TODO: implement... but normal launchers don't really have previews??
     property int previewPicX: readField(skinCfg.data, "preview_pic_x")
@@ -74,8 +69,8 @@ PanoramaUI {
     property int previewPicWidth: readField(skinCfg.data, "preview_pic_w")
     */
 
-    property string highlight: readField(skinCfg.data, "highlight")
-    property bool highlightEnabled: (readField(skinCfg.data, "highlight_enabled") != 0)
+    property string highlight: Parser.readField(skinCfg.data, "highlight")
+    property bool highlightEnabled: (Parser.readField(skinCfg.data, "highlight_enabled") != 0)
 
     /* TODO: implement
     property string mediaFileIcon: readField(skinCfg.data, "media_file_icon")
@@ -86,7 +81,7 @@ PanoramaUI {
 
     /* TODO: implement
     property bool showCategoryTitle: (readField(skinCfg.data, "show_category_title") != 0) */
-    property string noIcon: readField(skinCfg.data, "no_icon")
+    property string noIcon: Parser.readField(skinCfg.data, "no_icon")
     /* TODO: see above
     property string noPreview: readField(skinCfg.data, "no_preview")*/
 
@@ -96,7 +91,7 @@ PanoramaUI {
     //behind other objects...
 
     Image {
-        source: readField(skinCfg.data, "background_applications")
+        source: Parser.readField(skinCfg.data, "background_applications")
         x: 0
         y: 0
         z: -1
@@ -104,7 +99,7 @@ PanoramaUI {
     }
 
     Image {
-        source: readField(skinCfg.data, "background_media")
+        source: Parser.readField(skinCfg.data, "background_media")
         x: 0
         y: 0
         z: -1
@@ -112,7 +107,7 @@ PanoramaUI {
     }
 
     Image {
-        source: readField(skinCfg.data, "background_settings")
+        source: Parser.readField(skinCfg.data, "background_settings")
         x: 0
         y: 0
         z: -1
@@ -141,46 +136,46 @@ PanoramaUI {
 
     Helpers.TextStyle {
         id: smallStyle
-        function accessor(x) { return readField(skinCfg.data, "font_small" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "font_small" + x); }
     }
 
     Helpers.TextStyle {
         id: bigStyle
-        function accessor(x) { return readField(skinCfg.data, "font_big" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "font_big" + x); }
     }
 
     Helpers.TextStyle {
         id: mediaStyle
         fontify: true
-        function accessor(x) { return readField(skinCfg.data, "media_text" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "media_text" + x); }
     }
 
     Helpers.TextStyle {
         id: cpuStyle
         fontify: true
         highlightify: false
-        function accessor(x) { return readField(skinCfg.data, "cpu_text" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "cpu_text" + x); }
     }
 
     Helpers.TextStyle {
         id: sd1Style
         fontify: true
         highlightify: false
-        function accessor(x) { return readField(skinCfg.data, "sd1_text" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "sd1_text" + x); }
     }
 
     Helpers.TextStyle {
         id: sd2Style
         fontify: true
         highlightify: false
-        function accessor(x) { return readField(skinCfg.data, "sd2_text" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "sd2_text" + x); }
     }
 
     Helpers.TextStyle {
         id: clockStyle
         fontify: true
         highlightify: false
-        function accessor(x) { return readField(skinCfg.data, "clock_text" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "clock_text" + x); }
     }
 
     /*
@@ -192,7 +187,7 @@ PanoramaUI {
     //Category buttons:
     Helpers.SelectionIcon {
         id: emulatorsIcon
-        function accessor(x) { return readField(skinCfg.data, "emulators" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "emulators" + x); }
         function styleField(x) { return smallStyle.getField(x); }
         onClicked: ui.selectedIndex = 0
         intensity: emulatorsOpacity
@@ -200,7 +195,7 @@ PanoramaUI {
 
     Helpers.SelectionIcon {
         id: gamesIcon
-        function accessor(x) { return readField(skinCfg.data, "games" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "games" + x); }
         function styleField(x) { return smallStyle.getField(x); }
         onClicked: ui.selectedIndex = 1
         intensity: gamesOpacity
@@ -208,7 +203,7 @@ PanoramaUI {
 
     Helpers.SelectionIcon {
         id: miscIcon
-        function accessor(x) { return readField(skinCfg.data, "misc" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "misc" + x); }
         function styleField(x) { return smallStyle.getField(x); }
         onClicked: ui.selectedIndex = 2
         intensity: miscOpacity
@@ -216,7 +211,7 @@ PanoramaUI {
 
     Helpers.SelectionIcon {
         id: mediaIcon
-        function accessor(x) { return readField(skinCfg.data, "media" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "media" + x); }
         function styleField(x) { return smallStyle.getField(x); }
         onClicked: ui.selectedIndex = 3
         intensity: mediaOpacity
@@ -224,7 +219,7 @@ PanoramaUI {
 
     Helpers.SelectionIcon {
         id: favoritesIcon
-        function accessor(x) { return readField(skinCfg.data, "favorites" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "favorites" + x); }
         function styleField(x) { return smallStyle.getField(x); }
         onClicked: ui.selectedIndex = 4
         intensity: favoritesOpacity
@@ -232,7 +227,7 @@ PanoramaUI {
 
     Helpers.SelectionIcon {
         id: settingsIcon
-        function accessor(x) { return readField(skinCfg.data, "settings" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "settings" + x); }
         function styleField(x) { return smallStyle.getField(x); }
         onClicked: ui.selectedIndex = 5
         intensity: settingsOpacity
@@ -246,12 +241,12 @@ PanoramaUI {
     Helpers.PositionedImage {
         id: cpuIcon
         z: 2
-        function accessor(x) { return readField(skinCfg.data, "cpu_icon" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "cpu_icon" + x); }
     }
     Helpers.PositionedText {
         id: cpuText
         z: 2
-        function accessor(x) { return readField(skinCfg.data, "cpu_text" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "cpu_text" + x); }
         function styleField(x) { return cpuStyle.getField(x); }
         text: (sysinfo.usedCpu * 100 / sysinfo.cpu).toFixed(2) + "%"
     }
@@ -259,12 +254,12 @@ PanoramaUI {
     Helpers.PositionedImage {
         id: sd1Icon
         z: 2
-        function accessor(x) { return readField(skinCfg.data, "sd1_icon" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "sd1_icon" + x); }
     }
     Helpers.PositionedText {
         id: sd1Text
         z: 2
-        function accessor(x) { return readField(skinCfg.data, "sd1_text" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "sd1_text" + x); }
         function styleField(x) { return sd1Style.getField(x); }
         text: (sysinfo.sd1 - sysinfo.usedSd1) + " MiB"
     }
@@ -272,12 +267,12 @@ PanoramaUI {
     Helpers.PositionedImage {
         id: sd2Icon
         z: 2
-        function accessor(x) { return readField(skinCfg.data, "sd2_icon" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "sd2_icon" + x); }
     }
     Helpers.PositionedText {
         id: sd2Text
         z: 2
-        function accessor(x) { return readField(skinCfg.data, "sd2_text" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "sd2_text" + x); }
         function styleField(x) { return sd2Style.getField(x); }
         text: (sysinfo.sd2 - sysinfo.usedSd2) + " MiB"
     }
@@ -285,12 +280,12 @@ PanoramaUI {
     Helpers.PositionedImage {
         id: clockIcon
         z: 2
-        function accessor(x) { return readField(skinCfg.data, "clock_icon" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "clock_icon" + x); }
     }
     Helpers.PositionedText {
         id: clockText
         z: 2
-        function accessor(x) { return readField(skinCfg.data, "clock_text" + x); }
+        function accessor(x) { return Parser.readField(skinCfg.data, "clock_text" + x); }
         function styleField(x) { return clockStyle.getField(x); }
         text: time.hour + ":" + time.minute
         Timer {
@@ -321,22 +316,24 @@ PanoramaUI {
     Image {
         id: highl
         z: 1
-        opacity: SequentialAnimation {
-            //Make the highlight pulsate with a cubic curve
-            //(PMenu uses a simple linear curve)
-            running: true
-            repeat: true
-            NumberAnimation {
-                from: 0
-                to: highlightEnabled ? 1 : 0
-                easing: "easeOutCubic"
-                duration: 1000
-            }
-            NumberAnimation {
-                from: highlightEnabled ? 1 : 0
-                to: 0
-                easing: "easeInCubic"
-                duration: 1000
+        Behavior on opacity {
+            SequentialAnimation {
+                //Make the highlight pulsate with a cubic curve
+                //(PMenu uses a simple linear curve)
+                running: true
+                //repeat: true
+                NumberAnimation {
+                    from: 0
+                    to: highlightEnabled ? 1 : 0
+                    easing.type: Easing.OutCubic
+                    duration: 1000
+                }
+                NumberAnimation {
+                    from: highlightEnabled ? 1 : 0
+                    to: 0
+                    easing.type: Easing.InCubic
+                    duration: 1000
+                }
             }
         }
         source: highlight
@@ -347,9 +344,9 @@ PanoramaUI {
         id: favoriteDialog
         z: 25 //Show on top of *really* EVERYTHING!
         opacity: showFavDialog ? 1 : 0
-        source: readField(skinCfg.data, "confirm_box")
-        x: readField(skinCfg.data, "confirm_box_x") - width / 2
-        y: readField(skinCfg.data, "confirm_box_y") - height / 2
+        source: Parser.readField(skinCfg.data, "confirm_box")
+        x: Parser.readField(skinCfg.data, "confirm_box_x") - width / 2
+        y: Parser.readField(skinCfg.data, "confirm_box_y") - height / 2
         focus: showFavDialog
         Keys.onDigit1Pressed: {
             var idf = appBrowser.currentItem.ident;
@@ -372,11 +369,10 @@ PanoramaUI {
             anchors.centerIn: parent
             width: parent.width - 40
             height: parent.height - 20
-            text: (ui.selectedIndex != 4) ? ("Do you want to add \"" +
-                        appBrowser.currentItem.friendlyName + "\" to your favorites?")
-                  : ("Do you want to remove \"" + appBrowser.currentItem.friendlyName +
-                        "\" from your favorites?")
-            wrap: true
+            text: appBrowser.currentItem === null ? "" : (
+                (ui.selectedIndex != 4) ? ("Do you want to add \"" + appBrowser.currentItem.friendlyName + "\" to your favorites?") : 
+                ("Do you want to remove \"" + appBrowser.currentItem.friendlyName + "\" from your favorites?"))
+            wrapMode: Text.Wrap
 
             color: smallStyle.getField("color")
             font.bold: smallStyle.getField("bold")
@@ -448,7 +444,8 @@ PanoramaUI {
         Keys.onDigit1Pressed: {
             execute(appBrowser.currentItem.ident);
         }
-        Script {
+
+        ListView {
             function determineModel(x) {
                 switch(x) {
                     case 0:
@@ -464,8 +461,7 @@ PanoramaUI {
                         return ui.applications.matching("identifier", "^$") //Lists nothing
                 }
             }
-        }
-        ListView {
+            
             id: appBrowser
             anchors.fill: parent
             anchors.topMargin: 20
@@ -481,10 +477,13 @@ PanoramaUI {
             Component {
                 id: appHighlight
                 Item {
-                    y: SpringFollow {
-                        source: appBrowser.currentItem.y
-                        spring: 3
-                        damping: 0.2
+                    y: appBrowser.currentItem.y
+
+                    Behavior on y {
+                        SpringAnimation {
+                            spring: 3
+                            damping: 0.2
+                        }
                     }
                     clip: false
                     Image {
@@ -503,7 +502,7 @@ PanoramaUI {
                 height: iconScaleMin
                 property string ident: identifier
                 property string friendlyName: name
-                MouseRegion {
+                MouseArea {
                     anchors.fill: parent
                     onClicked: appBrowser.currentIndex = index
                 }
@@ -649,13 +648,13 @@ PanoramaUI {
             ParallelAnimation {
                 NumberAnimation {
                     duration: 300
-                    matchProperties: "x,y"
-                    easing: "easeOutQuad"
+                    properties: "x,y"
+                    easing.type: Easing.OutQuad
                 }
                 NumberAnimation {
                     duration: 200
-                    matchProperties: "settingsOpacity"
-                    easing: "easeLinear"
+                    properties: "settingsOpacity"
+                    easing.type: Easing.Linear
                 }
                 SequentialAnimation {
                     PauseAnimation {
@@ -663,8 +662,8 @@ PanoramaUI {
                     }
                     NumberAnimation {
                         duration: 300
-                        matchProperties: "emulatorsOpacity,gamesOpacity,miscOpacity,mediaOpacity,favoritesOpacity"
-                        easing: "easeOutQuad"
+                        properties: "emulatorsOpacity,gamesOpacity,miscOpacity,mediaOpacity,favoritesOpacity"
+                        easing.type: Easing.OutQuad
                     }
                 }
             }
@@ -674,13 +673,13 @@ PanoramaUI {
             ParallelAnimation {
                 NumberAnimation {
                     duration: 300
-                    matchProperties: "x,y"
-                    easing: "easeOutQuad"
+                    properties: "x,y"
+                    easing.type: Easing.OutQuad
                 }
                 NumberAnimation {
                     duration: 200
-                    matchProperties: "emulatorsOpacity"
-                    easing: "easeLinear"
+                    properties: "emulatorsOpacity"
+                    easing.type: Easing.Linear
                 }
                 SequentialAnimation {
                     PauseAnimation {
@@ -688,8 +687,8 @@ PanoramaUI {
                     }
                     NumberAnimation {
                         duration: 300
-                        matchProperties: "settingsOpacity,gamesOpacity,miscOpacity,mediaOpacity,favoritesOpacity"
-                        easing: "easeOutQuad"
+                        properties: "settingsOpacity,gamesOpacity,miscOpacity,mediaOpacity,favoritesOpacity"
+                        easing.type: Easing.OutQuad
                     }
                 }
             }
@@ -699,13 +698,13 @@ PanoramaUI {
             ParallelAnimation {
                 NumberAnimation {
                     duration: 300
-                    matchProperties: "x,y"
-                    easing: "easeOutQuad"
+                    properties: "x,y"
+                    easing.type: Easing.OutQuad
                 }
                 NumberAnimation {
                     duration: 200
-                    matchProperties: "gamesOpacity"
-                    easing: "easeLinear"
+                    properties: "gamesOpacity"
+                    easing.type: Easing.Linear
                 }
                 SequentialAnimation {
                     PauseAnimation {
@@ -713,8 +712,8 @@ PanoramaUI {
                     }
                     NumberAnimation {
                         duration: 300
-                        matchProperties: "settingsOpacity,emulatorsOpacity,miscOpacity,mediaOpacity,favoritesOpacity"
-                        easing: "easeOutQuad"
+                        properties: "settingsOpacity,emulatorsOpacity,miscOpacity,mediaOpacity,favoritesOpacity"
+                        easing.type: Easing.OutQuad
                     }
                 }
             }
@@ -724,13 +723,13 @@ PanoramaUI {
             ParallelAnimation {
                 NumberAnimation {
                     duration: 300
-                    matchProperties: "x,y"
-                    easing: "easeOutQuad"
+                    properties: "x,y"
+                    easing.type: Easing.OutQuad
                 }
                 NumberAnimation {
                     duration: 200
-                    matchProperties: "miscOpacity"
-                    easing: "easeLinear"
+                    properties: "miscOpacity"
+                    easing.type: Easing.Linear
                 }
                 SequentialAnimation {
                     PauseAnimation {
@@ -738,8 +737,8 @@ PanoramaUI {
                     }
                     NumberAnimation {
                         duration: 300
-                        matchProperties: "settingsOpacity,gamesOpacity,emulatorsOpacity,mediaOpacity,favoritesOpacity"
-                        easing: "easeOutQuad"
+                        properties: "settingsOpacity,gamesOpacity,emulatorsOpacity,mediaOpacity,favoritesOpacity"
+                        easing.type: Easing.OutQuad
                     }
                 }
             }
@@ -749,13 +748,13 @@ PanoramaUI {
             ParallelAnimation {
                 NumberAnimation {
                     duration: 300
-                    matchProperties: "x,y"
-                    easing: "easeOutQuad"
+                    properties: "x,y"
+                    easing.type: Easing.OutQuad
                 }
                 NumberAnimation {
                     duration: 200
-                    matchProperties: "mediaOpacity"
-                    easing: "easeLinear"
+                    properties: "mediaOpacity"
+                    easing.type: Easing.Linear
                 }
                 SequentialAnimation {
                     PauseAnimation {
@@ -763,8 +762,8 @@ PanoramaUI {
                     }
                     NumberAnimation {
                         duration: 300
-                        matchProperties: "settingsOpacity,gamesOpacity,miscOpacity,emulatorsOpacity,favoritesOpacity"
-                        easing: "easeOutQuad"
+                        properties: "settingsOpacity,gamesOpacity,miscOpacity,emulatorsOpacity,favoritesOpacity"
+                        easing.type: Easing.OutQuad
                     }
                 }
             }
@@ -774,13 +773,13 @@ PanoramaUI {
             ParallelAnimation {
                 NumberAnimation {
                     duration: 300
-                    matchProperties: "x,y"
-                    easing: "easeOutQuad"
+                    properties: "x,y"
+                    easing.type: Easing.OutQuad
                 }
                 NumberAnimation {
                     duration: 200
-                    matchProperties: "favoritesOpacity"
-                    easing: "easeLinear"
+                    properties: "favoritesOpacity"
+                    easing.type: Easing.Linear
                 }
                 SequentialAnimation {
                     PauseAnimation {
@@ -788,8 +787,8 @@ PanoramaUI {
                     }
                     NumberAnimation {
                         duration: 300
-                        matchProperties: "settingsOpacity,gamesOpacity,miscOpacity,mediaOpacity,emulatorsOpacity"
-                        easing: "easeOutQuad"
+                        properties: "settingsOpacity,gamesOpacity,miscOpacity,mediaOpacity,emulatorsOpacity"
+                        easing.type: Easing.OutQuad
                     }
                 }
             }

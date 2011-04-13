@@ -1,4 +1,4 @@
-import Qt 4.6
+import Qt 4.7
 
 Item {
     id: page
@@ -17,13 +17,13 @@ Item {
         smooth: true
         anchors.left: parent.left
         anchors.top: parent.top
-        effect: DropShadow {
+        /*effect: DropShadow {
             id: imageShadow
             color: page.labelShadowColor
             xOffset: 0
             yOffset: 0
             blurRadius: 5
-        }
+        }*/
     }
     Text {
         id: label
@@ -37,13 +37,13 @@ Item {
         font.pixelSize: page.topbarHeight * 0.8
         style: Text.Outline
         styleColor: page.labelOutlineColor
-        effect: DropShadow {
+        /*effect: DropShadow {
             id: labelShadow
             color: page.labelShadowColor
             xOffset: 0
             yOffset: 0
             blurRadius: 5
-        }
+        }*/
     }
     Item {
         anchors.top: label.bottom

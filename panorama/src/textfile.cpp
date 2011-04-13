@@ -43,5 +43,3 @@ void TextFile::loadFile(const QString &source)
 
     emit dataChanged(_data);
 }
-
-QML_DEFINE_TYPE(Panorama,1,0,TextFile,TextFile);

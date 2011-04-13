@@ -3,10 +3,10 @@
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QWidget>
-#include <QtDeclarative/QmlEngine>
-#include <QtDeclarative/QmlView>
-#include <QtDeclarative/QmlComponent>
-#include <QtDeclarative/QmlContext>
+#include <QDeclarativeEngine>
+#include <QDeclarativeView>
+#include <QDeclarativeComponent>
+#include <QDeclarativeContext>
 #include <QUrl>
 #include <QFile>
 #include <QtConcurrentRun>
@@ -44,14 +44,14 @@ private slots:
     void continueLoadingUI();
 
 private:
-    void printError(const QmlComponent *obj) const;
+    void printError(const QDeclarativeComponent *obj) const;
 
     void loadApps();
 
     volatile bool appsLoaded;
-    QmlEngine _engine;
-    QmlView _canvas;
-    QmlComponent *_component;
+    QDeclarativeEngine _engine;
+    QDeclarativeView _canvas;
+    QDeclarativeComponent *_component;
     PanoramaUI *_ui;
     Configuration _config;
     ApplicationModel _model;

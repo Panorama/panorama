@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QAbstractItemModel>
-#include <qml.h>
+#include <qdeclarative.h>
 
 #include "appaccumulator.h"
 #include "application.h"

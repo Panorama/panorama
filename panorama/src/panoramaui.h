@@ -5,7 +5,7 @@
 #include <QString>
 #include <QProcess>
 #include <QAbstractItemModel>
-#include <QtDeclarative/QmlGraphicsItem>
+#include <QDeclarativeItem>
 
 #include "appaccumulator.h"
 #include "constants.h"
@@ -15,7 +15,7 @@
  * The base class for all PanoramaUI instances.
  * This class is extended from actual .qml files via the QtScript core
  */
-class PanoramaUI : public QmlGraphicsItem
+class PanoramaUI : public QDeclarativeItem
 {
 Q_OBJECT
 Q_PROPERTY(QString  name        READ name           WRITE setName)
@@ -26,7 +26,7 @@ Q_PROPERTY(QVariant applications READ applications  NOTIFY applicationsUpdated)
 
 public:
     /** Constructs a new PanoramaUI instance */
-    explicit PanoramaUI(QmlGraphicsItem *parent = 0);
+    explicit PanoramaUI(QDeclarativeItem *parent = 0);
 
     /** Gets the name */
     QString name() const;

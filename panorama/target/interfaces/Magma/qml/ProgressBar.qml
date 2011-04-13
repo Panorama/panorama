@@ -1,4 +1,4 @@
-import Qt 4.6
+import Qt 4.7
 
 Item {
     id: progressbar
@@ -25,7 +25,7 @@ Item {
         property real b1: ((r - 1) * (Math.PI - 4) * h / 2 + 2 * r * w) / 2
         property real b2: Math.sqrt((r * h / 2 * ((Math.PI - 4) * h / 2 + 2 * w)) / Math.PI) * 2
         property real b: (b2 > h) ? b1 : b2
-        b: Behavior { NumberAnimation { duration: 300; easing: "OutQuad" } }
+        Behavior on b { NumberAnimation { duration: 300; easing.type: Easing.OutQuad } }
 
         radius: Math.min(b2, h / 2)
         width: b

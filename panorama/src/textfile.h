@@ -6,9 +6,9 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
-#include <qml.h>
-#include <QtDeclarative/QmlEngine>
-#include <QtDeclarative/QmlContext>
+#include <qdeclarative.h>
+#include <QDeclarativeEngine>
+#include <QDeclarativeContext>
 
 class TextFile : public QObject
 {

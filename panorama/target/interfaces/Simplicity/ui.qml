@@ -1,4 +1,4 @@
-import Qt 4.6
+import Qt 4.7
 import Panorama 1.0
 
 PanoramaUI {
@@ -89,7 +89,7 @@ PanoramaUI {
         id: box
         width: parent.width / 2
         anchors.centerIn: parent
-        focusOnPress: false
+        activeFocusOnPress: false
         cursorVisible: container.focus
         Rectangle {
             id: container
@@ -112,7 +112,7 @@ PanoramaUI {
         anchors.topMargin: 8
         anchors.bottom: bar.top
         width: parent.width / 2
-        overShoot: false
+        //overShoot: false
         clip: true
         model: applications
             .matching("name", box.text.length > 0 ? ".*" + box.text + ".*" : "^$")
@@ -122,7 +122,7 @@ PanoramaUI {
             opacity: 0.5
             radius: 8
         }
-        delegate: Row {
+        delegate: Item {
             id: deleg
             property string ident: identifier
             width: appView.width
@@ -134,13 +134,11 @@ PanoramaUI {
                 width: parent.height
                 height: parent.height
             }
-            Item { //separator
-                width: 5
-                height: parent.height
-            }
-            Column {
+            Item {
                 width: parent.width - iconField.height - 5
                 height: parent.height
+                anchors.left: iconField.right
+                anchors.leftMargin: 5
                 Text {
                     id: nameLabel
                     text: name
@@ -163,27 +161,29 @@ PanoramaUI {
                         width: parent.width
                         font.pixelSize: deleg.height / 5
                         color: "#38404D"
-                        wrap: true
-                        y: SequentialAnimation {
-                            running: ListView.isCurrentItem
-                            repeat: true
-                            PauseAnimation {
-                                duration: 1000
+                        wrapMode: Text.Wrap
+                        Behavior on y {
+                            SequentialAnimation {
+                                running: ListView.isCurrentItem
+                                //repeat: true
+                                PauseAnimation {
+                                    duration: 1000
+                                }
+                                NumberAnimation {
+                                    from: 0
+                                    to: Math.min(0, commentContainer.height - commentLabel.height)
+                                    duration: 1000
+                                }
+                                PauseAnimation {
+                                    duration: 1000
+                                }
+                                NumberAnimation { to: 0; duration: 100 }
                             }
-                            NumberAnimation {
-                                from: 0
-                                to: Math.min(0, commentContainer.height - commentLabel.height)
-                                duration: 1000
-                            }
-                            PauseAnimation {
-                                duration: 1000
-                            }
-                            NumberAnimation { to: 0; duration: 100 }
                         }
                     }
                 }
             }
-            MouseRegion {
+            MouseArea {
                 anchors.fill: parent
                 onClicked: appView.currentIndex = index
             }

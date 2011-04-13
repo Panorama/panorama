@@ -1,5 +1,12 @@
 # panorama.pro - Project file for the Panorama source code distribution
-QT += declarative
+QT += declarative opengl
+
+disable_opengl {
+    DEFINES += DISABLE_OPENGL
+    QT -= opengl
+} 
+
+
 TARGET = panorama
 DESTDIR = target
 TEMPLATE = app

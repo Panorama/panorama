@@ -84,4 +84,3 @@ void Setting::maybeInsertDefault()
 QString Setting::_defaultSection;
 SettingsHive *Setting::_settings;
 
-QML_DEFINE_TYPE(Panorama,1,0,Setting,Setting);

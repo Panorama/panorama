@@ -1,4 +1,4 @@
-import Qt 4.6
+import Qt 4.7
 
 Item {
     id: root
@@ -26,7 +26,7 @@ Item {
     property bool highlightify: true
 
     property color color: root.accessor("_color")
-    property color highlightColor: highlighify ? root.accessor("_color_highlight") : color
+    property color highlightColor: highlightify ? root.accessor("_color_highlight") : color
     property int s: accessor("_style")
     property bool bold: (s & 1) == 1
     property bool italic: (s & 2) == 2

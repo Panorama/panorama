@@ -1,7 +1,8 @@
 #include "panoramaui.h"
+#include <qdeclarative.h>
 
-PanoramaUI::PanoramaUI(QmlGraphicsItem *parent) :
-    QmlGraphicsItem(parent)
+PanoramaUI::PanoramaUI(QDeclarativeItem *parent) :
+    QDeclarativeItem(parent)
 {
     setWidth(UI_WIDTH);
     setHeight(UI_HEIGHT);
@@ -91,6 +92,3 @@ void PanoramaUI::indicateLoadFinished()
 }
 
 QVariant PanoramaUI::_apps;
-
-//Makes this type available in QML
-QML_DEFINE_TYPE(Panorama,1,0,PanoramaUI,PanoramaUI);

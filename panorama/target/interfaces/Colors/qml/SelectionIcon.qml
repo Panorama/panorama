@@ -1,4 +1,4 @@
-import Qt 4.6
+import Qt 4.7
 
 Item {
     id: root
@@ -18,7 +18,7 @@ Item {
         x: -width / 2
         y: -height / 2
         opacity: 1 - intensity
-        MouseRegion {
+        MouseArea {
             anchors.fill: parent
             onClicked: root.clicked()
         }
@@ -33,7 +33,7 @@ Item {
         font.italic: styleField("italic")
         font.pixelSize: styleField("pixelSize")
         font.family: styleField("family")
-        MouseRegion {
+        MouseArea {
             anchors.fill: parent
             onClicked: root.clicked()
         }

@@ -1,4 +1,4 @@
-import Qt 4.6
+import Qt 4.7
 
 Item {
     id: book
@@ -34,7 +34,7 @@ Item {
         anchors.fill: parent
 
         orientation: ListView.Horizontal
-        overShoot: false
+        //overShoot: false
         snapMode: ListView.SnapOneItem
         highlightRangeMode: ListView.StrictlyEnforceRange
         highlightMoveSpeed: parent.width * 4

@@ -1,14 +1,14 @@
-import Qt 4.6
+import Qt 4.7
 
 Item {
     id: clock
     width: 200; height: 230
 
     property alias city: cityLabel.text
-    property var hours
-    property var minutes
-    property var seconds
-    property var shift : 0
+    property int hours
+    property int minutes
+    property int seconds
+    property int shift : 0
     property bool night: false
 
     function timeChanged() {
@@ -33,10 +33,12 @@ Item {
         smooth: true
         transform: Rotation {
             id: hourRotation
-            origin.x: 7.5; origin.y: 73; angle: 0
-            angle: SpringFollow {
-                spring: 2; damping: 0.2; modulus: 360
-                source: (clock.hours * 30) + (clock.minutes * 0.5)
+            origin.x: 7.5; origin.y: 73
+            angle: (clock.hours * 30) + (clock.minutes * 0.5)
+            Behavior on angle { 
+                SpringAnimation {
+                    spring: 2; damping: 0.2; modulus: 360
+                }
             }
         }
     }
@@ -47,10 +49,12 @@ Item {
         smooth: true
         transform: Rotation {
             id: minuteRotation
-            origin.x: 6.5; origin.y: 83; angle: 0
-            angle: SpringFollow {
-                spring: 2; damping: 0.2; modulus: 360
-                source: clock.minutes * 6
+            origin.x: 6.5; origin.y: 83
+            angle: clock.minutes * 6
+            Behavior on angle { 
+                SpringAnimation {
+                    spring: 2; damping: 0.2; modulus: 360
+                }
             }
         }
     }
@@ -61,10 +65,12 @@ Item {
         smooth: true
         transform: Rotation {
             id: secondRotation
-            origin.x: 2.5; origin.y: 80; angle: 0
-            angle: SpringFollow {
-                spring: 5; damping: 0.25; modulus: 360
-                source: clock.seconds * 6
+            origin.x: 2.5; origin.y: 80
+            angle: clock.seconds * 6
+            Behavior on angle { 
+                SpringAnimation {
+                    spring: 5; damping: 0.25; modulus: 360
+                }
             }
         }
     }

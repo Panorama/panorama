@@ -1,5 +1,9 @@
 #include "mainwindow.h"
 
+#ifndef DISABLE_OPENGL
+#include <QGLWidget>
+#endif
+
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent)
 {
@@ -20,10 +24,14 @@ MainWindow::MainWindow(QWidget *parent) :
     _canvas.setParent(this);
     _canvas.rootContext()->setContextProperty("ctxtHeight", UI_HEIGHT);
     _canvas.rootContext()->setContextProperty("ctxtWidth", UI_WIDTH);
-    _canvas.setUrl(QUrl("qrc:/root.qml"));
+    _canvas.setSource(QUrl("qrc:/root.qml"));
     _canvas.setFocusPolicy(Qt::StrongFocus);
-    _canvas.execute();
+    // TODO: _canvas.execute();
     this->setCentralWidget(&_canvas);
+
+#ifndef DISABLE_OPENGL
+    _canvas.setViewport(new QGLWidget());
+#endif
 
     _model.setParent(this);
     PanoramaUI::setApplicationsSource(&_model);
@@ -64,7 +72,7 @@ void MainWindow::loadUIFile(const QString &file)
         _component->deleteLater();
 
     //Create a generic component from the file
-    _component = new QmlComponent(&_engine, file, this);
+    _component = new QDeclarativeComponent(&_engine, file, this);
 
     //Check if the component has errors and print them
     printError(_component);
@@ -74,16 +82,16 @@ void MainWindow::loadUIFile(const QString &file)
     if(_component->isReady() && !_component->isError())
         continueLoadingUI();
     else if(!_component->isError())
-        connect(_component, SIGNAL(statusChanged(QmlComponent::Status)),
+        connect(_component, SIGNAL(statusChanged(QDeclarativeComponent::Status)),
                 this, SLOT(continueLoadingUI()));
 }
 
-void MainWindow::printError(const QmlComponent *c) const
+void MainWindow::printError(const QDeclarativeComponent *c) const
 {
     if(c->isError())
     {
-        QList<QmlError> errorList = c->errors();
-        foreach (const QmlError &error, errorList)
+        QList<QDeclarativeError> errorList = c->errors();
+        foreach (const QDeclarativeError &error, errorList)
             qWarning() << error;
         return;
     }
@@ -92,7 +100,7 @@ void MainWindow::printError(const QmlComponent *c) const
 void MainWindow::continueLoadingUI()
 {
     //If this is a delayed load, remove the old connection
-    disconnect(_component, SIGNAL(statusChanged(QmlComponent::Status)),
+    disconnect(_component, SIGNAL(statusChanged(QDeclarativeComponent::Status)),
                this, SLOT(continueLoadingUI()));
 
     //Cehck errors again (now that the component is loaded)
@@ -117,7 +125,7 @@ void MainWindow::continueLoadingUI()
         //didn't put a Panorama UI in the file at all
         if(_ui)
         {
-            _ui->setParentItem(_canvas.root());
+            _ui->setParentItem(qobject_cast<QDeclarativeItem*>(_canvas.rootObject()));
             if(appsLoaded)
             {
                 connect(&_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),

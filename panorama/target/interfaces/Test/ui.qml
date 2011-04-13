@@ -1,4 +1,4 @@
-import Qt 4.6                   //Import Qt
+import Qt 4.7                   //Import Qt
 import Panorama 1.0             //Import Panorama extensions
 import "widgets" as Widgets     //Import widgets from "widgets/"
 import "pages" as Pages         //Import page prototypes from "pages/"

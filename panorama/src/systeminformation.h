@@ -2,7 +2,7 @@
 #define SYSTEMINFORMATION_H
 
 #include <QObject>
-#include <qml.h>
+#include <qdeclarative.h>
 #include <QTimer>
 #include <QFile>
 #include <QTextStream>

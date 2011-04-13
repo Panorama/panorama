@@ -1,4 +1,5 @@
 #include "systeminformation.h"
+#include <QStringList>
 
 SystemInformation::SystemInformation(QObject *parent) :
     QObject(parent)
@@ -209,4 +210,3 @@ void SystemInformation::updateMem()
     }
 }
 
-QML_DEFINE_TYPE(Panorama,1,0,SystemInformation,SystemInformation);

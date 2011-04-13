@@ -2,7 +2,7 @@
 #define CATEGORYFILTERMODEL_H
 
 #include <QSortFilterProxyModel>
-#include <qml.h>
+#include <qdeclarative.h>
 
 #include "applicationfiltermethods.h"
 #include "applicationmodel.h"

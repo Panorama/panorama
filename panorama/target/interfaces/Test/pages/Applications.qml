@@ -1,4 +1,4 @@
-import Qt 4.6
+import Qt 4.7
 
 Item {
     id: root
@@ -25,7 +25,8 @@ Item {
             property string ident: identifier
             width: appView.width
             height: itemHeight
-            MouseRegion {
+            
+            MouseArea {
                 id: delegMouse
                 anchors.fill: parent
                 onClicked: {
@@ -79,15 +80,16 @@ Item {
             radius: root.itemHeight / 8
             width: appView.width
             x: 0
-            y: SpringFollow {
-                source: appView.currentItem.y
-                spring: 3
-                damping: 0.2
+            Behavior on y { 
+                SpringAnimation { 
+                    spring: 2 
+                    damping: 0.2 
+                }                 
             }
         }
     }
 
-    Column {
+    Item {
         id: filters
         anchors.top: parent.top
         anchors.right: parent.right
@@ -97,22 +99,28 @@ Item {
         anchors.topMargin: 3
         anchors.bottomMargin: 3
         width: 200
-        spacing: 5
+        //spacing: 5
         z: 2
         Text {
             id: nameText
             text: "Name"
             font.pixelSize: root.itemHeight * 0.7
             color: root.textColor
+            anchors.top: parent.top
         }
         TextInput {
             id: nameField
             anchors.top: nameText.bottom
+            anchors.topMargin: 5
             width: parent.width
             height: root.itemHeight * 0.7
             color: root.textColor
             font.pixelSize: height * 0.8
-            focusOnPress: false
+            focus: true
+            Keys.onEnterPressed: selected(appView.currentItem.ident);
+            Keys.onReturnPressed: selected(appView.currentItem.ident);
+            // TODO: disabled due to nameField never getting key events
+            /*activeFocusOnPress: false
             cursorVisible: keyInterceptor.focus
             Item {
                 id: keyInterceptor
@@ -121,7 +129,7 @@ Item {
                 Keys.onDigit1Pressed: {
                     selected(appView.currentItem.ident);
                 }
-            }
+            }*/
             Rectangle {
                 anchors.fill: parent
                 anchors.leftMargin: -3
@@ -138,12 +146,15 @@ Item {
             text: "Category"
             font.pixelSize: root.itemHeight * 0.7
             color: root.textColor
+            anchors.top: nameField.bottom
+            anchors.topMargin: 5
         }
         ListView {
             id: catSelector
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: catText.bottom
+            anchors.topMargin: 5
             anchors.bottom: parent.bottom
             property string selectedCategory: ""
             onCurrentIndexChanged: {
@@ -206,7 +217,7 @@ Item {
                 property string rawName: raw
                 height: root.itemHeight * 0.7
                 width: catSelector.width
-                MouseRegion {
+                MouseArea {
                     anchors.fill: parent
                     onClicked: {
                         catSelector.currentIndex = index;
@@ -247,7 +258,7 @@ Item {
             id: appView
             highlight: highl
             snapMode: ListView.SnapOneItem
-            highlightFollowsCurrentItem: false
+            //highlightFollowsCurrentItem: false
             clip: true
             delegate: appDelegate
             anchors.fill: parent

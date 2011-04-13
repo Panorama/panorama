@@ -4,8 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QHash>
-#include <qml.h>
-
+#include <qdeclarative.h>
 #include "settingshive.h"
 
 /**

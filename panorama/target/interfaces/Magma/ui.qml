@@ -204,7 +204,7 @@ PanoramaUI {
                 topSection = section;
                 level = 1;
             }
-            
+
             id: topMenu
             focus: true
             anchors.bottom: parent.bottom
@@ -241,7 +241,8 @@ PanoramaUI {
                     anchors.fill: parent
                     onClicked: {
                         topMenu.currentIndex = index;
-                        setSection(section);
+                        ui.topSection = section;
+                        ui.level = 1;
                     }
                 }
             }

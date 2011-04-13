@@ -102,7 +102,8 @@ PanoramaUI {
             opacity: 0.5
             radius: 8
             focus: true
-            Keys.onDigit1Pressed: ui.execute(appView.currentItem.ident)
+            Keys.onEnterPressed: ui.execute(appView.currentItem.ident)
+            Keys.onReturnPressed: ui.execute(appView.currentItem.ident)
         }
     }
     ListView {

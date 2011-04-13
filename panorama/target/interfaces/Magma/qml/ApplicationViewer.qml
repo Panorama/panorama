@@ -14,10 +14,10 @@ Item {
     property alias currentItem: appView.currentItem
     property alias nameFilter: nameField.text
 
-    Keys.onDigit1Pressed: {
+    Keys.onEnterPressed: {
         selected(appView.currentItem.ident);
     }
-    Keys.onSpacePressed: {
+    Keys.onReturnPressed: {
         selected(appView.currentItem.ident);
     }
 

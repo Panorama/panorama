@@ -212,10 +212,10 @@ PanoramaUI {
             model: menu
             //overShoot: false
             spacing: 6
-            Keys.onDigit1Pressed: {
+            Keys.onEnterPressed: {
                 setSection(topMenu.currentItem.sect);
             }
-            Keys.onSpacePressed: {
+            Keys.onReturnPressed: {
                 setSection(topMenu.currentItem.sect);
             }
             delegate: Text {

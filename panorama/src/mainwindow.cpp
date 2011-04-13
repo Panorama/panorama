@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     appsLoaded = false;
 
     //Resize the window
-    setFixedSize(UI_WIDTH, UI_HEIGHT);
+    resize(UI_WIDTH, UI_HEIGHT);
 
     //Create our Canvas that we'll use later for the UI
     _canvas.setParent(this);
@@ -35,12 +35,20 @@ MainWindow::MainWindow(QWidget *parent) :
     _canvas.setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
     _canvas.setOptimizationFlag(QGraphicsView::DontSavePainterState);
     
-
     _canvas.viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
     _canvas.viewport()->setAttribute(Qt::WA_NoSystemBackground);
     _canvas.viewport()->setAttribute(Qt::WA_PaintUnclipped);
     _canvas.viewport()->setAttribute(Qt::WA_TranslucentBackground, false);
     
+#ifdef FULLSCREEN
+    _canvas.showFullScreen();
+#endif
+
+    _canvas.setStyleSheet( "QGraphicsView { border-style: none; }" );
+    _canvas.setFrameStyle(0);
+    _canvas.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    _canvas.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     _model.setParent(this);
     PanoramaUI::setApplicationsSource(&_model);
 
@@ -151,6 +159,21 @@ void MainWindow::switchToUI(const QString &uiDir, const QString &uiName)
 {
     emit uiChanged(QString(uiDir).append(QDir::separator()).append(uiName)
                    .append(QDir::separator()).append("ui.qml"));
+}
+
+void MainWindow::keyPressEvent(QKeyEvent* e)
+{
+    if(e->key() == Qt::Key_Q && e->modifiers() & Qt::ControlModifier)
+    {
+        exit(0);
+    }
+    else if(e->key() == Qt::Key_F && e->modifiers() & Qt::ControlModifier)
+    {
+        if(isFullScreen())
+            showNormal();
+        else
+            showFullScreen();
+    }
 }
 
 void MainWindow::loadApps() {

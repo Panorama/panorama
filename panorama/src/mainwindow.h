@@ -10,6 +10,7 @@
 #include <QUrl>
 #include <QFile>
 #include <QtConcurrentRun>
+#include <QKeyEvent>
 
 #include "configuration.h"
 #include "panoramaui.h"
@@ -39,6 +40,9 @@ public slots:
 
     /** Change to the UI in the specified directory */
     void switchToUI(const QString &uiDir, const QString &uiName);
+
+protected:
+    void keyPressEvent(QKeyEvent* e);
 
 private slots:
     void continueLoadingUI();

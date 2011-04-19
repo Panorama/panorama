@@ -7,4 +7,3 @@ pandora-libraries.subdir = pandora-libraries
 
 panorama.subdir = panorama
 panorama.depends = pandora-libraries
-

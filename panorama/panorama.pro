@@ -1,10 +1,20 @@
 # panorama.pro - Project file for the Panorama source code distribution
 QT += declarative opengl
 
+pandora {
+    message(Building for Pandora)
+    QMAKE_LFLAGS = -L$$(PND_BASEDIR)/$$(PRJ)/lib -L$$(SDK_PATH)/$$(TARGET_SYS)/usr/lib -Wl,-O2,-rpath,$$(PND_BASEDIR)/$$(PRJ)/lib:$$(SDK_PATH)/$$(TARGET_SYS)/usr/lib
+    QMAKE_INCDIR_QT = $$(PND_BASEDIR)/$$(PRJ)/include
+    DEFINES += PANDORA
+}
+
 disable_opengl {
+    message(OpenGL support disabled)
     DEFINES += DISABLE_OPENGL
     QT -= opengl
-} 
+} else {
+    message(OpenGL support enabled)
+}
 
 
 TARGET = panorama

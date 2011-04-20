@@ -45,5 +45,5 @@ the project.
 [openpandora]: http://openpandora.org/ (OpenPandora - The OMAP3 based Handheld)
 [git]: http://git-scm.com/ (Git)
 [github]: http://github.com/bzar/panorama (GitHub)
-[pandora-libraries]: https://github.com/dflemstr/pandora-libraries
+[pandora-libraries]: https://github.com/bzar/pandora-libraries
 [wiki]: http://wiki.github.com/dflemstr/panorama (Wiki)

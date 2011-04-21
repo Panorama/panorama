@@ -6,6 +6,7 @@
 #include <QLocale>
 #include <QTextStream>
 #include <QDebug>
+#include <QtCore/QSettings>
 
 #include "application.h"
 #include "iconfinder.h"
@@ -31,13 +32,7 @@ public:
     Application readToApplication();
 
 private:
-    void readLocalizedWithFallbacks(const QString &line,
-                                    const QString &fieldName,
-                                    QString &local,
-                                    QString &us,
-                                    QString &generic);
-
-    QString readField(const QString &line, const QString &field) const;
+    static QString readLocalized(const QSettings &settings, const QString &fieldName);
 
     QString _file;
 

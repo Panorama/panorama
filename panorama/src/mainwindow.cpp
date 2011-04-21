@@ -181,14 +181,7 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
     }
     else if(e->key() == Qt::Key_F && e->modifiers() & Qt::ControlModifier)
     {
-        if(isFullScreen())
-        {
-            showNormal();
-        }
-        else
-        {
-            showFullScreen();
-        }
+        _fullscreenSetting->setValue(!_fullscreenSetting->value().toBool());
     }
 }
 

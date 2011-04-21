@@ -38,12 +38,13 @@ void AppAccumulator::loadFrom(const QStringList &searchpaths)
         if(subPaths.count() > 0)
             loadFrom(subPaths);
     }
+
     _watcher.addPaths(searchpaths);
 }
 
 QString AppAccumulator::getExecLine(const QString &id)
 {
-    return _execs[id];
+    return _apps[id].exec;
 }
 
 Application AppAccumulator::getApplication(const QString &id)
@@ -130,7 +131,6 @@ void AppAccumulator::removeViaDesktopFile(const QString &f)
         if(app.relatedFile == f)
         {
             emit appRemoved(app);
-            _execs.remove(app.id);
             _apps.remove(key);
             return;
         }
@@ -154,24 +154,15 @@ void AppAccumulator::addViaDesktopFile(const QString &f)
         Application result = DesktopFile(f).readToApplication();
         if(!result.name.isEmpty() && !result.id.isEmpty())
         {
-            QString oldExec = result.id;
-            result.id = QCryptographicHash::hash(oldExec.toLocal8Bit()
-                                                 .append(result.pandoraId)
-                                                 .append(result.name),
-                                                 QCryptographicHash::Sha1)
-                                                     .toHex();
-
             //Enables us to filter out applications without categories
             if(result.categories.isEmpty())
                 result.categories.append("NoCategory");
 
             _apps[result.id] = result;
-            _execs[result.id] = oldExec;
 
             emit appAdded(result);
         }
     }
 }
 
-QHash<QString, QString> AppAccumulator::_execs;
 QHash<QString, Application> AppAccumulator::_apps;

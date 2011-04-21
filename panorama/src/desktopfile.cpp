@@ -117,6 +117,9 @@ Application DesktopFile::readToApplication()
     }
 
     result.relatedFile = _file;
+
+    result.id = QCryptographicHash::hash(result.exec.toUtf8(), QCryptographicHash::Sha1).toHex();
+
     return result;
 }
 

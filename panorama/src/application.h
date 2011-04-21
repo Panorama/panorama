@@ -12,6 +12,9 @@ struct Application
     /** The SHA1 ID of this application */
     QString id;
 
+    /** The exec line for this application */
+    QString exec;
+
     /** The PND id that this application is related to */
     QString pandoraId;
 

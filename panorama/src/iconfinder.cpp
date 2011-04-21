@@ -48,6 +48,10 @@ Q_GLOBAL_STATIC(QtIconLoaderImplementation, iconLoaderInstance);
 QString IconFinder::findIcon(const QString &name, const QString &fallback)
 {
     QString icon;
+
+    if(name.contains(QDir::separator()))
+        return name; //Already resolved
+
 #ifdef Q_WS_X11
     QString png = QLatin1String(".png");
     QString svg = QLatin1String(".svg");

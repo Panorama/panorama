@@ -1,4 +1,4 @@
 [submodule "pandora-libraries"]
 	path = pandora-libraries
-	url = git://github.com/dflemstr/pandora-libraries.git
+	url = git://github.com/bzar/pandora-libraries.git
         branch = clean

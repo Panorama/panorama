@@ -46,7 +46,7 @@ PanoramaUI {
     Setting { id: favorites; section: "system"; key: "favorites" }
 
     //The clockspeed setting, stored as an integer in MHz
-    Setting { id: clockspeed; section: "system"; key: "clockspeed" }
+    Setting { id: clockspeed; section: "system"; key: "clockspeed"; defaultValue: 0 }
 
     //------------------------------PMenu properties----------------------------
 

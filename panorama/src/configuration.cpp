@@ -1,13 +1,13 @@
 #include "configuration.h"
 
 Configuration::Configuration(QObject *parent) :
-    QObject(parent), _fullscreen(false)
+        QObject(parent), _fullscreen(false)
 {
     _hive = new SettingsHive(this);
 
     connect(&_watcher, SIGNAL(fileChanged(QString)),
             this, SLOT(readFile(QString)));
-    connect(_hive, SIGNAL(settingChanged(QString,QString,QString,ChangeSource)),
+    connect(_hive, SIGNAL(settingChanged(QString,QString,QVariant,ChangeSource)),
             this, SLOT(saveFile()));
 }
 
@@ -28,9 +28,6 @@ void Configuration::loadFile(const QString &f)
 
 void Configuration::readFile(const QString &f)
 {
-    QString line;
-    QString section;
-    QFile file(f);
     bool changed(false);
 
     //For some reason, the FileWatcher stops tracking files sometimes...
@@ -39,98 +36,40 @@ void Configuration::readFile(const QString &f)
     if(!_watcher.files().contains(f) && QFileInfo(f).exists())
         _watcher.addPath(f);
 
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    QSettings settings(f, QSettings::IniFormat);
+
+    settings.beginGroup("panorama");
+    QString uiDir = settings.value("uiDirectory").toString();
+    if(_uiDir != uiDir)
     {
-        qWarning() << "Could not open file " << f;
-        return;
+        _uiDir = uiDir;
+        changed = true;
     }
 
-    QTextStream in(&file);
-
-    while(!in.atEnd())
+    QString ui = settings.value("ui").toString();
+    if(_ui != ui)
     {
-        //XXX Optimize this
-        line = in.readLine().trimmed();
-        if(line.startsWith("#"))
-            continue;
-        else if(line.startsWith("["))
-            section = line.mid(1, line.length() - 2);
-        else if(section.isEmpty() && line.startsWith("uiDirectory"))
-        {
-            QStringList parts = line.split("=");
-            if(parts.count() > 1)
-            {
-                parts.removeFirst();
-                line = parts.join("=").trimmed();
-
-                if(line.startsWith("\""))
-                    line = line.mid(1, line.length() - 2);
-
-                if(_uiDir != line)
-                {
-                    _uiDir = line;
-                    changed = true;
-                }
-            }
-        }
-        else if(section.isEmpty() && line.startsWith("ui"))
-        {
-            QStringList parts = line.split("=");
-            if(parts.count() > 1)
-            {
-                parts.removeFirst();
-                line = parts.join("=").trimmed();
-
-                if(line.startsWith("\""))
-                    line = line.mid(1, line.length() - 2);
-
-                if(_ui != line)
-                {
-                    _ui = line;
-                    changed = true;
-                }
-            }
-        }
-        else if(section.isEmpty() && line.startsWith("fullscreen"))
-        {
-            QStringList parts = line.split("=");
-            if(parts.count() > 1)
-            {
-                parts.removeFirst();
-                line = parts.join("=").simplified();
-
-                if(line == "\"true\"" && !_fullscreen)
-                {
-                    changed = true;
-                    _fullscreen = true;
-                }
-                else if(_fullscreen)
-                {
-                    _fullscreen = false;
-                    changed = true;
-                }
-                else
-                {
-                    _fullscreen = false;
-                }
-            }
-        }
-        else
-        {
-            QStringList parts = line.split("=");
-            if(parts.length() > 1)
-            {
-                const QString key = parts[0].trimmed();
-                parts.removeFirst();
-                QString value = parts.join("=").trimmed();
-
-                if(value.startsWith('"'))
-                    value = value.mid(1, value.length() - 2);
-                _hive->setSetting(section, key, value, SettingsHive::File);
-            }
-        }
+        _ui = ui;
+        changed = true;
     }
-    file.close();
+
+    bool fullscreen = settings.value("fullscreen").toBool();
+    if(_fullscreen ^ fullscreen)
+    {
+        _fullscreen = fullscreen;
+        changed = true;
+    }
+    settings.endGroup();
+
+    foreach(const QString &section, settings.childGroups())
+    {
+        settings.beginGroup(section);
+        foreach(const QString &key, settings.allKeys())
+        {
+            _hive->setSetting(section, key, settings.value(key), SettingsHive::File);
+        }
+        settings.endGroup();
+    }
 
     if(changed)
         emit uiChanged(_uiDir, _ui);
@@ -146,23 +85,15 @@ void Configuration::reactToChange(const QString&,
 
 void Configuration::saveFile()
 {
-    QFile file(_file);
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        qWarning() << "Could not open file " << _file;
-        return;
-    }
+    QSettings out(_file, QSettings::IniFormat);
 
-    QTextStream out(&file);
+    out.beginGroup("panorama");
+    out.setValue("uiDirectory", _uiDir);
+    out.setValue("ui", _ui);
+    out.setValue("fullscreen", _fullscreen);
+    out.endGroup();
 
-    out << "uiDirectory = \"" << _uiDir << '\"' << endl;
-    out << "ui = \"" << _ui << '\"' << endl;
-    out << "fullscreen = " << (_fullscreen ? "\"true\"" : "\"false\"") << endl;
-
-    _hive->writeIni(out);
-
-    file.flush();
-    file.close();
+    _hive->writeSettings(out);
 }
 
 QString Configuration::ui() const

@@ -57,7 +57,6 @@ private:
     void removeViaDesktopFile(const QString &file);
     bool shouldAddThisApp(const QString &file) const;
 
-    static QHash<QString, QString> _execs;
     static QHash<QString, Application> _apps;
 
     QFileSystemWatcher _watcher;

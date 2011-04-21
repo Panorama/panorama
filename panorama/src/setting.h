@@ -13,10 +13,10 @@
 class Setting : public QObject
 {
 Q_OBJECT
-Q_PROPERTY(QString section READ section WRITE setSection NOTIFY sectionChanged)
-Q_PROPERTY(QString key READ key WRITE setKey NOTIFY keyChanged)
-Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
-Q_PROPERTY(QString defaultValue READ defaultValue WRITE setDefaultValue NOTIFY defaultValueChanged)
+Q_PROPERTY(QString  section READ section WRITE setSection NOTIFY sectionChanged)
+Q_PROPERTY(QString  key READ key WRITE setKey NOTIFY keyChanged)
+Q_PROPERTY(QVariant value READ value WRITE setValue NOTIFY valueChanged)
+Q_PROPERTY(QVariant defaultValue READ defaultValue WRITE setDefaultValue NOTIFY defaultValueChanged)
 public:
     /** Constructs a new Setting instance */
     explicit Setting(QObject *parent = 0);
@@ -40,19 +40,19 @@ public:
     }
 
     /** Sets the default value of this setting */
-    void setDefaultValue(const QString &value);
+    void setDefaultValue(const QVariant &value);
 
     /** Retrieves the default value of this setting */
-    QString defaultValue() const
+    QVariant defaultValue() const
     {
         return _default;
     }
 
     /** Sets the value of this setting */
-    void setValue(const QString &value);
+    void setValue(const QVariant &value);
 
     /** Retrieves the value of this setting */
-    QString value() const;
+    QVariant value() const;
 
     /** Sets the default section for all Setting instances */
     static void setDefaultSection(const QString &section)
@@ -76,21 +76,21 @@ signals:
     void keyChanged(const QString &key);
 
     /** The default value for this section was changed */
-    void defaultValueChanged(const QString &value);
+    void defaultValueChanged(const QVariant &value);
 
     /** The value of this setting was changed */
-    void valueChanged(const QString &value);
+    void valueChanged(const QVariant &value);
 
 private slots:
     void handleFieldChange(const QString &section, const QString &key,
-                           const QString &value);
+                           const QVariant &value);
 
 private:
     void maybeInsertDefault();
 
     QString _section;
     QString _key;
-    QString _default;
+    QVariant _default;
 
     static QString _defaultSection;
     static SettingsHive *_settings;

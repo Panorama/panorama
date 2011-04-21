@@ -25,6 +25,7 @@ Item {
         id: favorites
         section: "system"
         key: "favorites"
+        defaultValue: ""
     }
 
     Component {

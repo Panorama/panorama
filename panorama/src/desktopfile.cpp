@@ -1,4 +1,7 @@
 #include "desktopfile.h"
+#include <QCryptographicHash>
+
+// TODO Fix constants, there's lots of memory duplication here
 
 DesktopFile::DesktopFile(const QString &file)
 {
@@ -8,107 +11,49 @@ DesktopFile::DesktopFile(const QString &file)
 Application DesktopFile::readToApplication()
 {
     Application result;
-    QString line;
-    QString enName, enComment;
-    QString genericName, genericComment;
-    QFile file(_file);
+    result.clockspeed = 0;
 
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    QSettings settings(_file, QSettings::IniFormat);
+    settings.beginGroup("Desktop Entry");
+
+    //Should we not load this?
+    if(!settings.value(TYPES_FIELD).toString().contains(APPLICATION_TYPE) || //Not an app
+       settings.value("Hidden").toBool() || //Should be hidden in menus
+       settings.value("NoDisplay").toBool()) //Should not be displayed
     {
-        qWarning() << "Could not open file " << _file;
-        return result;
+        return Application();
     }
 
-    QTextStream in(&file);
+    //Name
+    result.name = readLocalized(settings, NAME_FIELD);
 
-    //Skip ahead over the "[Desktop Entry]" section
-    while(!in.atEnd() && !in.readLine().contains("[Desktop Entry]"));
+    //Comment
+    result.comment = readLocalized(settings, COMMENT_FIELD);
 
-    while(!in.atEnd())
+    //Exec
+    result.exec = settings.value(EXEC_FIELD).toString();
+
+    //Icon
+    result.icon = IconFinder::findIcon(settings.value(ICON_FIELD).toString());
+
+    //X-Desktop-File-Install-Version
+    result.version = settings.value(VERSION_FIELD).toString();
+
+    //X-Pandora-UID
+    result.pandoraId = settings.value(PANDORA_UID_FIELD).toString();
+
+    //Categories
+    const QString data = settings.value(CATEGORIES_FIELD).toString();
+    if(!data.isNull() && !data.isEmpty())
     {
-        line = in.readLine();
-
-        //User comment (Hah! A meta-pun!)
-        if(line.startsWith("#"))
-            continue;
-        //Name
-        else if(line.startsWith(NAME_FIELD))
-            readLocalizedWithFallbacks(line, NAME_FIELD, result.name, enName,
-                                       genericName);
-        //Comment
-        else if(line.startsWith(COMMENT_FIELD))
-            readLocalizedWithFallbacks(line, COMMENT_FIELD, result.comment,
-                                       enComment, genericComment);
-        //Exec
-        else if(line.startsWith(EXEC_FIELD))
-            result.id = readField(line, EXEC_FIELD); //Temporarily use id
-        //Icon
-        else if(line.startsWith(ICON_FIELD))
-            result.icon = IconFinder::findIcon(readField(line, ICON_FIELD));
-        //X-Desktop-File-Install-Version
-        else if(line.startsWith(VERSION_FIELD))
-            result.version = readField(line, VERSION_FIELD);
-        //X-Pandora-UID
-        else if(line.startsWith(PANDORA_UID_FIELD))
-            result.pandoraId = readField(line, PANDORA_UID_FIELD);
-        //Categories
-        else if(line.startsWith(CATEGORIES_FIELD))
+        result.categories = data.split(";");
+        for(int i = 0; i < result.categories.count(); i++)
         {
-            const QString data = readField(line, CATEGORIES_FIELD);
-            if(data.length() > 0)
-            {
-                result.categories = data.split(";");
-                for(int i = 0; i < result.categories.count(); i++)
-                {
-                    result.categories[i] = result.categories[i].trimmed();
-                }
-            }
+            result.categories[i] = result.categories[i].trimmed();
         }
-        //Type
-        //(We don't want to load this application if its Type isn't Application)
-        else if(line.startsWith(TYPES_FIELD)
-            && !line.contains(APPLICATION_TYPE))
-        {
-            file.close();
-            return Application();
-        }
-        //Hidden
-        //(We don't want to add the file if it's supposed to be hidden)
-        else if(line.startsWith("Hidden=true"))
-        {
-            file.close();
-            return Application();
-        }
-        //NoDisplay
-        //(Dito)
-        else if(line.startsWith("NoDisplay=true"))
-        {
-            file.close();
-            return Application();
-        }
-        //We stop if we reach a new section
-        else if(line.startsWith("["))
-            break;
-    }
-    file.close();
-
-    //Merge in the fields from the fallback localization
-    if(result.name.isEmpty())
-    {
-        if(enName.isEmpty())
-            result.name = genericName;
-        else
-            result.name = enName;
     }
 
-    if(result.comment.isEmpty())
-    {
-        if(enComment.isEmpty())
-            result.comment = genericComment;
-        else
-            result.comment = enComment;
-    }
-
+    //Is this a PND app? Then load additional metadata from libpnd
     if(!result.pandoraId.isEmpty())
     {
         Pnd pnd(PndScanner::pndForUID(result.pandoraId));
@@ -117,19 +62,14 @@ Application DesktopFile::readToApplication()
     }
 
     result.relatedFile = _file;
+
+    result.id = QCryptographicHash::hash(result.exec.toUtf8(), QCryptographicHash::Sha1).toHex();
+
     return result;
 }
 
-void DesktopFile::readLocalizedWithFallbacks(const QString &line,
-                                             const QString &fieldName,
-                                             QString &local,
-                                             QString &en,
-                                             QString &generic)
+QString DesktopFile::readLocalized(const QSettings &settings, const QString &fieldName)
 {
-    //XXX This could be done much more efficiently
-    QString tmp;
-    int i = -1;
-
     //We have 6 levels of localization, in 3 groups:
     //Native:
     //0: ideal translation
@@ -139,62 +79,33 @@ void DesktopFile::readLocalizedWithFallbacks(const QString &line,
     //3: american english translation
     //4: brittish translation
     //Generic:
-    //5: whatever unlocalized translation happens to be last in the file
-    do {
-        i++;
+    //5: whatever unlocalized translation happens to be in the file
+    for(int i = 0; i < 5; i++) {
+        QString locale;
         switch(i)
         {
         case 0:
-            tmp = QLocale::system().name();
+            locale = QLocale::system().name();
             break;
         case 1:
-            tmp = QLocale::system().name().split("_")[0];
+            locale = QLocale::system().name().split("_")[0];
             break;
         case 2:
-            tmp = "en";
+            locale = "en";
             break;
         case 3:
-            tmp = "en_US";
+            locale = "en_US";
             break;
         case 4:
-            tmp = "en_GB";
+            locale = "en_GB";
             break;
         }
 
-        if(i == 5)
-            tmp = readField(line, fieldName);
-        else
-            tmp = readField(line, FIELD_TEMPLATE.arg(fieldName).arg(tmp));
-    } while(tmp.isEmpty() && i < 6);
-
-    switch(i)
-    {
-    case 0:
-    case 1:
-        local = tmp;
-        break;
-    case 2:
-    case 3:
-    case 4:
-        en = tmp;
-        break;
-    case 5:
-        generic = tmp;
+        QString result = settings.value(FIELD_TEMPLATE.arg(fieldName).arg(locale)).toString();
+        if(!result.isNull())
+            return result;
     }
-}
-
-QString DesktopFile::readField(const QString &line, const QString &field) const
-{
-    QString start(field);
-    start.append("=");
-    if(line.startsWith(start))
-    {
-        //Don't do 'split("=")' here; it's against the standard
-        return line.right(line.length() - field.length() -1)
-                .split("#")[0].trimmed();
-    }
-    else
-        return QString();
+    return settings.value(fieldName).toString();
 }
 
 const QString DesktopFile::NAME_FIELD       = QString("Name");

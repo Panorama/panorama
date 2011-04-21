@@ -27,7 +27,7 @@ public:
     static Pnd pndForUID(const QString &uid);
 
 private:
-    PndScanner() {};
+    PndScanner() {}
 
     PndScanner(const PndScanner&);
 

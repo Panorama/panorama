@@ -5,6 +5,7 @@
 #include <QString>
 #include <QTextStream>
 #include <QHash>
+#include <QSettings>
 
 class SettingsHive : public QObject
 {
@@ -21,20 +22,20 @@ public:
         External
     };
 
-    void writeIni(QTextStream &out) const;
+    void writeSettings(QSettings &out) const;
 
-    QString setting(const QString &section, const QString &key) const;
+    QVariant setting(const QString &section, const QString &key) const;
 
 signals:
     void settingChanged(const QString &section, const QString &key,
-                        const QString &value, ChangeSource source);
+                        const QVariant &value, ChangeSource source);
 
 public slots:
     void setSetting(const QString &section, const QString &key,
-                    const QString &value, ChangeSource source = Unknown);
+                    const QVariant &value, ChangeSource source = Unknown);
 
 private:
-    QHash<QString, QHash<QString, QString> *> *_store;
+    QHash<QString, QHash<QString, QVariant> *> *_store;
 };
 
 #endif // SETTINGSHIVE_H

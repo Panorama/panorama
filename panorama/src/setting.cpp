@@ -3,8 +3,8 @@
 Setting::Setting(QObject *parent) :
     QObject(parent)
 {
-    connect(_settings, SIGNAL(settingChanged(QString,QString,QString,ChangeSource)),
-            this, SLOT(handleFieldChange(QString,QString,QString)));
+    connect(_settings, SIGNAL(settingChanged(QString,QString,QVariant,ChangeSource)),
+            this, SLOT(handleFieldChange(QString,QString,QVariant)));
 }
 
 void Setting::setSettingsSource(SettingsHive *value)
@@ -32,7 +32,7 @@ void Setting::setKey(const QString &key)
     }
 }
 
-void Setting::setDefaultValue(const QString &value)
+void Setting::setDefaultValue(const QVariant &value)
 {
     if(_default != value)
     {
@@ -42,7 +42,7 @@ void Setting::setDefaultValue(const QString &value)
     }
 }
 
-void Setting::setValue(const QString &value)
+void Setting::setValue(const QVariant &value)
 {
     if(_settings)
     {
@@ -51,18 +51,18 @@ void Setting::setValue(const QString &value)
     }
 }
 
-QString Setting::value() const
+QVariant Setting::value() const
 {
     const QString &section(_section.isEmpty() ? _defaultSection : _section);
 
     if(_settings)
         return _settings->setting(section, _key);
     else
-        return QString();
+        return QVariant();
 }
 
 void Setting::handleFieldChange(const QString &section, const QString &key,
-                                const QString &value)
+                                const QVariant &value)
 {
     const QString &s(_section.isEmpty() ? _defaultSection : _section);
     if(s == section && _key == key)
@@ -74,8 +74,8 @@ void Setting::maybeInsertDefault()
     const QString &section(_section.isEmpty() ? _defaultSection : _section);
 
     if(!section.isEmpty() && !_key.isEmpty() && _settings &&
-       _settings->setting(section, _key).length() == 0 &&
-       _default.length() != 0)
+       !_settings->setting(section, _key).isValid() &&
+       _default.isValid())
     {
         _settings->setSetting(section, _key, _default, SettingsHive::External);
     }

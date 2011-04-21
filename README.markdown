@@ -25,9 +25,11 @@ You will need the following tools and resources to compile Panorama:
 Once you have these tools, you should get hold of the latest version of the
 Panorama source code distribution, which you can do by going to the
 [GitHub repository][github] for Panorama. You'll also need the Pandora
-libraries that are used for PND software package integration. These are
-available in [another git][pandora-libraries] which you should clone to
-to the pandora-libraries subdirectory.
+libraries that are used for PND software package integration. You can get
+them using the following commands:
+
+    git submodule init
+    git submodule update
 
 Then, do the following:
 
@@ -45,5 +47,4 @@ the project.
 [openpandora]: http://openpandora.org/ (OpenPandora - The OMAP3 based Handheld)
 [git]: http://git-scm.com/ (Git)
 [github]: http://github.com/bzar/panorama (GitHub)
-[pandora-libraries]: https://github.com/bzar/pandora-libraries
 [wiki]: http://wiki.github.com/dflemstr/panorama (Wiki)

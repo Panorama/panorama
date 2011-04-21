@@ -46,7 +46,7 @@ public:
     static QVariant take(QAbstractItemModel *source, int count);
 
 private:
-    ApplicationFilterMethods() {};
+    ApplicationFilterMethods() {}
 
     ApplicationFilterMethods(const ApplicationFilterMethods&);
 

@@ -1,249 +1,275 @@
 #include "iconfinder.h"
 
-QString IconFinder::findIcon(const QString &icon)
-{
-    //XXX This algorithm doesn't work in non-gconf environments
-    //(but all desktops *should* have gconf by now)
+#include <QtCore/QList>
+#include <QtCore/QHash>
+#include <QtCore/QDir>
+#include <QtCore/QString>
+#include <QtCore/QLibrary>
+#include <QtCore/QSettings>
+#include <QtCore/QTextStream>
 
-    if(icon.contains("/")) //We have a resolved icon; quit
-        return icon;
-    else
+#ifdef Q_WS_X11
+class QIconTheme
+{
+public:
+    QIconTheme(QHash<int, QString> dirList, QStringList parents)
+        : _dirList(dirList), _parents(parents), _valid(true) {}
+    QIconTheme() : _valid(false) {}
+    const QHash<int, QString> &dirList() const { return _dirList; }
+    const QStringList &parents() const { return _parents; }
+    bool isValid() const { return _valid; }
+private:
+    QHash<int, QString> _dirList;
+    QStringList _parents;
+    bool _valid;
+};
+
+class QtIconLoaderImplementation
+{
+public:
+    QtIconLoaderImplementation();
+    QString findIcon(int size, const QString &name) const;
+
+private:
+    QIconTheme parseIndexFile(const QString &themeName) const;
+    void lookupIconTheme() const;
+    QString findIconHelper(int size,
+                           const QString &themeName,
+                           const QString &iconName,
+                           QStringList &visited) const;
+    mutable QString themeName;
+    mutable QStringList iconDirs;
+    mutable QHash <QString, QIconTheme> themeList;
+};
+
+Q_GLOBAL_STATIC(QtIconLoaderImplementation, iconLoaderInstance);
+#endif
+
+QString IconFinder::findIcon(const QString &name, const QString &fallback)
+{
+    QString icon;
+#ifdef Q_WS_X11
+    QString png = QLatin1String(".png");
+    QString svg = QLatin1String(".svg");
+    QList<int> iconSizes;
+    iconSizes << 64 << 48 << 32 << 24 << 16;
+    foreach(int size, iconSizes)
     {
-        //XXX The search index should be implemented as a tree
-        foreach(const QDir &dir, _searchIndex) //Search the index
-        {
-            const QString file = findIconInDir(icon, dir);
-            if(!file.isEmpty())
-                return file;
-        }
-        return QString();
+        icon = iconLoaderInstance()->findIcon(size, name + png);
+        if(!icon.isNull())
+            return icon;
     }
+#endif
+    Q_UNUSED(name);
+    return fallback;
 }
 
-QString IconFinder::findIconInDir(const QString &iconName, const QDir &dir)
+#ifdef Q_WS_X11
+QtIconLoaderImplementation::QtIconLoaderImplementation()
 {
-    //This just shallowly searches for named files in the directory
-    if(iconName.contains("."))
-    {
-        const QString fileName(dir.filePath(iconName));
-        const QFileInfo info(fileName);
-        if(info.exists() && info.isFile())
-            return fileName;
-    }
-    else
-    {
-        foreach(const QString &suffix, _iconSuffixes)
-        {
-            QString name(iconName);
-            name.append(suffix);
-            const QString fileName(dir.filePath(name));
-
-            const QFileInfo info(fileName);
-            if(info.exists() && info.isFile())
-                return fileName;
-        }
-    }
-    return QString();
+    lookupIconTheme();
 }
 
-QString IconFinder::getParentTheme(const QDir &themeDir)
+extern "C" {
+    struct GConfClient;
+    struct GError;
+    typedef void (*Ptr_g_type_init)();
+    typedef GConfClient* (*Ptr_gconf_client_get_default)();
+    typedef char* (*Ptr_gconf_client_get_string)(GConfClient*, const char*, GError **);
+    typedef void (*Ptr_g_object_unref)(void *);
+    typedef void (*Ptr_g_error_free)(GError *);
+    typedef void (*Ptr_g_free)(void*);
+    static Ptr_g_type_init p_g_type_init = 0;
+    static Ptr_gconf_client_get_default p_gconf_client_get_default = 0;
+    static Ptr_gconf_client_get_string p_gconf_client_get_string = 0;
+    static Ptr_g_object_unref p_g_object_unref = 0;
+    static Ptr_g_error_free p_g_error_free = 0;
+    static Ptr_g_free p_g_free = 0;
+}
+
+static int kdeVersion()
+{
+    static int version = qgetenv("KDE_SESSION_VERSION").toInt();
+    return version;
+}
+
+static QString kdeHome()
+{
+    static QString kdeHomePath;
+    if (kdeHomePath.isEmpty()) {
+        kdeHomePath = QFile::decodeName(qgetenv("KDEHOME"));
+        if (kdeHomePath.isEmpty()) {
+            int kdeSessionVersion = kdeVersion();
+            QDir homeDir(QDir::homePath());
+            QString kdeConfDir(QLatin1String("/.kde"));
+            if (4 == kdeSessionVersion && homeDir.exists(QLatin1String(".kde4")))
+                kdeConfDir = QLatin1String("/.kde4");
+            kdeHomePath = QDir::homePath() + kdeConfDir;
+        }
+    }
+    return kdeHomePath;
+}
+
+void QtIconLoaderImplementation::lookupIconTheme() const
+{
+
+#ifdef Q_WS_X11
+    QString dataDirs = QFile::decodeName(getenv("XDG_DATA_DIRS"));
+    if (dataDirs.isEmpty())
+        dataDirs = QLatin1String("/usr/local/share:/usr/share");
+
+    dataDirs.prepend(QDir::homePath() + QLatin1String("/:"));
+    iconDirs = dataDirs.split(QLatin1Char(':'));
+
+    if (qgetenv("DESKTOP_SESSION") == "gnome" ||
+        !qgetenv("GNOME_DESKTOP_SESSION_ID").isEmpty()) {
+
+        if (themeName.isEmpty()) {
+            p_g_type_init =              (Ptr_g_type_init)QLibrary::resolve(QLatin1String("gobject-2.0"), 0, "g_type_init");
+            p_gconf_client_get_default = (Ptr_gconf_client_get_default)QLibrary::resolve(QLatin1String("gconf-2"), 4, "gconf_client_get_default");
+            p_gconf_client_get_string =  (Ptr_gconf_client_get_string)QLibrary::resolve(QLatin1String("gconf-2"), 4, "gconf_client_get_string");
+            p_g_object_unref =           (Ptr_g_object_unref)QLibrary::resolve(QLatin1String("gobject-2.0"), 0, "g_object_unref");
+            p_g_error_free =             (Ptr_g_error_free)QLibrary::resolve(QLatin1String("glib-2.0"), 0, "g_error_free");
+            p_g_free =                   (Ptr_g_free)QLibrary::resolve(QLatin1String("glib-2.0"), 0, "g_free");
+
+            if (p_g_type_init && p_gconf_client_get_default &&
+                p_gconf_client_get_string && p_g_object_unref &&
+                p_g_error_free && p_g_free) {
+
+                p_g_type_init();
+                GConfClient* client = p_gconf_client_get_default();
+                GError *err = 0;
+
+                char *str = p_gconf_client_get_string(client, "/desktop/gnome/interface/icon_theme", &err);
+                if (!err) {
+                    themeName = QString::fromUtf8(str);
+                    p_g_free(str);
+                }
+
+                p_g_object_unref(client);
+                if (err)
+                    p_g_error_free (err);
+            }
+            if (themeName.isEmpty())
+                themeName = QLatin1String("gnome");
+        }
+
+        if (!themeName.isEmpty())
+            return;
+    }
+
+    if (dataDirs.isEmpty())
+        dataDirs = QLatin1String("/usr/local/share:/usr/share");
+
+    dataDirs += QLatin1Char(':') + kdeHome() + QLatin1String("/share");
+    dataDirs.prepend(QDir::homePath() + QLatin1String("/:"));
+    QStringList kdeDirs = QFile::decodeName(getenv("KDEDIRS")).split(QLatin1Char(':'));
+    Q_FOREACH (const QString dirName, kdeDirs)
+            dataDirs.append(QLatin1Char(':') + dirName + QLatin1String("/share"));
+    iconDirs = dataDirs.split(QLatin1Char(':'));
+
+    QFileInfo fileInfo(QLatin1String("/usr/share/icons/default.kde"));
+    QDir dir(fileInfo.canonicalFilePath());
+    QString kdeDefault = kdeVersion() >= 4 ? QString::fromLatin1("oxygen") : QString::fromLatin1("crystalsvg");
+    QString defaultTheme = fileInfo.exists() ? dir.dirName() : kdeDefault;
+    QSettings settings(kdeHome() + QLatin1String("/share/config/kdeglobals"), QSettings::IniFormat);
+    settings.beginGroup(QLatin1String("Icons"));
+    themeName = settings.value(QLatin1String("Theme"), defaultTheme).toString();
+#endif
+}
+
+QIconTheme QtIconLoaderImplementation::parseIndexFile(const QString &themeName) const
+{
+    QIconTheme theme;
+    QFile themeIndex;
+    QStringList parents;
+    QHash <int, QString> dirList;
+
+    for ( int i = 0 ; i < iconDirs.size() && !themeIndex.exists() ; ++i) {
+        const QString &contentDir = QLatin1String(iconDirs[i].startsWith(QDir::homePath()) ? "/.icons/" : "/icons/");
+        themeIndex.setFileName(iconDirs[i] + contentDir + themeName + QLatin1String("/index.theme"));
+    }
+
+    if (themeIndex.exists()) {
+        QSettings indexReader(themeIndex.fileName(), QSettings::IniFormat);
+        Q_FOREACH (const QString &key, indexReader.allKeys()) {
+            if (key.endsWith("/Size")) {
+                if (int size = indexReader.value(key).toInt())
+                    dirList.insertMulti(size, key.left(key.size() - 5));
+            }
+        }
+
+        parents = indexReader.value(QLatin1String("Icon Theme/Inherits")).toString().split(QLatin1Char(','));
+    }
+
+    if (kdeVersion() >= 3) {
+        QFileInfo fileInfo(QLatin1String("/usr/share/icons/default.kde"));
+        QDir dir(fileInfo.canonicalFilePath());
+        QString defaultKDETheme = dir.exists() ? dir.dirName() : kdeVersion() == 3 ?
+                                  QString::fromLatin1("crystalsvg") : QString::fromLatin1("oxygen");
+        if (!parents.contains(defaultKDETheme) && themeName != defaultKDETheme)
+            parents.append(defaultKDETheme);
+    } else if (parents.isEmpty() && themeName != QLatin1String("hicolor")) {
+        parents.append(QLatin1String("hicolor"));
+    }
+
+    theme = QIconTheme(dirList, parents);
+    return theme;
+}
+
+QString QtIconLoaderImplementation::findIconHelper(int size, const QString &themeName,
+                                                   const QString &iconName, QStringList &visited) const
 {
     QString result;
-    QFile file(themeDir.filePath("index.theme"));
 
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return result;
+    if (!themeName.isEmpty()) {
+        visited << themeName;
+        QIconTheme theme = themeList.value(themeName);
 
-    QTextStream in(&file);
-    QString line;
-
-    while(!in.atEnd() && !in.readLine().contains("[Icon Theme]"));
-
-    while(!in.atEnd())
-    {
-        line = in.readLine();
-        if(line.startsWith("#"))
-            continue;
-        else if(line.startsWith("Inherits="))
-            return line.right(line.length() - 9); //9 == length of "Inherits="
-        else if(line.startsWith("["))
-            break;
-    }
-    file.close();
-    return result;
-}
-
-QString IconFinder::findSystemTheme()
-{
-    QProcess gconftool;
-    QStringList args;
-    args << "--get" << "/desktop/gnome/interface/icon_theme";
-    gconftool.start("gconftool-2", args);
-    if(!gconftool.waitForStarted())
-    {
-        qWarning() << "The application \"gconftool-2\" couldn't be found";
-        return QString();
-    }
-
-    gconftool.waitForFinished(1000);
-
-    if(gconftool.state() == QProcess::NotRunning)
-    {
-        QString name(gconftool.readAllStandardOutput());
-        name.chop(1);
-        return name;
-    }
-    else
-    {
-        gconftool.kill();
-        return QString();
-    }
-}
-
-QStringList IconFinder::getDefaultThemePaths()
-{
-    QStringList result;
-    QStringList tmp;
-    tmp << QDir::root().filePath("usr") << "share" << "icons";
-    result << QDir::home().filePath(".icons") << tmp.join(QDir::separator());
-    return result;
-}
-
-QStringList IconFinder::getIconSuffixes()
-{
-    QStringList result, accepted;
-    accepted << "png" << "svg" << "xpm";
-
-    foreach(const QString &format, QImageReader::supportedImageFormats ())
-        if(accepted.contains(format))
-            result += QString(format).prepend(".");
-
-    return result;
-}
-
-QList<QDir> IconFinder::indexForTheme(const QString &name,
-                                      const QStringList &paths,
-                                      const QStringList &suffixes)
-{
-    QStringList filters;
-    foreach(const QString &str, suffixes)
-        filters += QString("*").append(str);
-
-    return indexAllThemes(name, paths, filters);
-}
-
-QList<QDir> IconFinder::indexAllThemes(const QString &name,
-                                       const QStringList &paths,
-                                       const QStringList &filters)
-{
-    QList<QDir> result;
-
-    QStringList tmp;
-    tmp << QDir::root().filePath("tmp") << QString("panorama-iconindex-")
-            .append(name);
-
-    const QString cacheFileName(tmp.join(QDir::separator()));
-    bool rebuildCache(true);
-
-    if(QFileInfo(cacheFileName).exists())
-    {
-        rebuildCache = false;
-        QFile cachedIndex(cacheFileName);
-        if(cachedIndex.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            QTextStream in(&cachedIndex);
-            while(!in.atEnd())
-                result += in.readLine();
-            cachedIndex.close();
+        if (!theme.isValid()) {
+            theme = parseIndexFile(themeName);
+            themeList.insert(themeName, theme);
         }
-        else
-            rebuildCache = true;
-    }
 
-    if(rebuildCache)
-    {
-        QStringList tmp;
-        tmp << QDir::root().filePath("usr") << "share" << "pixmaps";
-        result += QDir(tmp.join(QDir::separator()));
-        indexTheme(name, paths, filters, result);
-        indexTheme("hicolor", paths, filters, result);
+        if (!theme.isValid())
+            return QString();
 
-        QFile cachedIndex(cacheFileName);
-        if(cachedIndex.open(QIODevice::WriteOnly | QIODevice::Text))
-        {
-            QTextStream out(&cachedIndex);
+        QList <QString> subDirs = theme.dirList().values(size);
 
-            foreach(const QDir &entry, result)
-                out << entry.absolutePath() << endl;
-
-            cachedIndex.flush();
-            cachedIndex.close();
+        for ( int i = 0 ; i < iconDirs.size() ; ++i) {
+            for ( int j = 0 ; j < subDirs.size() ; ++j) {
+                QString contentDir = (iconDirs[i].startsWith(QDir::homePath())) ?
+                                     QLatin1String("/.icons/") : QLatin1String("/icons/");
+                QString fileName = iconDirs[i] + contentDir + themeName + QLatin1Char('/') + subDirs[j] + QLatin1Char('/') + iconName;
+                QFile file(fileName);
+                if (file.exists())
+                    result = fileName;
+                if (!result.isNull())
+                    break;
+            }
         }
-        else
-            qWarning() << "Could not open file " << cacheFileName;
+
+        if (result.isNull()) {
+            QStringList parents = theme.parents();
+            //search recursively through inherited themes
+            for (int i = 0 ; result.isNull() && i < parents.size() ; ++i) {
+                QString parentTheme = parents[i].trimmed();
+                if (!visited.contains(parentTheme)) //guard against endless recursion
+                    result = findIconHelper(size, parentTheme, iconName, visited);
+            }
+        }
     }
     return result;
 }
 
-void IconFinder::indexTheme(const QString &name, const QStringList &paths,
-                            const QStringList &filters, QList<QDir> &result)
+QString QtIconLoaderImplementation::findIcon(int size, const QString &name) const
 {
-    foreach(const QString &path, paths)
-    {
-        QDir dir(path);
-        if(dir.cd(name))
-        {
-            if(dir.entryInfoList(filters, QDir::Files).count() > 0)
-                result += QDir(dir);
-            indexSubdir(dir, filters, result);
-            QString super = getParentTheme(dir);
-            if(!super.isEmpty())
-                indexTheme(super, paths, filters, result);
-        }
+    QString result;
+
+    if (!themeName.isEmpty()) {
+        QStringList visited;
+        result = findIconHelper(size, themeName, name, visited);
     }
+    return result;
 }
-
-void IconFinder::indexSubdir(const QDir &dir, const QStringList &filters,
-                             QList<QDir> &result)
-{
-    QStringList subdirs = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot,
-                                        QDir::Name | QDir::Reversed);
-
-    //Let's do some magic to get the icons we need
-    QMap<int, QStringList> costs;
-    foreach(const QString &d, subdirs)
-    {
-        if(d.at(0).isDigit())
-        {
-            QString &dimStr = d.split("x")[0];
-            bool ok;
-            int dim = dimStr.toInt(&ok, 10);
-            if(ok)
-                costs[abs(64 - dim)] += d;
-            else
-                costs[0] += d;
-        }
-        else if (d == "scalable")
-            costs[0] += d;
-        else
-            costs[1024] += d;
-    }
-    QList<int> keys = costs.keys();
-    qSort(keys);
-
-    foreach(const int key, keys)
-        foreach(const QString &d, costs[key])
-        {
-            const QDir subdir(dir.filePath(d));
-            if(subdir.entryList(filters, QDir::Files).count() > 0)
-                result += subdir;
-            if(subdir.entryList(QDir::Dirs | QDir::NoDotAndDotDot).count() > 0)
-                indexSubdir(subdir, filters, result);
-        }
-}
-
-QString IconFinder::_themeName = findSystemTheme();
-QStringList IconFinder::_themePaths = getDefaultThemePaths();
-QStringList IconFinder::_iconSuffixes = getIconSuffixes();
-QList<QDir> IconFinder::_searchIndex = indexForTheme(_themeName, _themePaths,
-                                                     _iconSuffixes);
+#endif

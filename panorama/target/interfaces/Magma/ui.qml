@@ -1,7 +1,7 @@
 import Qt 4.7
 import Panorama 1.0
 import "qml" as Extensions
-import Qt.labs.particles 1.0
+//import Qt.labs.particles 1.0
 
 PanoramaUI {
     id: ui
@@ -42,6 +42,7 @@ PanoramaUI {
         z: -1
         width: parent.width
         height: parent.height * 2
+        /* TODO: Re-enable when the time is right
         Timer {
             interval: 200
             running: level == 0 && volcano.value == "true"
@@ -89,7 +90,7 @@ PanoramaUI {
                 yattractor: ui.height
                 acceleration: 7
             }
-        }
+        }*/
         Image {
             width: ui.width
             height: ui.height
@@ -107,7 +108,7 @@ PanoramaUI {
             clip: true
         }
         Item {
-            anchors.horizontalCenter: flow.horizontalCenter
+            x: ui.width / 2
             y: ui.height
             width: 132
             height: ui.height

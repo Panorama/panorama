@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _canvas.viewport()->setAttribute(Qt::WA_PaintUnclipped);
     _canvas.viewport()->setAttribute(Qt::WA_TranslucentBackground, false);
 
-    _canvas.setStyleSheet( "QGraphicsView { border-style: none; }" );
+    _canvas.setStyleSheet("QGraphicsView { border-style: none; }");
     _canvas.setFrameStyle(0);
     _canvas.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     _canvas.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -56,22 +56,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Set up UI loading and channel quit() events from QML
     connect(&_engine, SIGNAL(quit()), this, SLOT(close()));
-    connect(&_config, SIGNAL(uiChanged(QString,QString)),
-            this, SLOT(switchToUI(QString,QString)));
     connect(this, SIGNAL(uiChanged(QString)), this, SLOT(loadUIFile(QString)));
     Setting::setSettingsSource(_config.generalConfig());
 
-    if(!QFileInfo(CONFIG_FILE).exists())
-    {
-        QFile(":/settings.cfg").copy(CONFIG_FILE);
-        //chmod 644:
-        QFile(CONFIG_FILE).setPermissions(QFile::ReadOwner | QFile::WriteOwner |
-                                          QFile::ReadGroup | QFile::ReadOther);
-    }
-    _config.loadFile(CONFIG_FILE);
+    _uiSetting = new Setting("panorama", "ui", QVariant(), this);
+    _uiDirSetting = new Setting("panorama", "uiDirectory", QVariant(), this);
+    _fullscreenSetting = new Setting("panorama", "fullscreen", QVariant(), this);
 
-    if(_config.fullscreen())
-        showFullScreen();
+    connect(_uiSetting, SIGNAL(valueChanged(QVariant)), this, SLOT(changeUI()));
+    connect(_uiDirSetting, SIGNAL(valueChanged(QVariant)), this, SLOT(changeUI()));
+    connect(_fullscreenSetting, SIGNAL(valueChanged(QVariant)), this, SLOT(changeFullscreen()));
+
+    _config.loadConfiguration();
 }
 
 void MainWindow::loadUIFile(const QString &file)
@@ -144,6 +140,21 @@ void MainWindow::continueLoadingUI()
             qWarning() << "The specified UI file does not contain "
                     "a Panorama UI";
     }
+}
+
+
+void MainWindow::changeFullscreen()
+{
+    if(_fullscreenSetting->value().toBool())
+        showFullScreen();
+    else
+        showNormal();
+}
+
+void MainWindow::changeUI()
+{
+    if(!_uiDirSetting->value().toString().isEmpty())
+        switchToUI(_uiDirSetting->value().toString(), _uiSetting->value().toString());
 }
 
 void MainWindow::switchToUI(const QString &uiDir, const QString &uiName)

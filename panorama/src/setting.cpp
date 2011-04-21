@@ -1,13 +1,32 @@
 #include "setting.h"
 
-Setting::Setting(QObject *parent) :
-    QObject(parent)
+Setting::Setting(QObject *parent)
+    : QObject(parent)
 {
+    connect(_settings, SIGNAL(settingChanged(QString,QString,QVariant,SettingsSource::ChangeSource)),
+            this, SLOT(handleFieldChange(QString,QString,QVariant)));
+}
+
+Setting::Setting(const QString &section, const QString &key, QObject *parent)
+    : QObject(parent)
+{
+    setSection(section);
+    setKey(key);
     connect(_settings, SIGNAL(settingChanged(QString,QString,QVariant,ChangeSource)),
             this, SLOT(handleFieldChange(QString,QString,QVariant)));
 }
 
-void Setting::setSettingsSource(SettingsHive *value)
+Setting::Setting(const QString &section, const QString &key, const QVariant &defaultValue, QObject *parent)
+    : QObject(parent)
+{
+    setSection(section);
+    setKey(key);
+    setDefaultValue(defaultValue);
+    connect(_settings, SIGNAL(settingChanged(QString,QString,QVariant,SettingsSource::ChangeSource)),
+            this, SLOT(handleFieldChange(QString,QString,QVariant)));
+}
+
+void Setting::setSettingsSource(SettingsSource *value)
 {
     _settings = value;
 }
@@ -47,7 +66,7 @@ void Setting::setValue(const QVariant &value)
     if(_settings)
     {
         const QString &section(_section.isEmpty() ? _defaultSection : _section);
-        _settings->setSetting(section, _key, value, SettingsHive::External);
+        _settings->setSetting(section, _key, value, SettingsSource::External);
     }
 }
 
@@ -77,10 +96,10 @@ void Setting::maybeInsertDefault()
        !_settings->setting(section, _key).isValid() &&
        _default.isValid())
     {
-        _settings->setSetting(section, _key, _default, SettingsHive::External);
+        _settings->setSetting(section, _key, _default, SettingsSource::External);
     }
 }
 
 QString Setting::_defaultSection;
-SettingsHive *Setting::_settings;
+SettingsSource *Setting::_settings;
 

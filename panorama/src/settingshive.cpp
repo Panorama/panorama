@@ -1,7 +1,7 @@
 #include "settingshive.h"
 
 SettingsHive::SettingsHive(QObject *parent) :
-    QObject(parent)
+    SettingsSource(parent)
 {
     _store = new QHash<QString, QHash<QString, QVariant> *>;
 }

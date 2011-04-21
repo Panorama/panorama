@@ -45,6 +45,8 @@ protected:
 
 private slots:
     void continueLoadingUI();
+    void changeFullscreen();
+    void changeUI();
 
 private:
     void printError(const QDeclarativeComponent *obj) const;
@@ -58,6 +60,10 @@ private:
     Configuration _config;
     ApplicationModel _model;
     AppAccumulator _accumulator;
+
+    Setting *_fullscreenSetting;
+    Setting *_uiSetting;
+    Setting *_uiDirSetting;
 };
 
 #endif // MAINWINDOW_H

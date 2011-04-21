@@ -3,6 +3,7 @@
 #ifndef DISABLE_OPENGL
 #include <QGLWidget>
 #endif
+#include <QCoreApplication>
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent)
@@ -159,7 +160,16 @@ void MainWindow::changeUI()
 
 void MainWindow::switchToUI(const QString &uiDir, const QString &uiName)
 {
-    emit uiChanged(QString(uiDir).append(QDir::separator()).append(uiName)
+    QString newUiDir;
+    if(!QFileInfo(uiDir).exists() || //Dir cannot be found
+       (!uiDir.contains(":") && //Dir is not an URL
+       QDir(uiDir).isRelative())) { //Dir is potentially relative
+        QDir dir = QDir(QCoreApplication::applicationDirPath());
+        dir.cd(uiDir);
+        newUiDir = dir.absolutePath();
+    } else
+        newUiDir = uiDir;
+    emit uiChanged(QString(newUiDir).append(QDir::separator()).append(uiName)
                    .append(QDir::separator()).append("ui.qml"));
 }
 

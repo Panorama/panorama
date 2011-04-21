@@ -1,7 +1,5 @@
-<!--default.qrc - Default application resources that are to be embedded into the executable -->
 <RCC>
     <qresource prefix="/">
         <file alias="root.qml">root.qml</file>
-        <file alias="settings.cfg">settings.cfg</file>
     </qresource>
 </RCC>

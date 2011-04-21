@@ -18,6 +18,7 @@ public:
     ~SettingsHive();
 
     void writeSettings(QSettings &out) const;
+    void readSettings(const QSettings &in);
 
     QVariant setting(const QString &section, const QString &key) const;
 

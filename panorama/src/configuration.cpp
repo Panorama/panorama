@@ -16,19 +16,10 @@ void Configuration::loadConfiguration()
 {
     initConfiguration();
     _settings->sync();
+    _hive->readSettings(*_settings);
 
     if(QFileInfo(_settings->fileName()).exists() && !_watcher.files().contains(_settings->fileName()))
         _watcher.addPath(_settings->fileName());
-
-    foreach(const QString &section, _settings->childGroups())
-    {
-        _settings->beginGroup(section);
-        foreach(const QString &key, _settings->allKeys())
-        {
-            _hive->setSetting(section, key, _settings->value(key), SettingsSource::File);
-        }
-        _settings->endGroup();
-    }
 }
 
 void Configuration::saveConfiguration()
@@ -62,19 +53,11 @@ void Configuration::initConfiguration()
 #endif
         if(_settings->allKeys().isEmpty()) {
             qWarning() << "Warning: No configuration file detected, creating default configuration.";
-            _settings->beginGroup("panorama");
-            {
-                _settings->setValue("uiDirectory", "interfaces");
-                _settings->setValue("ui", "Test");
-                _settings->setValue("fullscreen", false);
-            }
-            _settings->endGroup();
-            _settings->beginGroup("system");
-            {
-                _settings->setValue("clockspeed", 600);
-                _settings->setValue("favorites", "");
-            }
-            _settings->endGroup();
+            _settings->setValue("panorama/uiDirectory", "interfaces");
+            _settings->setValue("panorama/ui", "Test");
+            _settings->setValue("panorama/fullscreen", false);
+            _settings->setValue("system/clockspeed", 600);
+            _settings->setValue("system/favorites", "");
             _settings->sync();
         }
         _watcher.addPath(_settings->fileName());

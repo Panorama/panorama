@@ -9,7 +9,6 @@
 #include <QDeclarativeContext>
 #include <QUrl>
 #include <QFile>
-#include <QtConcurrentRun>
 #include <QKeyEvent>
 
 #include "configuration.h"
@@ -52,7 +51,6 @@ private:
 
     void loadApps();
 
-    volatile bool appsLoaded;
     QDeclarativeEngine _engine;
     QDeclarativeView _canvas;
     QDeclarativeComponent *_component;

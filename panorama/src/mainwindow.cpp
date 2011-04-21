@@ -11,12 +11,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _component = 0;
     _ui = 0;
 
-    //This is responsible for delaying the connection between
-    //_model.dataChanged and _ui->applicationDataChanged
-    //to avoid lag when the 100's of applications are loaded when starting up,
-    //each application resulting in a dataChanged emission.
-    appsLoaded = false;
-
     //Resize the window
     resize(UI_WIDTH, UI_HEIGHT);
 
@@ -34,12 +28,12 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
     _canvas.setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
     _canvas.setOptimizationFlag(QGraphicsView::DontSavePainterState);
-    
+
     _canvas.viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
     _canvas.viewport()->setAttribute(Qt::WA_NoSystemBackground);
     _canvas.viewport()->setAttribute(Qt::WA_PaintUnclipped);
     _canvas.viewport()->setAttribute(Qt::WA_TranslucentBackground, false);
-    
+
     _canvas.setStyleSheet( "QGraphicsView { border-style: none; }" );
     _canvas.setFrameStyle(0);
     _canvas.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -58,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
     qRegisterMetaType<Application>("Application");
 
     //Load some actual applications from paths
-    QtConcurrent::run(this, &MainWindow::loadApps);
+    loadApps();
 
     //Set up UI loading and channel quit() events from QML
     connect(&_engine, SIGNAL(quit()), this, SLOT(close()));
@@ -141,15 +135,13 @@ void MainWindow::continueLoadingUI()
         if(_ui)
         {
             _ui->setParentItem(qobject_cast<QDeclarativeItem*>(_canvas.rootObject()));
-            if(appsLoaded)
-            {
-                connect(&_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
-                        _ui, SLOT(propagateApplicationDataChange()));
-            }
+            connect(&_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+                    _ui, SLOT(propagateApplicationDataChange()));
             _ui->indicateLoadFinished();
+            _ui->propagateApplicationDataChange();
         }
         else
-            qWarning() << "The specified UI file does not contain"
+            qWarning() << "The specified UI file does not contain "
                     "a Panorama UI";
     }
 }
@@ -192,11 +184,4 @@ void MainWindow::loadApps() {
     list.append(tmp.join(QDir::separator()));
 
     _accumulator.loadFrom(list);
-    appsLoaded = true;
-    if(_ui)
-    {
-        connect(&_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
-                _ui, SLOT(propagateApplicationDataChange()));
-        _ui->propagateApplicationDataChange();
-    }
 }

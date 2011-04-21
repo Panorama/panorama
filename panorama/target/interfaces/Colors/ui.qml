@@ -453,7 +453,7 @@ PanoramaUI {
                     case 1:
                         return ui.applications.inCategory("Game").sortedBy("name", true);
                     case 2:
-                        return ui.applications.inCategory("^(?!Game|Emulator)$").sortedBy("name", true);
+                        return ui.applications.sortedBy("name", true);
                     case 4:
                         if(favorites.value.length > 0)
                             return ui.applications.matching("identifier", favorites.value).sortedBy("name", true);

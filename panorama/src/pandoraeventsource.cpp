@@ -34,7 +34,7 @@ PandoraEventSource::~PandoraEventSource()
 
 void PandoraEventSource::handleEvents()
 {
-    pnd_evdev_catchup(1); //1 == Don't do this asynchronously
+    pnd_evdev_catchup(0); //1 == Don't do this asynchronously
 
     int dpadState = pnd_evdev_dpad_state(pnd_evdev_dpads);
     //int dpadState = _prevState ^ (1 << (qrand() % 12)); //Toggle random key

@@ -69,10 +69,5 @@ void PandoraEventSource::emitKeyEvent(const int key, const bool press) const
 void PandoraEventSource::testKey(const int prevState, const int currentState, const int mask, const int keyToEmit) const
 {
     if((currentState ^ prevState) & mask) //Key changed
-    {
-        if(currentState & mask) //Key pressed
-            emitKeyEvent(keyToEmit, true);
-        else //Key released
-            emitKeyEvent(keyToEmit, false);
-    }
+        emitKeyEvent(keyToEmit, currentState & mask);
 }

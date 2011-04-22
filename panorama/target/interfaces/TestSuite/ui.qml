@@ -37,6 +37,9 @@ PanoramaUI {
             focus: true
             Keys.onPressed: {
                 var test;
+                var pressed = function(key) {
+                    write("Pressed the <span style\"color: yellow;\">" + key + "</span> button.");
+                }
                 switch(event.key) {
                 case Qt.Key_S:
                         test = settingsTest;
@@ -45,43 +48,43 @@ PanoramaUI {
                         test = fullscreenTest;
                     break;
                 case Pandora.ButtonX:
-                        write("Pressed the X button");
+                        pressed("X");
                     break;
                 case Pandora.ButtonY:
-                        write("Pressed the Y button");
+                        pressed("Y");
                     break;
                 case Pandora.ButtonA:
-                        write("Pressed the A button");
+                        pressed("A");
                     break;
                 case Pandora.ButtonB:
-                        write("Pressed the B button");
+                        pressed("B");
                     break;
                 case Pandora.DPadLeft:
-                        write("Pressed the Left D-Pad button");
+                        pressed("Left D-Pad");
                     break;
                 case Pandora.DPadRight:
-                        write("Pressed the Right D-Pad button");
+                        pressed("Right D-Pad");
                     break;
                 case Pandora.DPadUp:
-                        write("Pressed the Up D-Pad button");
+                        pressed("Up D-Pad");
                     break;
                 case Pandora.DPadDown:
-                        write("Pressed the Down D-Pad button");
+                        pressed("Down D-Pad");
                     break;
                 case Pandora.TriggerL:
-                        write("Pressed the Left Trigger button");
+                        pressed("Left Trigger");
                     break;
                 case Pandora.TriggerR:
-                        write("Pressed the Right Trigger button");
+                        pressed("Right Trigger");
                     break;
                 case Pandora.ButtonStart:
-                        write("Pressed the Start button");
+                        pressed("Start");
                     break;
                 case Pandora.ButtonSelect:
-                        write("Pressed the Select button");
+                        pressed("Select");
                     break;
                 case Pandora.ButtonPandora:
-                        write("Pressed the Pandora button");
+                        pressed("Pandora");
                     break;
                 }
                 if(test) {

@@ -12,17 +12,25 @@ PanoramaUI {
         anchors.fill: parent
         anchors.margins: 16
         text: "<p>This is a stress test suite for panorama</p>" +
-                "<dl><dt>" +
-                "<code>S</code> - Settings test</dt><dd>Writes to the settings " +
-                "registry extremely frequently, forcing the settings to be " +
-                "written to disk and flushed.</dd></dl>"
+                "<dl>" +
+                "<dt><code>S</code> - Settings test</dt>" +
+                "<dd>Writes to the settings registry extremely frequently, " +
+                "forcing the settings to be written to disk and flushed.</dd>" +
+                "<dt><code>F</code> - Fullscreen test</dt>" +
+                "<dd>Toggles fullscreen extremely quickly.</dd>" +
+                "</dl>"
         color: "white"
 
         focus: true
         Keys.onPressed: {
             var test;
-            if(event.key == Qt.Key_S) {
-                test = settingsTest;
+            switch(event.key) {
+            case Qt.Key_S:
+                    test = settingsTest;
+                break;
+            case Qt.Key_F:
+                    test = fullscreenTest;
+                break;
             }
             if(test) {
                 if(!test.running) {
@@ -51,7 +59,6 @@ PanoramaUI {
         }
 
         Timer {
-            id: settingsTimer
             interval: 10
             repeat: true
             running: settingsTest.running
@@ -75,6 +82,40 @@ PanoramaUI {
         Setting {
             id: setting3
             key: "setting3"
+        }
+    }
+
+    Item {
+        id: fullscreenTest
+        property string name: "Fullscreen"
+        property bool running: false;
+        property bool previousValue: false;
+        function start() {
+            previousValue = fullscreenSetting.value;
+            running = true;
+        }
+        function stop() {
+            running = false;
+            fullscreenSetting.value = previousValue;
+        }
+
+        Timer {
+            interval: 100
+            repeat: true
+            running: fullscreenTest.running
+            onTriggered: fullscreenSetting.value = false
+        }
+        Timer {
+            interval: 100
+            repeat: true
+            running: fullscreenTest.running
+            onTriggered: fullscreenSetting.value = true
+        }
+
+        Setting {
+            id: fullscreenSetting
+            section: "panorama"
+            key: "fullscreen"
         }
     }
 }

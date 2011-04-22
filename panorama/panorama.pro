@@ -41,7 +41,9 @@ SOURCES += src/main.cpp \
     src/setting.cpp \
     src/systeminformation.cpp \
     src/settingshive.cpp \
-    src/settingssource.cpp
+    src/settingssource.cpp \
+    src/pandoraeventsource.cpp \
+    src/pandora.cpp
 HEADERS += src/mainwindow.h \
     src/configuration.h \
     src/panoramaui.h \
@@ -59,6 +61,8 @@ HEADERS += src/mainwindow.h \
     src/setting.h \
     src/systeminformation.h \
     src/settingshive.h \
-    src/settingssource.h
+    src/settingssource.h \
+    src/pandoraeventsource.h \
+    src/pandora.h
 OTHER_FILES += qrc/root.qml
 RESOURCES += qrc/default.qrc

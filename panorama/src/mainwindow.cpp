@@ -6,7 +6,7 @@
 #include <QCoreApplication>
 
 MainWindow::MainWindow(QWidget *parent) :
-        QMainWindow(parent)
+        QMainWindow(parent), _pandoraEventSource(&_canvas)
 {
     //"Clear" some memory
     _component = 0;
@@ -79,6 +79,7 @@ void MainWindow::loadUIFile(const QString &file)
 
     //Create a generic component from the file
     _component = new QDeclarativeComponent(&_engine, file, this);
+
 
     //Check if the component has errors and print them
     printError(_component);

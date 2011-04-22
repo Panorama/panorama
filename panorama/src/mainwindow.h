@@ -17,6 +17,7 @@
 #include "appaccumulator.h"
 #include "constants.h"
 #include "setting.h"
+#include "pandoraeventsource.h"
 
 /**
  * A MainWindow that is capable of displaying the Panorama's GUI
@@ -60,6 +61,7 @@ private:
     Configuration _config;
     ApplicationModel _model;
     AppAccumulator _accumulator;
+    PandoraEventSource _pandoraEventSource;
 
     Setting *_fullscreenSetting;
     Setting *_uiSetting;

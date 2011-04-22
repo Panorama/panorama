@@ -3,8 +3,8 @@ import Panorama 1.0
 
 PanoramaUI {
     id: ui
-    name: "StressTest"
-    description: "A stress test theme, testing the robustness of Panorama"
+    name: "TestSuite"
+    description: "A test theme that tests the Panorama-specific features"
     author: "dflemstr"
     settingsSection: "stress"
 

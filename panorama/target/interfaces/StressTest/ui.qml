@@ -8,37 +8,116 @@ PanoramaUI {
     author: "dflemstr"
     settingsSection: "stress"
 
-    Text {
-        anchors.fill: parent
-        anchors.margins: 16
-        text: "<p>This is a stress test suite for panorama</p>" +
-                "<dl>" +
-                "<dt><code>S</code> - Settings test</dt>" +
-                "<dd>Writes to the settings registry extremely frequently, " +
-                "forcing the settings to be written to disk and flushed.</dd>" +
-                "<dt><code>F</code> - Fullscreen test</dt>" +
-                "<dd>Toggles fullscreen extremely quickly.</dd>" +
-                "</dl>"
-        color: "white"
+    function write(what) {
+        print(what);
+        output.text += what + '\n';
+    }
 
-        focus: true
-        Keys.onPressed: {
-            var test;
-            switch(event.key) {
-            case Qt.Key_S:
-                    test = settingsTest;
-                break;
-            case Qt.Key_F:
-                    test = fullscreenTest;
-                break;
+    Rectangle {
+        color: "black"
+        anchors.fill: parent
+        Text {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: parent.height / 2
+            anchors.margins: 16
+            text: "<p>This is a stress test and feature test suite for panorama</p>" +
+                    "<dl>" +
+                    "<dt><code>S</code> - Settings test</dt>" +
+                    "<dd>Writes to the settings registry extremely frequently, " +
+                    "forcing the settings to be written to disk and flushed.</dd>" +
+                    "<dt><code>F</code> - Fullscreen test</dt>" +
+                    "<dd>Toggles fullscreen extremely quickly.</dd>" +
+                    "<dt>Any Pandora button</dt>" +
+                    "<dd>Prints to the output box the name of that button.</dd>" +
+                    "</dl>"
+            color: "white"
+
+            focus: true
+            Keys.onPressed: {
+                var test;
+                switch(event.key) {
+                case Qt.Key_S:
+                        test = settingsTest;
+                    break;
+                case Qt.Key_F:
+                        test = fullscreenTest;
+                    break;
+                case Pandora.ButtonX:
+                        write("Pressed the X button");
+                    break;
+                case Pandora.ButtonY:
+                        write("Pressed the Y button");
+                    break;
+                case Pandora.ButtonA:
+                        write("Pressed the A button");
+                    break;
+                case Pandora.ButtonB:
+                        write("Pressed the B button");
+                    break;
+                case Pandora.DPadLeft:
+                        write("Pressed the Left D-Pad button");
+                    break;
+                case Pandora.DPadRight:
+                        write("Pressed the Right D-Pad button");
+                    break;
+                case Pandora.DPadUp:
+                        write("Pressed the Up D-Pad button");
+                    break;
+                case Pandora.DPadDown:
+                        write("Pressed the Down D-Pad button");
+                    break;
+                case Pandora.TriggerL:
+                        write("Pressed the Left Trigger button");
+                    break;
+                case Pandora.TriggerR:
+                        write("Pressed the Right Trigger button");
+                    break;
+                case Pandora.ButtonStart:
+                        write("Pressed the Start button");
+                    break;
+                case Pandora.ButtonSelect:
+                        write("Pressed the Select button");
+                    break;
+                case Pandora.ButtonPandora:
+                        write("Pressed the Pandora button");
+                    break;
+                }
+                if(test) {
+                    if(!test.running) {
+                        write("Starting " + test.name + " test");
+                        test.start();
+                    } else {
+                        write("Stopping " + test.name + " test");
+                        test.stop();
+                    }
+                }
             }
-            if(test) {
-                if(!test.running) {
-                    print("Starting " + test.name + " test");
-                    test.start();
-                } else {
-                    print("Stopping " + test.name + " test");
-                    test.stop();
+        }
+        Text {
+            id: output
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: parent.height / 2
+            anchors.margins: 16
+            clip: true
+            verticalAlignment: Text.AlignBottom
+            text: ""
+            color: "white"
+        }
+
+        Rectangle {
+            anchors.fill: output
+            gradient: Gradient {
+                GradientStop {
+                    position: 0.0
+                    color: "#FF000000"
+                }
+                GradientStop {
+                    position: 0.3
+                    color: "#00000000"
                 }
             }
         }

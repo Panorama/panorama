@@ -1,7 +1,9 @@
 #include "settingshive.h"
+#include <QStringList>
+#include <QDebug>
 
 SettingsHive::SettingsHive(QObject *parent) :
-    QObject(parent)
+        SettingsSource(parent)
 {
     _store = new QHash<QString, QHash<QString, QVariant> *>;
 }
@@ -17,12 +19,26 @@ void SettingsHive::writeSettings(QSettings &out) const
 {
     foreach(const QString &section, _store->keys())
     {
-        out.beginGroup(section);
         foreach(const QString &key, _store->value(section)->keys())
         {
-            out.setValue(key, _store->value(section)->value(key));
+            const QVariant value =  _store->value(section)->value(key);
+            const QString actualKey = QString(section).append("/").append(key);
+            if(value.isValid())
+                out.setValue(actualKey, value);
+            else
+                out.remove(actualKey);
         }
-        out.endGroup();
+    }
+}
+
+void SettingsHive::readSettings(const QSettings &in)
+{
+    foreach(const QString &key, in.allKeys())
+    {
+        const int slash = key.indexOf('/');
+        const QString section = key.left(slash);
+        const QString sectionKey = key.right(key.length() - slash - 1);
+        setSetting(section, sectionKey, in.value(key), SettingsSource::File);
     }
 }
 

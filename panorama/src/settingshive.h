@@ -1,13 +1,15 @@
 #ifndef SETTINGSHIVE_H
 #define SETTINGSHIVE_H
 
+#include "settingssource.h"
+
 #include <QObject>
 #include <QString>
 #include <QTextStream>
 #include <QHash>
 #include <QSettings>
 
-class SettingsHive : public QObject
+class SettingsHive : public SettingsSource
 {
 Q_OBJECT
 public:
@@ -15,24 +17,14 @@ public:
 
     ~SettingsHive();
 
-    enum ChangeSource {
-        Unknown,
-        Internal,
-        File,
-        External
-    };
-
     void writeSettings(QSettings &out) const;
+    void readSettings(const QSettings &in);
 
     QVariant setting(const QString &section, const QString &key) const;
 
-signals:
-    void settingChanged(const QString &section, const QString &key,
-                        const QVariant &value, ChangeSource source);
-
 public slots:
     void setSetting(const QString &section, const QString &key,
-                    const QVariant &value, ChangeSource source = Unknown);
+                    const QVariant &value, SettingsSource::ChangeSource source = SettingsSource::Unknown);
 
 private:
     QHash<QString, QHash<QString, QVariant> *> *_store;

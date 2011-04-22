@@ -1,114 +1,41 @@
 #include "configuration.h"
 
 Configuration::Configuration(QObject *parent) :
-        QObject(parent), _fullscreen(false)
+        QObject(parent)
 {
     _hive = new SettingsHive(this);
+    _settings = 0;
 
     connect(&_watcher, SIGNAL(fileChanged(QString)),
-            this, SLOT(readFile(QString)));
-    connect(_hive, SIGNAL(settingChanged(QString,QString,QVariant,ChangeSource)),
-            this, SLOT(saveFile()));
+            this, SLOT(loadConfiguration()));
+    connect(_hive, SIGNAL(settingChanged(QString,QString,QVariant,SettingsSource::ChangeSource)),
+            this, SLOT(reactToChange(QString,QString,QVariant,SettingsSource::ChangeSource)));
 }
 
-void Configuration::loadFile(const QString &f)
+void Configuration::loadConfiguration()
 {
-    if(_watcher.files().contains(_file))
-        _watcher.removePath(_file);
+    initConfiguration();
+    _settings->sync();
+    _hive->readSettings(*_settings);
 
-    _file = f;
-
-    //Try to read the file once
-    readFile(f);
-
-    //Only add the file to the watcher if it exists
-    if(!_watcher.files().contains(f) && QFileInfo(f).exists())
-        _watcher.addPath(f);
+    if(QFileInfo(_settings->fileName()).exists() && !_watcher.files().contains(_settings->fileName()))
+        _watcher.addPath(_settings->fileName());
 }
 
-void Configuration::readFile(const QString &f)
+void Configuration::saveConfiguration()
 {
-    bool changed(false);
-
-    //For some reason, the FileWatcher stops tracking files sometimes...
-    //(Probably when editors delete+recreate a file instead of modifying it)
-    //Thus, we might have to readd it
-    if(!_watcher.files().contains(f) && QFileInfo(f).exists())
-        _watcher.addPath(f);
-
-    QSettings settings(f, QSettings::IniFormat);
-
-    settings.beginGroup("panorama");
-    QString uiDir = settings.value("uiDirectory").toString();
-    if(_uiDir != uiDir)
-    {
-        _uiDir = uiDir;
-        changed = true;
-    }
-
-    QString ui = settings.value("ui").toString();
-    if(_ui != ui)
-    {
-        _ui = ui;
-        changed = true;
-    }
-
-    bool fullscreen = settings.value("fullscreen").toBool();
-    if(_fullscreen ^ fullscreen)
-    {
-        _fullscreen = fullscreen;
-        changed = true;
-    }
-    settings.endGroup();
-
-    foreach(const QString &section, settings.childGroups())
-    {
-        settings.beginGroup(section);
-        foreach(const QString &key, settings.allKeys())
-        {
-            _hive->setSetting(section, key, settings.value(key), SettingsHive::File);
-        }
-        settings.endGroup();
-    }
-
-    if(changed)
-        emit uiChanged(_uiDir, _ui);
+    initConfiguration();
+    _hive->writeSettings(*_settings);
+    _settings->sync();
 }
+
 void Configuration::reactToChange(const QString&,
                                   const QString&,
-                                  const QString&,
-                                  SettingsHive::ChangeSource source)
+                                  const QVariant&,
+                                  SettingsSource::ChangeSource source)
 {
-    if(source != SettingsHive::File)
-        saveFile();
-}
-
-void Configuration::saveFile()
-{
-    QSettings out(_file, QSettings::IniFormat);
-
-    out.beginGroup("panorama");
-    out.setValue("uiDirectory", _uiDir);
-    out.setValue("ui", _ui);
-    out.setValue("fullscreen", _fullscreen);
-    out.endGroup();
-
-    _hive->writeSettings(out);
-}
-
-QString Configuration::ui() const
-{
-    return _ui;
-}
-
-QString Configuration::uiDir() const
-{
-    return _uiDir;
-}
-
-bool Configuration::fullscreen() const
-{
-    return _fullscreen;
+    if(source != SettingsSource::File)
+        saveConfiguration();
 }
 
 SettingsHive *Configuration::generalConfig() const
@@ -116,21 +43,24 @@ SettingsHive *Configuration::generalConfig() const
     return _hive;
 }
 
-void Configuration::setUI(const QString &value)
+void Configuration::initConfiguration()
 {
-    if(_ui != value)
-    {
-        _ui = value;
-        emit uiChanged(_uiDir, _ui);
+    if(!_settings) {
+#ifdef PANDORA
+        _settings = new QSettings(CONFIG_FILE, QSettings::IniFormat, this);
+#else
+        _settings = new QSettings(QSettings::UserScope, "panorama", "core", this);
+#endif
+        if(_settings->allKeys().isEmpty()) {
+            qWarning() << "Warning: No configuration file detected, creating default configuration.";
+            _settings->setValue("panorama/uiDirectory", "interfaces");
+            _settings->setValue("panorama/ui", "Test");
+            _settings->setValue("panorama/fullscreen", false);
+            _settings->setValue("system/clockspeed", 600);
+            _settings->setValue("system/favorites", "");
+            _settings->sync();
+        }
+        _watcher.addPath(_settings->fileName());
+        qDebug() << "Settings are saved in" << _settings->fileName();
     }
-}
-
-void Configuration::setUIDir(const QString &value)
-{
-    _uiDir = value;
-}
-
-void Configuration::setFullscreen(const bool &value)
-{
-    _fullscreen = value;
 }

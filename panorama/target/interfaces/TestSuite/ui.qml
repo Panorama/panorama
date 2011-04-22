@@ -9,8 +9,8 @@ PanoramaUI {
     settingsSection: "stress"
 
     function write(what) {
-        print(what);
-        output.text += what + '\n';
+        print(what.replace(/<(.|\n)*?>/g, ""));
+        output.text += "<p>" + what + '</p>';
     }
 
     Rectangle {
@@ -89,10 +89,10 @@ PanoramaUI {
                 }
                 if(test) {
                     if(!test.running) {
-                        write("Starting " + test.name + " test");
+                        write("<span style=\"color: blue;\">Starting <span style=\"color: teal;\">" + test.name + "</span> test.</span>");
                         test.start();
                     } else {
-                        write("Stopping " + test.name + " test");
+                        write("<span style=\"color: blue;\">Stopping <span style=\"color: teal;\">" + test.name + "</span> test.</span>");
                         test.stop();
                     }
                 }
@@ -107,7 +107,7 @@ PanoramaUI {
             anchors.margins: 16
             clip: true
             verticalAlignment: Text.AlignBottom
-            text: ""
+            text: "<style type=\"text/css\">p { margin: 0; }</style>"
             color: "white"
         }
 

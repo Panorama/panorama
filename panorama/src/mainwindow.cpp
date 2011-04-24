@@ -178,7 +178,7 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
 {
     if(e->key() == Qt::Key_Q && e->modifiers() & Qt::ControlModifier)
     {
-        exit(0);
+        close();
     }
     else if(e->key() == Qt::Key_F && e->modifiers() & Qt::ControlModifier)
     {

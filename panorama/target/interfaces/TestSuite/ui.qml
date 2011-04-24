@@ -10,7 +10,7 @@ PanoramaUI {
 
     function write(what) {
         print(what.replace(/<(.|\n)*?>/g, ""));
-        output.text += "<p>" + what + '</p>';
+        output.text += "<p>" + what + "</p>";
     }
 
     Rectangle {

@@ -59,7 +59,6 @@ void PandoraEventSource::handleEvents()
 
 void PandoraEventSource::emitKeyEvent(const int key, const bool press) const
 {
-    //TODO: Modifier keys + Pandora buttons = ??
     QCoreApplication::postEvent(_receiver, new QKeyEvent(press ? QEvent::KeyPress : QEvent::KeyRelease, key, Qt::NoModifier));
 }
 

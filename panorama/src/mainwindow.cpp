@@ -21,7 +21,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _canvas.rootContext()->setContextProperty("ctxtWidth", UI_WIDTH);
     _canvas.setSource(QUrl("qrc:/root.qml"));
     _canvas.setFocusPolicy(Qt::StrongFocus);
-    // TODO: _canvas.execute();
     this->setCentralWidget(&_canvas);
 
 #ifndef DISABLE_OPENGL

@@ -11,7 +11,7 @@ PanoramaUI {
     property int keyDown:    pandoraControlsActive ? Pandora.DPadDown     : Qt.Key_Down
     property int keyLeft:    pandoraControlsActive ? Pandora.DPadLeft     : Qt.Key_Left
     property int keyRight:   pandoraControlsActive ? Pandora.DPadRight    : Qt.Key_Right
-    property int keyOK:      pandoraControlsActive ? Pandora.ButtonA      : Qt.Key_Return
+    property int keyOK:      pandoraControlsActive ? Pandora.ButtonB      : Qt.Key_Return
     property int keyNextTab: pandoraControlsActive ? Pandora.TriggerRight : Qt.Key_PageDown
     property int keyPrevTab: pandoraControlsActive ? Pandora.TriggerLeft  : Qt.Key_PageUp
 
@@ -267,6 +267,12 @@ PanoramaUI {
             model: ui.applications.inCategory(tabs.selectedRawName)
                     .matching("name", (search.text.length == 0) ? ".*" : ".*" + search.text + ".*")
                     .sortedBy("name", true)
+
+            // Disable default navigation keys
+            Keys.onUpPressed:    {}
+            Keys.onDownPressed:  {}
+            Keys.onLeftPressed:  {}
+            Keys.onRightPressed: {}
 
             Keys.onPressed: {
                 var accept = true;

@@ -13,9 +13,9 @@ function readField(sourceData, field) {
         }
         else if(/^0x[a-fA-F0-9]{8}$/.test(data)) {
             data = data.substring(2).toLowerCase();
-            //var a = data.substring(6, 8); //TODO: change when QML gains alpha color support
+            var a = data.substring(6, 8);
             data = data.substring(0, 6);
-            data = "#" /*+ a*/ + data;
+            data = "#" + a + data;
             return data;
         }
         else {

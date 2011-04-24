@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QSocketNotifier>
 
 class PandoraEventSource : public QObject
 {
@@ -18,7 +19,7 @@ private:
     inline void emitKeyEvent(const int key, const bool press) const;
     inline void testKey(const int prevState, const int currentState, const int mask, const int keyToEmit) const;
     QObject *_receiver;
-    QTimer _timer;
+    QSocketNotifier *_notifier;
     int _prevState;
     bool _init;
 };

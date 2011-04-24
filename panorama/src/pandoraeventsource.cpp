@@ -61,6 +61,8 @@ void PandoraEventSource::handleEvents()
     testKey(_prevState, dpadState, pnd_evdev_start, Pandora::ButtonStart);
     testKey(_prevState, dpadState, pnd_evdev_select, Pandora::ButtonSelect);
     testKey(_prevState, dpadState, pnd_evdev_pandora, Pandora::ButtonPandora);
+    testKey(_prevState, dpadState, pnd_evdev_ltrigger, Pandora::TriggerL);
+    testKey(_prevState, dpadState, pnd_evdev_rtrigger, Pandora::TriggerR);
 
     _prevState = dpadState;
 }

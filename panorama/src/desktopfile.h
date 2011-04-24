@@ -32,7 +32,8 @@ public:
     Application readToApplication();
 
 private:
-    static QString readLocalized(const QSettings &settings, const QString &fieldName);
+    static QString readLocalized(const QMap<QString, QVariant> &map, const QString &fieldName);
+    static QMap<QString, QVariant> parseDesktop(const QString &file);
 
     QString _file;
 

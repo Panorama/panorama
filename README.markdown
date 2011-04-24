@@ -33,8 +33,8 @@ them using the following commands:
 
 Then, do the following:
 
-*   Run `qmake` for the Qt version you used. If you want to disable OpenGL
-    rendering for compatibility reasons use `qmake CONFIG+=disable_opengl panorama.pro`
+*   Run `qmake` for the Qt version you used. If you want to enable OpenGL
+    rendering use `qmake CONFIG+=enable_opengl panorama.pro`. 
 *   Run `gmake` (or `make`). You should now have the `panorama` executable in the panorama/target directory.
 
 Further documentation

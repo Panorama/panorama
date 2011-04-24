@@ -54,7 +54,6 @@ private:
 
     void loadApps();
 
-    QDeclarativeEngine _engine;
     QDeclarativeView _canvas;
     QDeclarativeComponent *_component;
     PanoramaUI *_ui;

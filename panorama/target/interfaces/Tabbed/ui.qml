@@ -7,6 +7,15 @@ PanoramaUI {
     description: "A tab based UI"
     author: "B-ZaR"
 
+    property int keyUp:      pandoraControlsActive ? Pandora.DPadUp       : Qt.Key_Up
+    property int keyDown:    pandoraControlsActive ? Pandora.DPadDown     : Qt.Key_Down
+    property int keyLeft:    pandoraControlsActive ? Pandora.DPadLeft     : Qt.Key_Left
+    property int keyRight:   pandoraControlsActive ? Pandora.DPadRight    : Qt.Key_Right
+    property int keyOK:      pandoraControlsActive ? Pandora.ButtonA      : Qt.Key_Return
+    property int keyNextTab: pandoraControlsActive ? Pandora.TriggerRight : Qt.Key_PageDown
+    property int keyPrevTab: pandoraControlsActive ? Pandora.TriggerLeft  : Qt.Key_PageUp
+
+
     Item {
         id: keyHandler
         focus: true
@@ -131,10 +140,10 @@ PanoramaUI {
             }
             
             Keys.onPressed: {
-                if(event.key == Qt.Key_PageUp) {
+                if(event.key == ui.keyPrevTab) {
                     prevTab();
                     event.accepted = true;
-                } else if(event.key == Qt.Key_PageDown) {
+                } else if(event.key == ui.keyNextTab) {
                     nextTab();
                     event.accepted = true;
                 }
@@ -258,9 +267,25 @@ PanoramaUI {
             model: ui.applications.inCategory(tabs.selectedRawName)
                     .matching("name", (search.text.length == 0) ? ".*" : ".*" + search.text + ".*")
                     .sortedBy("name", true)
-                    
-            Keys.onEnterPressed: ui.execute(applications.currentItem.ident);
-            Keys.onReturnPressed: ui.execute(applications.currentItem.ident);
+
+            Keys.onPressed: {
+                var accept = true;
+                if(event.key == ui.keyUp) {
+                    applications.moveCurrentIndexUp();
+                } else if(event.key == ui.keyDown) {
+                    applications.moveCurrentIndexDown();
+                } else if(event.key == ui.keyLeft) {
+                    applications.moveCurrentIndexLeft();
+                } else if(event.key == ui.keyRight) {
+                    applications.moveCurrentIndexRight();
+                } else if(event.key == ui.keyOK) {
+                    ui.execute(applications.currentItem.ident);
+                } else {
+                    accept = false;
+                }
+
+                event.accepted = accept;
+            }
             
             delegate: Item {
                 property string ident: identifier

@@ -11,6 +11,8 @@ public:
     explicit PandoraEventSource(QObject *receiver, QObject *parent = 0);
     ~PandoraEventSource();
 
+    bool isActive();
+
 private slots:
     void handleEvents();
 

@@ -32,6 +32,11 @@ PandoraEventSource::~PandoraEventSource()
     }
 }
 
+bool PandoraEventSource::isActive()
+{
+    return _timer.isActive();
+}
+
 void PandoraEventSource::handleEvents()
 {
     pnd_evdev_catchup(0); //1 == Don't do this asynchronously

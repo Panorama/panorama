@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 
-#ifndef DISABLE_OPENGL
+#ifdef ENABLE_OPENGL
 #include <QGLWidget>
 #endif
 #include <QCoreApplication>
@@ -19,12 +19,13 @@ MainWindow::MainWindow(QWidget *parent) :
     _canvas.setParent(this);
     _canvas.rootContext()->setContextProperty("ctxtHeight", UI_HEIGHT);
     _canvas.rootContext()->setContextProperty("ctxtWidth", UI_WIDTH);
+    _canvas.rootContext()->setContextProperty("pandoraControlsActive", _pandoraEventSource.isActive());
     _canvas.setSource(QUrl("qrc:/root.qml"));
     _canvas.setFocusPolicy(Qt::StrongFocus);
     // TODO: _canvas.execute();
     this->setCentralWidget(&_canvas);
 
-#ifndef DISABLE_OPENGL
+#ifdef ENABLE_OPENGL
     _canvas.setViewport(new QGLWidget());
 #endif
     _canvas.setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
@@ -56,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
     loadApps();
 
     //Set up UI loading and channel quit() events from QML
-    connect(&_engine, SIGNAL(quit()), this, SLOT(close()));
+    connect(_canvas.engine(), SIGNAL(quit()), this, SLOT(close()));
     connect(this, SIGNAL(uiChanged(QString)), this, SLOT(loadUIFile(QString)));
     Setting::setSettingsSource(_config.generalConfig());
 
@@ -78,7 +79,7 @@ void MainWindow::loadUIFile(const QString &file)
         _component->deleteLater();
 
     //Create a generic component from the file
-    _component = new QDeclarativeComponent(&_engine, file, this);
+    _component = new QDeclarativeComponent(_canvas.engine(), file, this);
 
 
     //Check if the component has errors and print them
@@ -114,7 +115,7 @@ void MainWindow::continueLoadingUI()
     printError(_component);
 
     //Create an instance of the component
-    QObject *obj(_component->create());
+    QObject *obj(_component->create(_canvas.rootContext()));
 
     //Check errors again (now that the component is created)
     printError(_component);

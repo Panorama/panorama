@@ -1,5 +1,5 @@
 # panorama.pro - Project file for the Panorama source code distribution
-QT += declarative opengl
+QT += declarative
 
 pandora {
     message(Building for Pandora)
@@ -8,12 +8,12 @@ pandora {
     DEFINES += PANDORA
 }
 
-disable_opengl {
-    message(OpenGL support disabled)
-    DEFINES += DISABLE_OPENGL
-    QT -= opengl
-} else {
+enable_opengl {
     message(OpenGL support enabled)
+    DEFINES += ENABLE_OPENGL
+    QT += opengl
+} else {
+    message(OpenGL support disabled)
 }
 
 

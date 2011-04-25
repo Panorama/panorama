@@ -3,12 +3,9 @@
 #include <QTemporaryFile>
 #include <QResource>
 
-// TODO Fix constants, there's lots of memory duplication here
-
 DesktopFile::DesktopFile(const QString &file)
-{
-    _file = file;
-}
+    : _file(file)
+{}
 
 Application DesktopFile::readToApplication()
 {
@@ -18,33 +15,22 @@ Application DesktopFile::readToApplication()
     const QMap<QString, QVariant> entries = parseDesktop(_file);
 
     //Should we not load this?
-    if(!entries[TYPES_FIELD].toString().contains(APPLICATION_TYPE) || //Not an app
+    if(!entries["Type"].toString().contains("Application") || //Not an app
        entries["Hidden"].toBool() || //Should be hidden in menus
        entries["NoDisplay"].toBool()) //Should not be displayed
     {
         return Application();
     }
 
-    //Name
-    result.name = readLocalized(entries, NAME_FIELD);
+    result.name = readLocalized(entries, "Name");
+    result.comment = readLocalized(entries, "Comment");
 
-    //Comment
-    result.comment = readLocalized(entries, COMMENT_FIELD);
+    result.exec = entries["Exec"].toString();
+    result.icon = IconFinder::findIcon(entries["Icon"].toString());
+    result.version = entries["X-Desktop-File-Install-Version"].toString();
+    result.pandoraId = entries["X-Pandora-UID"].toString();
 
-    //Exec
-    result.exec = entries[EXEC_FIELD].toString();
-
-    //Icon
-    result.icon = IconFinder::findIcon(entries[ICON_FIELD].toString());
-
-    //X-Desktop-File-Install-Version
-    result.version = entries[VERSION_FIELD].toString();
-
-    //X-Pandora-UID
-    result.pandoraId = entries[PANDORA_UID_FIELD].toString();
-
-    //Categories
-    const QString categoriesString = entries[CATEGORIES_FIELD].toString();
+    const QString categoriesString = entries["Categories"].toString();
     if(!categoriesString.isNull() && !categoriesString.isEmpty())
     {
         result.categories = categoriesString.split(";");
@@ -103,7 +89,7 @@ QString DesktopFile::readLocalized(const QMap<QString, QVariant> &entries, const
             break;
         }
 
-        QString result = entries[FIELD_TEMPLATE.arg(fieldName).arg(locale)].toString();
+        QString result = entries[QString("%1[%2]").arg(fieldName).arg(locale)].toString();
         if(!result.isNull())
             return result;
     }
@@ -137,15 +123,3 @@ QMap<QString, QVariant> DesktopFile::parseDesktop(const QString &file)
 
     return result;
 }
-
-const QString DesktopFile::NAME_FIELD       = QString("Name");
-const QString DesktopFile::COMMENT_FIELD    = QString("Comment");
-const QString DesktopFile::EXEC_FIELD       = QString("Exec");
-const QString DesktopFile::ICON_FIELD       = QString("Icon");
-const QString DesktopFile::VERSION_FIELD    =
-        QString("X-Desktop-File-Install-Version");
-const QString DesktopFile::PANDORA_UID_FIELD= QString("X-Pandora-UID");
-const QString DesktopFile::CATEGORIES_FIELD = QString("Categories");
-const QString DesktopFile::TYPES_FIELD      = QString("Type");
-const QString DesktopFile::APPLICATION_TYPE = QString("Application");
-const QString DesktopFile::FIELD_TEMPLATE   = QString("%1[%2]");

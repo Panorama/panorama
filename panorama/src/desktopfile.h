@@ -35,18 +35,7 @@ private:
     static QString readLocalized(const QMap<QString, QVariant> &map, const QString &fieldName);
     static QMap<QString, QVariant> parseDesktop(const QString &file);
 
-    QString _file;
-
-    static const QString EXEC_FIELD;
-    static const QString NAME_FIELD;
-    static const QString COMMENT_FIELD;
-    static const QString ICON_FIELD;
-    static const QString VERSION_FIELD;
-    static const QString PANDORA_UID_FIELD;
-    static const QString CATEGORIES_FIELD;
-    static const QString TYPES_FIELD;
-    static const QString APPLICATION_TYPE;
-    static const QString FIELD_TEMPLATE;
+    const QString _file;
 };
 
 #endif // DESKTOPFILE_H

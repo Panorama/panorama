@@ -22,7 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _canvas.rootContext()->setContextProperty("pandoraControlsActive", _pandoraEventSource.isActive());
     _canvas.setSource(QUrl("qrc:/root.qml"));
     _canvas.setFocusPolicy(Qt::StrongFocus);
-    // TODO: _canvas.execute();
     this->setCentralWidget(&_canvas);
 
 #ifdef ENABLE_OPENGL
@@ -179,7 +178,7 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
 {
     if(e->key() == Qt::Key_Q && e->modifiers() & Qt::ControlModifier)
     {
-        exit(0);
+        close();
     }
     else if(e->key() == Qt::Key_F && e->modifiers() & Qt::ControlModifier)
     {

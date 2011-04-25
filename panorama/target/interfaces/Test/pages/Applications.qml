@@ -119,17 +119,6 @@ Item {
             focus: true
             Keys.onEnterPressed: selected(appView.currentItem.ident);
             Keys.onReturnPressed: selected(appView.currentItem.ident);
-            // TODO: disabled due to nameField never getting key events
-            /*activeFocusOnPress: false
-            cursorVisible: keyInterceptor.focus
-            Item {
-                id: keyInterceptor
-                focus: true
-                //Hack so that we can intercept the "1" keypress before the TextInput grabs it
-                Keys.onDigit1Pressed: {
-                    selected(appView.currentItem.ident);
-                }
-            }*/
             Rectangle {
                 anchors.fill: parent
                 anchors.leftMargin: -3

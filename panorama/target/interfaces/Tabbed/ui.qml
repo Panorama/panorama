@@ -32,6 +32,7 @@ PanoramaUI {
         color: "#222"
         
         Rectangle {
+            id: searchBox
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: parent.left
@@ -68,7 +69,7 @@ PanoramaUI {
             verticalAlignment: Text.AlignVCenter
             font.pixelSize: 24
             color: "#eee"
-            
+
             function zeroPad(integer, size) {
                 var s = integer.toString()
                 if(s.length < size) {
@@ -269,10 +270,10 @@ PanoramaUI {
                     .sortedBy("name", true)
 
             // Disable default navigation keys
-            Keys.onUpPressed:    {}
-            Keys.onDownPressed:  {}
-            Keys.onLeftPressed:  {}
-            Keys.onRightPressed: {}
+            Keys.onUpPressed:    {event.accepted = false;}
+            Keys.onDownPressed:  {event.accepted = false;}
+            Keys.onLeftPressed:  {event.accepted = false;}
+            Keys.onRightPressed: {event.accepted = false;}
 
             Keys.onPressed: {
                 var accept = true;

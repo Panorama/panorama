@@ -8,7 +8,8 @@
 #include "pandora.h"
 
 PandoraEventSource::PandoraEventSource(QObject *receiver, QObject *parent) :
-        QObject(parent), _receiver(receiver), _prevState(0), _init(false)
+        QObject(parent), _receiver(receiver), _notifier(0), _prevState(0), 
+        _init(false)
 {
 
     if(pnd_evdev_open(pnd_evdev_dpads))
@@ -23,14 +24,14 @@ PandoraEventSource::PandoraEventSource(QObject *receiver, QObject *parent) :
 
 PandoraEventSource::~PandoraEventSource()
 {
-    if(_notifier->isEnabled())
+    if(_notifier && _notifier->isEnabled())
         _notifier->setEnabled(false);
     pnd_evdev_close(pnd_evdev_dpads);
 }
 
 bool PandoraEventSource::isActive()
 {
-    return _timer.isActive();
+    return _notifier != 0;
 }
 
 void PandoraEventSource::handleEvents()

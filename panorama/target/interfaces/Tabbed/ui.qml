@@ -7,13 +7,13 @@ PanoramaUI {
     description: "A tab based UI"
     author: "B-ZaR"
 
-    property int keyUp:      pandoraControlsActive ? Pandora.DPadUp       : Qt.Key_Up
-    property int keyDown:    pandoraControlsActive ? Pandora.DPadDown     : Qt.Key_Down
-    property int keyLeft:    pandoraControlsActive ? Pandora.DPadLeft     : Qt.Key_Left
-    property int keyRight:   pandoraControlsActive ? Pandora.DPadRight    : Qt.Key_Right
-    property int keyOK:      pandoraControlsActive ? Pandora.ButtonB      : Qt.Key_Return
-    property int keyNextTab: pandoraControlsActive ? Pandora.TriggerRight : Qt.Key_PageDown
-    property int keyPrevTab: pandoraControlsActive ? Pandora.TriggerLeft  : Qt.Key_PageUp
+    property int keyUp:      pandoraControlsActive ? Pandora.DPadUp    : Qt.Key_Up
+    property int keyDown:    pandoraControlsActive ? Pandora.DPadDown  : Qt.Key_Down
+    property int keyLeft:    pandoraControlsActive ? Pandora.DPadLeft  : Qt.Key_Left
+    property int keyRight:   pandoraControlsActive ? Pandora.DPadRight : Qt.Key_Right
+    property int keyOK:      pandoraControlsActive ? Pandora.ButtonB   : Qt.Key_Return
+    property int keyNextTab: pandoraControlsActive ? Pandora.TriggerR  : Qt.Key_PageDown
+    property int keyPrevTab: pandoraControlsActive ? Pandora.TriggerL  : Qt.Key_PageUp
 
 
     Item {
@@ -270,10 +270,10 @@ PanoramaUI {
                     .sortedBy("name", true)
 
             // Disable default navigation keys
-            Keys.onUpPressed:    {event.accepted = false;}
-            Keys.onDownPressed:  {event.accepted = false;}
-            Keys.onLeftPressed:  {event.accepted = false;}
-            Keys.onRightPressed: {event.accepted = false;}
+            Keys.onUpPressed:    {if(!pandoraControlsActive) event.accepted = false;}
+            Keys.onDownPressed:  {if(!pandoraControlsActive) event.accepted = false;}
+            Keys.onLeftPressed:  {if(!pandoraControlsActive) event.accepted = false;}
+            Keys.onRightPressed: {if(!pandoraControlsActive) event.accepted = false;}
 
             Keys.onPressed: {
                 var accept = true;

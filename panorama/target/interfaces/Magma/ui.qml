@@ -116,17 +116,12 @@ PanoramaUI {
 
             Image {
                 id: stream
-                SequentialAnimation {
-                    id: seq
+                NumberAnimation on y {
                     running: level == 1 && magmaStream.value == "true"
                     loops: Animation.Infinite
-                    NumberAnimation {
-                        target: stream
-                        property: "y"
-                        from: 0
-                        to: -413
-                        duration: 5000
-                    }
+                    from: 0
+                    to: -413
+                    duration: 5000
                 }
                 height: ui.height + 413
                 fillMode: Image.TileVertically

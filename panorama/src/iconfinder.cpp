@@ -54,7 +54,6 @@ QString IconFinder::findIcon(const QString &name, const QString &fallback)
 
 #ifdef Q_WS_X11
     QString png = QLatin1String(".png");
-    QString svg = QLatin1String(".svg");
     QList<int> iconSizes;
     iconSizes << 64 << 48 << 32 << 24 << 16;
     foreach(int size, iconSizes)
@@ -203,7 +202,7 @@ QIconTheme QtIconLoaderImplementation::parseIndexFile(const QString &themeName) 
             }
         }
 
-        parents = indexReader.value(QLatin1String("Icon Theme/Inherits")).toString().split(QLatin1Char(','));
+        parents = indexReader.value(QLatin1String("Icon Theme/Inherits")).toStringList();
     }
 
     if (kdeVersion() >= 3) {

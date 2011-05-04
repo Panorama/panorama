@@ -6,7 +6,7 @@
 #include <QCoreApplication>
 
 MainWindow::MainWindow(QWidget *parent) :
-        QMainWindow(parent), _pandoraEventSource(&_canvas)
+        QMainWindow(parent)
 {
     //"Clear" some memory
     _component = 0;
@@ -19,7 +19,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _canvas.setParent(this);
     _canvas.rootContext()->setContextProperty("ctxtHeight", UI_HEIGHT);
     _canvas.rootContext()->setContextProperty("ctxtWidth", UI_WIDTH);
-    _canvas.rootContext()->setContextProperty("pandoraControlsActive", _pandoraEventSource.isActive());
     _canvas.setSource(QUrl("qrc:/root.qml"));
     _canvas.setFocusPolicy(Qt::StrongFocus);
     this->setCentralWidget(&_canvas);

@@ -2,29 +2,40 @@
 #define PANDORA_H
 
 #include <QObject>
+#include "pandoraeventsource.h"
 
 class Pandora : public QObject
 {
     Q_OBJECT
     Q_ENUMS(Key)
+    Q_PROPERTY(bool controlsActive READ controlsActive NOTIFY controlsActiveUpdated)
 public:
     explicit Pandora(QObject *parent = 0);
 
-    enum Key { //Codes are set apart from Qt::Key values
-        DPadLeft      = 0x01200012, //For every key, key & 0xfe000000 must == 0
-        DPadUp        = 0x01200013,
-        DPadRight     = 0x01200014,
-        DPadDown      = 0x01200015,
-        ButtonX       = 0x01300000,
-        ButtonY       = 0x01300001,
-        ButtonA       = 0x01300002,
-        ButtonB       = 0x01300003,
-        TriggerL      = 0x01200059,
-        TriggerR      = 0x01200060,
-        ButtonStart   = 0x01200055,
-        ButtonSelect  = 0x01200058,
-        ButtonPandora = 0x0120010a
+    bool controlsActive();
+
+    enum Key {
+        DPadLeft      = 0x00000001,
+        DPadUp        = 0x00000002,
+        DPadRight     = 0x00000003,
+        DPadDown      = 0x00000004,
+        ButtonX       = 0x00000005,
+        ButtonY       = 0x00000006,
+        ButtonA       = 0x00000007,
+        ButtonB       = 0x00000008,
+        TriggerL      = 0x00000009,
+        TriggerR      = 0x0000000a,
+        ButtonStart   = 0x0000000b,
+        ButtonSelect  = 0x0000000c,
+        ButtonPandora = 0x0000000d
     };
+
+signals:
+    void controlsActiveUpdated(const bool state);
+    void pressed(const int key);
+    void released(const int key);
+private:
+    static PandoraEventSource _pandoraEventSource;
 };
 
 #endif // PANDORA_H

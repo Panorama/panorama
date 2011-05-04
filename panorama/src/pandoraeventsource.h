@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QTimer>
 #include <QSocketNotifier>
+#include <QKeyEvent>
 
 class PandoraEventSource : public QObject
 {
@@ -17,8 +18,8 @@ public:
 
 signals:
     void isActiveChanged(const bool value);
-    void keyPressed(const int key);
-    void keyReleased(const int key);
+    void keyPressed(const QKeyEvent &event);
+    void keyReleased(const QKeyEvent &event);
 
 private slots:
     void handleEvents();

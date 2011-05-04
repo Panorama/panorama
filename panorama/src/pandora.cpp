@@ -3,18 +3,11 @@
 
 Pandora::Pandora(QObject *parent)
     : QObject(parent)
+{}
+
+PandoraAttached *Pandora::qmlAttachedProperties(QObject *)
 {
-    connect(&_pandoraEventSource, SIGNAL(isActiveChanged(bool)),
-            this, SIGNAL(controlsActiveUpdated(bool)));
-    connect(&_pandoraEventSource, SIGNAL(pressed(int)),
-            this, SIGNAL(pressed(int)));
-    connect(&_pandoraEventSource, SIGNAL(released(int)),
-            this, SIGNAL(released(int)));
+    return &_attached;
 }
 
-bool Pandora::controlsActive()
-{
-    return _pandoraEventSource.isActive();
-}
-
-PandoraEventSource Pandora::_pandoraEventSource;
+PandoraAttached Pandora::_attached;

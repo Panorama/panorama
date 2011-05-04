@@ -1,7 +1,6 @@
 #include "pandoraeventsource.h"
 
 #include <QCoreApplication>
-#include <QKeyEvent>
 #include <QDebug>
 
 #include "pnd_io_evdev.h"
@@ -70,9 +69,9 @@ void PandoraEventSource::handleEvents()
 void PandoraEventSource::emitKeyEvent(const int key, const bool press)
 {
     if(press)
-        emit keyPressed(key);
+        emit keyPressed(QKeyEvent(QKeyEvent::KeyPress, key, Qt::NoModifier));
     else
-        emit keyReleased(key);
+        emit keyReleased(QKeyEvent(QKeyEvent::KeyRelease, key, Qt::NoModifier));
 }
 
 void PandoraEventSource::testKey(const int prevState, const int currentState, const int mask, const int keyToEmit)

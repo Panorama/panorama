@@ -2,17 +2,17 @@
 #define PANDORA_H
 
 #include <QObject>
+#include <qdeclarative.h>
+#include <QKeyEvent>
 #include "pandoraeventsource.h"
+#include "pandoraattached.h"
 
 class Pandora : public QObject
 {
     Q_OBJECT
     Q_ENUMS(Key)
-    Q_PROPERTY(bool controlsActive READ controlsActive NOTIFY controlsActiveUpdated)
 public:
     explicit Pandora(QObject *parent = 0);
-
-    bool controlsActive();
 
     enum Key {
         DPadLeft      = 0x00000001,
@@ -30,12 +30,12 @@ public:
         ButtonPandora = 0x0000000d
     };
 
-signals:
-    void controlsActiveUpdated(const bool state);
-    void pressed(const int key);
-    void released(const int key);
+    static PandoraAttached *qmlAttachedProperties(QObject *object);
+
 private:
-    static PandoraEventSource _pandoraEventSource;
+    static PandoraAttached _attached;
 };
+
+QML_DECLARE_TYPEINFO(Pandora, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // PANDORA_H

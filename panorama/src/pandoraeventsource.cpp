@@ -1,20 +1,20 @@
 #include "pandoraeventsource.h"
 
 #include <QCoreApplication>
-#include <QKeyEvent>
 #include <QDebug>
 
 #include "pnd_io_evdev.h"
 #include "pandora.h"
 
-PandoraEventSource::PandoraEventSource(QObject *receiver, QObject *parent) :
-        QObject(parent), _receiver(receiver), _notifier(0), _prevState(0), 
+PandoraEventSource::PandoraEventSource(QObject *parent) :
+        QObject(parent), _notifier(0), _prevState(0),
         _init(false)
 {
 
     if(pnd_evdev_open(pnd_evdev_dpads))
     {
         _notifier = new QSocketNotifier(pnd_evdev_get_fd(pnd_evdev_dpads), QSocketNotifier::Read, this);
+        emit isActiveChanged(true);
         connect(_notifier, SIGNAL(activated(int)), this, SLOT(handleEvents()));
     }
     else
@@ -25,7 +25,10 @@ PandoraEventSource::PandoraEventSource(QObject *receiver, QObject *parent) :
 PandoraEventSource::~PandoraEventSource()
 {
     if(_notifier && _notifier->isEnabled())
+    {
         _notifier->setEnabled(false);
+        emit isActiveChanged(false);
+    }
     pnd_evdev_close(pnd_evdev_dpads);
 }
 
@@ -63,12 +66,15 @@ void PandoraEventSource::handleEvents()
     _prevState = dpadState;
 }
 
-void PandoraEventSource::emitKeyEvent(const int key, const bool press) const
+void PandoraEventSource::emitKeyEvent(const int key, const bool press)
 {
-    QCoreApplication::postEvent(_receiver, new QKeyEvent(press ? QEvent::KeyPress : QEvent::KeyRelease, key, Qt::NoModifier));
+    if(press)
+        emit keyPressed(QKeyEvent(QKeyEvent::KeyPress, key, Qt::NoModifier));
+    else
+        emit keyReleased(QKeyEvent(QKeyEvent::KeyRelease, key, Qt::NoModifier));
 }
 
-void PandoraEventSource::testKey(const int prevState, const int currentState, const int mask, const int keyToEmit) const
+void PandoraEventSource::testKey(const int prevState, const int currentState, const int mask, const int keyToEmit)
 {
     if((currentState ^ prevState) & mask) //Key changed
         emitKeyEvent(keyToEmit, currentState & mask);

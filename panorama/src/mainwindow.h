@@ -60,7 +60,6 @@ private:
     Configuration _config;
     ApplicationModel _model;
     AppAccumulator _accumulator;
-    PandoraEventSource _pandoraEventSource;
 
     Setting *_fullscreenSetting;
     Setting *_uiSetting;

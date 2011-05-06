@@ -5,6 +5,31 @@
 #include <QTimer>
 #include <QSocketNotifier>
 #include <QKeyEvent>
+#include <QThread>
+
+class PandoraEventListener : public QThread
+{
+    Q_OBJECT
+    Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
+public:
+    explicit PandoraEventListener();
+    ~PandoraEventListener();
+
+    bool isActive();
+
+signals:
+    void isActiveChanged(const bool value);
+    void newEvent(const int state);
+
+protected:
+    void run();
+
+private slots:
+    void readEvent();
+
+private:
+    QSocketNotifier *_notifier;
+};
 
 class PandoraEventSource : public QObject
 {
@@ -12,7 +37,6 @@ class PandoraEventSource : public QObject
     Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
 public:
     explicit PandoraEventSource(QObject *parent = 0);
-    ~PandoraEventSource();
 
     bool isActive();
 
@@ -22,15 +46,15 @@ signals:
     void keyReleased(const QKeyEvent &event);
 
 private slots:
-    void handleEvents();
+    void handleEvent(const int dpadState);
 
 private:
     inline void emitKeyEvent(const int key, const bool press);
     inline void testKey(const int prevState, const int currentState, const int mask, const int keyToEmit);
     QObject *_receiver;
-    QSocketNotifier *_notifier;
     int _prevState;
-    bool _init;
+    bool _hasReceivedInput;
+    static PandoraEventListener *_eventListener;
 };
 
 #endif // PANDORAEVENTSOURCE_H

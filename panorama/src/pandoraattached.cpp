@@ -15,3 +15,5 @@ bool PandoraAttached::controlsActive()
 {
     return _pandoraEventSource.isActive();
 }
+
+PandoraEventSource PandoraAttached::_pandoraEventSource;

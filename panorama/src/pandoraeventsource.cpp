@@ -7,47 +7,35 @@
 #include "pandora.h"
 
 PandoraEventSource::PandoraEventSource(QObject *parent) :
-        QObject(parent), _notifier(0), _prevState(0),
-        _init(false)
+        QObject(parent), _prevState(0),
+        _hasReceivedInput(false)
 {
-
-    if(pnd_evdev_open(pnd_evdev_dpads))
+    if(!_eventListener)
     {
-        _notifier = new QSocketNotifier(pnd_evdev_get_fd(pnd_evdev_dpads), QSocketNotifier::Read, this);
-        emit isActiveChanged(true);
-        connect(_notifier, SIGNAL(activated(int)), this, SLOT(handleEvents()));
+        _eventListener = new PandoraEventListener();
+        _eventListener->start();
     }
-    else
-        qWarning() << "Warning: Failed to locate D-Pad controls. "
-                "This means that only keyboard controls can be used.";
-}
-
-PandoraEventSource::~PandoraEventSource()
-{
-    if(_notifier && _notifier->isEnabled())
-    {
-        _notifier->setEnabled(false);
-        emit isActiveChanged(false);
-    }
-    pnd_evdev_close(pnd_evdev_dpads);
+    connect(_eventListener, SIGNAL(isActiveChanged(bool)),
+            this, SIGNAL(isActiveChanged(bool)));
+    connect(_eventListener, SIGNAL(newEvent(int)), this, SLOT(handleEvent(int)));
 }
 
 bool PandoraEventSource::isActive()
 {
-    return _notifier != 0;
+    return _eventListener->isActive();
 }
 
-void PandoraEventSource::handleEvents()
+void PandoraEventSource::handleEvent(const int dpadState)
 {
-    pnd_evdev_catchup(0); //1 == Don't do this asynchronously
-
-    int dpadState = pnd_evdev_dpad_state(pnd_evdev_dpads);
-    if(!_init)
+    if(!_hasReceivedInput)
     {
         _prevState = dpadState;
-        _init = true;
+        _hasReceivedInput = true;
         return;
     }
+
+    if(dpadState == _prevState)
+        return;
 
     testKey(_prevState, dpadState, pnd_evdev_left, Pandora::DPadLeft);
     testKey(_prevState, dpadState, pnd_evdev_right, Pandora::DPadRight);
@@ -78,4 +66,49 @@ void PandoraEventSource::testKey(const int prevState, const int currentState, co
 {
     if((currentState ^ prevState) & mask) //Key changed
         emitKeyEvent(keyToEmit, currentState & mask);
+}
+
+PandoraEventListener *PandoraEventSource::_eventListener(0);
+
+PandoraEventListener::PandoraEventListener()
+    : _notifier(0)
+{}
+
+PandoraEventListener::~PandoraEventListener()
+{
+    if(_notifier && _notifier->isEnabled())
+    {
+        _notifier->setEnabled(false);
+        emit isActiveChanged(false);
+    }
+    if(_notifier)
+    {
+        delete _notifier;
+    }
+    pnd_evdev_close(pnd_evdev_dpads);
+}
+
+void PandoraEventListener::run()
+{
+    _notifier = new QSocketNotifier(pnd_evdev_get_fd(pnd_evdev_dpads), QSocketNotifier::Read);
+    if(pnd_evdev_open(pnd_evdev_dpads))
+    {
+        emit isActiveChanged(false);
+        connect(_notifier, SIGNAL(activated(int)), this, SLOT(readEvent()));
+    }
+    else
+        qWarning() << "Warning: Failed to locate D-Pad controls. "
+                "This means that only keyboard controls can be used.";
+    exec();
+}
+
+bool PandoraEventListener::isActive()
+{
+    return _notifier && _notifier->isEnabled();
+}
+
+void PandoraEventListener::readEvent()
+{
+    pnd_evdev_catchup(0);
+    emit newEvent(pnd_evdev_dpad_state(pnd_evdev_dpads));
 }

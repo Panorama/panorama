@@ -19,7 +19,7 @@ signals:
     void controlsActiveUpdated(const bool state);
 
 private:
-    static PandoraEventSource _pandoraEventSource;
+    static PandoraEventSource *_pandoraEventSource;
 };
 
 #endif // PANDORAATTACHED_H

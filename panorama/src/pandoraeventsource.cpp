@@ -90,11 +90,11 @@ PandoraEventListener::~PandoraEventListener()
 
 void PandoraEventListener::run()
 {
-    _notifier = new QSocketNotifier(pnd_evdev_get_fd(pnd_evdev_dpads), QSocketNotifier::Read);
     if(pnd_evdev_open(pnd_evdev_dpads))
     {
-        emit isActiveChanged(false);
+        _notifier = new QSocketNotifier(pnd_evdev_get_fd(pnd_evdev_dpads), QSocketNotifier::Read);
         connect(_notifier, SIGNAL(activated(int)), this, SLOT(readEvent()));
+        emit isActiveChanged(true);
     }
     else
         qWarning() << "Warning: Failed to locate D-Pad controls. "

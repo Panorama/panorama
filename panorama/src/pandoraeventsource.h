@@ -2,34 +2,9 @@
 #define PANDORAEVENTSOURCE_H
 
 #include <QObject>
-#include <QTimer>
-#include <QSocketNotifier>
 #include <QKeyEvent>
-#include <QThread>
 
-class PandoraEventListener : public QThread
-{
-    Q_OBJECT
-    Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
-public:
-    explicit PandoraEventListener();
-    ~PandoraEventListener();
-
-    bool isActive();
-
-signals:
-    void isActiveChanged(const bool value);
-    void newEvent(const int state);
-
-protected:
-    void run();
-
-private slots:
-    void readEvent();
-
-private:
-    QSocketNotifier *_notifier;
-};
+#include "pandoraeventlistener.h"
 
 class PandoraEventSource : public QObject
 {

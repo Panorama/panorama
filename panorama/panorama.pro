@@ -44,7 +44,8 @@ SOURCES += src/main.cpp \
     src/settingssource.cpp \
     src/pandoraeventsource.cpp \
     src/pandora.cpp \
-    src/pandoraattached.cpp
+    src/pandoraattached.cpp \
+    src/pandoraeventlistener.cpp
 HEADERS += src/mainwindow.h \
     src/configuration.h \
     src/panoramaui.h \
@@ -65,6 +66,7 @@ HEADERS += src/mainwindow.h \
     src/settingssource.h \
     src/pandoraeventsource.h \
     src/pandora.h \
-    src/pandoraattached.h
+    src/pandoraattached.h \
+    src/pandoraeventlistener.h
 OTHER_FILES += qrc/root.qml
 RESOURCES += qrc/default.qrc

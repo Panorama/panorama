@@ -35,18 +35,11 @@ PanoramaUI {
             color: "white"
 
             focus: true
-            Keys.onPressed: {
-                var test;
+            Pandora.onPressed: {
                 var pressed = function(key) {
                     write("Pressed the <span style\"color: yellow;\">" + key + "</span> button.");
                 }
                 switch(event.key) {
-                case Qt.Key_S:
-                        test = settingsTest;
-                    break;
-                case Qt.Key_F:
-                        test = fullscreenTest;
-                    break;
                 case Pandora.ButtonX:
                         pressed("X");
                     break;
@@ -85,6 +78,18 @@ PanoramaUI {
                     break;
                 case Pandora.ButtonPandora:
                         pressed("Pandora");
+                    break;
+                }
+            }
+
+            Keys.onPressed: {
+                var test;
+                switch(event.key) {
+                case Qt.Key_S:
+                        test = settingsTest;
+                    break;
+                case Qt.Key_F:
+                        test = fullscreenTest;
                     break;
                 }
                 if(test) {

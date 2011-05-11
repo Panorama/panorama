@@ -2,7 +2,6 @@
 #define PANDORAATTACHED_H
 
 #include <QObject>
-#include <QKeyEvent>
 #include "pandoraeventsource.h"
 
 class PandoraAttached : public QObject
@@ -14,8 +13,8 @@ public:
     bool controlsActive();
 
 signals:
-    void pressed(const QKeyEvent &event);
-    void released(const QKeyEvent &event);
+    void pressed(const PandoraKeyEvent &event);
+    void released(const PandoraKeyEvent &event);
     void controlsActiveUpdated(const bool state);
 
 private:

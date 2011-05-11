@@ -2,7 +2,7 @@
 #define PANDORAEVENTSOURCE_H
 
 #include <QObject>
-#include <QKeyEvent>
+#include "pandorakeyevent.h"
 
 #include "pandoraeventlistener.h"
 
@@ -17,8 +17,8 @@ public:
 
 signals:
     void isActiveChanged(const bool value);
-    void keyPressed(const QKeyEvent &event);
-    void keyReleased(const QKeyEvent &event);
+    void keyPressed(const PandoraKeyEvent &event);
+    void keyReleased(const PandoraKeyEvent &event);
 
 private slots:
     void handleEvent(const int dpadState);

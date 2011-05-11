@@ -1,33 +1,57 @@
 #include "configuration.h"
+
+#include <QFileSystemWatcher>
+#include <QFileInfo>
+#include <QStringList>
+#include <QDebug>
 #include "constants.h"
+
+class ConfigurationPrivate
+{
+    PANORAMA_DECLARE_PUBLIC(Configuration)
+public:
+    void initConfiguration();
+    QSettings *settings;
+    SettingsHive *hive;
+    QFileSystemWatcher watcher;
+};
 
 Configuration::Configuration(QObject *parent) :
         QObject(parent)
 {
-    _hive = new SettingsHive(this);
-    _settings = 0;
+    PANORAMA_INITIALIZE(Configuration);
+    priv->hive = new SettingsHive(this);
+    priv->settings = 0;
 
-    connect(&_watcher, SIGNAL(fileChanged(QString)),
+    connect(&priv->watcher, SIGNAL(fileChanged(QString)),
             this, SLOT(loadConfiguration()));
-    connect(_hive, SIGNAL(settingChanged(QString,QString,QVariant,SettingsSource::ChangeSource)),
+    connect(priv->hive, SIGNAL(settingChanged(QString,QString,QVariant,SettingsSource::ChangeSource)),
             this, SLOT(reactToChange(QString,QString,QVariant,SettingsSource::ChangeSource)));
+}
+
+Configuration::~Configuration()
+{
+    PANORAMA_UNINITIALIZE(Configuration);
 }
 
 void Configuration::loadConfiguration()
 {
-    initConfiguration();
-    _settings->sync();
-    _hive->readSettings(*_settings);
+    PANORAMA_PRIVATE(Configuration);
+    priv->initConfiguration();
+    priv->settings->sync();
+    priv->hive->readSettings(*priv->settings);
 
-    if(QFileInfo(_settings->fileName()).exists() && !_watcher.files().contains(_settings->fileName()))
-        _watcher.addPath(_settings->fileName());
+    const QString fileName = priv->settings->fileName();
+    if(QFileInfo(fileName).exists() && !priv->watcher.files().contains(fileName))
+        priv->watcher.addPath(fileName);
 }
 
 void Configuration::saveConfiguration()
 {
-    initConfiguration();
-    _hive->writeSettings(*_settings);
-    _settings->sync();
+    PANORAMA_PRIVATE(Configuration);
+    priv->initConfiguration();
+    priv->hive->writeSettings(*priv->settings);
+    priv->settings->sync();
 }
 
 void Configuration::reactToChange(const QString&,
@@ -41,27 +65,29 @@ void Configuration::reactToChange(const QString&,
 
 SettingsHive *Configuration::generalConfig() const
 {
-    return _hive;
+    PANORAMA_PRIVATE(const Configuration);
+    return priv->hive;
 }
 
-void Configuration::initConfiguration()
+void ConfigurationPrivate::initConfiguration()
 {
-    if(!_settings) {
+    PANORAMA_PUBLIC(Configuration);
+    if(!settings) {
 #ifdef PANDORA
-        _settings = new QSettings(CONFIG_FILE, QSettings::IniFormat, this);
+        settings = new QSettings(CONFIG_FILE, QSettings::IniFormat, pub);
 #else
-        _settings = new QSettings(QSettings::UserScope, "panorama", "core", this);
+        settings = new QSettings(QSettings::UserScope, "panorama", "core", pub);
 #endif
-        if(_settings->allKeys().isEmpty()) {
+        if(settings->allKeys().isEmpty()) {
             qWarning() << "Warning: No configuration file detected, creating default configuration.";
-            _settings->setValue("panorama/uiDirectory", "interfaces");
-            _settings->setValue("panorama/ui", "Test");
-            _settings->setValue("panorama/fullscreen", false);
-            _settings->setValue("system/clockspeed", 600);
-            _settings->setValue("system/favorites", "");
-            _settings->sync();
+            settings->setValue("panorama/uiDirectory", "interfaces");
+            settings->setValue("panorama/ui", "Test");
+            settings->setValue("panorama/fullscreen", false);
+            settings->setValue("system/clockspeed", 600);
+            settings->setValue("system/favorites", "");
+            settings->sync();
         }
-        _watcher.addPath(_settings->fileName());
-        qDebug() << "Settings are saved in" << _settings->fileName();
+        watcher.addPath(settings->fileName());
+        qDebug() << "Settings are saved in" << settings->fileName();
     }
 }

@@ -57,9 +57,6 @@ private:
     QDeclarativeView _canvas;
     QDeclarativeComponent *_component;
     PanoramaUI *_ui;
-    Configuration _config;
-    ApplicationModel _model;
-    AppAccumulator _accumulator;
 
     Setting *_fullscreenSetting;
     Setting *_uiSetting;

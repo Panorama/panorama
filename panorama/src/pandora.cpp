@@ -5,9 +5,7 @@ Pandora::Pandora(QObject *parent)
     : QObject(parent)
 {}
 
-PandoraAttached *Pandora::qmlAttachedProperties(QObject *)
+PandoraAttached *Pandora::qmlAttachedProperties(QObject *parent)
 {
-    return &_attached;
+    return new PandoraAttached(parent);
 }
-
-PandoraAttached Pandora::_attached;

@@ -30,10 +30,7 @@ public:
         ButtonPandora = 0x0000000d
     };
 
-    static PandoraAttached *qmlAttachedProperties(QObject *object);
-
-private:
-    static PandoraAttached _attached;
+    static PandoraAttached *qmlAttachedProperties(QObject *parent);
 };
 
 QML_DECLARE_TYPEINFO(Pandora, QML_HAS_ATTACHED_PROPERTIES)

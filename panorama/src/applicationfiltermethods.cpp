@@ -1,5 +1,7 @@
 #include "applicationfiltermethods.h"
 
+#include "applicationmodel.h"
+
 QVariant ApplicationFilterMethods::inCategory(QAbstractItemModel *source,
                                               const QString &category)
 {

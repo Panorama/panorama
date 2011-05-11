@@ -1,17 +1,15 @@
 #ifndef APPACCUMULATOR_H
 #define APPACCUMULATOR_H
 
+#include "panoramainternal.h"
+
 #include <QObject>
 #include <QString>
 #include <QStringList>
-#include <QList>
-#include <QFileSystemWatcher>
-#include <QDateTime>
-#include <QCryptographicHash>
 
 #include "application.h"
-#include "desktopfile.h"
-#include "pndscanner.h"
+
+class AppAccumulatorPrivate;
 
 /**
  * Scans a set of search paths, finds all of the .desktop files in those search
@@ -23,15 +21,14 @@
 class AppAccumulator : public QObject
 {
     Q_OBJECT
+    PANORAMA_DECLARE_PRIVATE(AppAccumulator)
 public:
     /** Constructs a new AppAccumulator instance */
     explicit AppAccumulator(QObject *parent = 0);
-
-    /** Gets the exec line for the given application's id */
-    static QString getExecLine(const QString &id);
+    ~AppAccumulator();
 
     /** Gets the application data structure for the given id */
-    static Application getApplication(const QString &id);
+    Application getApplication(const QString &id) const;
 
 public slots:
     /** Loads all .desktop files from the specified search paths (not recursive) */
@@ -44,23 +41,8 @@ signals:
     /** An application has been removed from one of the search paths */
     void appRemoved(const Application &app);
 
-private slots:
+protected slots:
     void rescanDir(const QString &dir);
-
-private:
-    struct FileInfo {
-        QString file;
-        QDateTime lastModified;
-    };
-
-    void addViaDesktopFile(const QString &file);
-    void removeViaDesktopFile(const QString &file);
-    bool shouldAddThisApp(const QString &file) const;
-
-    static QHash<QString, Application> _apps;
-
-    QFileSystemWatcher _watcher;
-    QHash<QString, QList<FileInfo *> > _currentFileInfos;
 };
 
 #endif // APPACCUMULATOR_H

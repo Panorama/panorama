@@ -268,7 +268,7 @@ PanoramaUI {
             anchors.fill: parent
             anchors.margins: 10
 
-            model: ui.applications.inCategory(tabs.selectedRawName)
+            model: Applications.list.inCategory(tabs.selectedRawName)
                     .matching("name", (search.text.length == 0) ? ".*" : ".*" + search.text + ".*")
                     .sortedBy("name", true)
 
@@ -296,7 +296,7 @@ PanoramaUI {
                         applications.moveCurrentIndexRight();
                         break;
                     case Qt.Key_Return:
-                        ui.execute(applications.currentItem.ident);
+                        Applications.execute(applications.currentItem.ident);
                         break;
                     default:
                         accept = false;
@@ -320,7 +320,7 @@ PanoramaUI {
                         applications.moveCurrentIndexRight();
                         break;
                     case Pandora.ButtonB:
-                        ui.execute(applications.currentItem.ident);
+                        Applications.execute(applications.currentItem.ident);
                         break;
                     default:
                         accept = false;
@@ -339,7 +339,7 @@ PanoramaUI {
                         applications.currentIndex = index;
                     }
                     onDoubleClicked: {
-                        ui.execute(applications.currentItem.ident);
+                        Applications.execute(applications.currentItem.ident);
                     }
                 }
                 Image {

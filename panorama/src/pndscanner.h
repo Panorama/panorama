@@ -1,18 +1,9 @@
 #ifndef PNDSCANNER_H
 #define PNDSCANNER_H
 
-#include <QHash>
 #include <QString>
-#include <QDebug>
-#include <pnd_conf.h>
-#include <pnd_apps.h>
-#include <pnd_container.h>
-#include <pnd_discovery.h>
 
 #include "pnd.h"
-
-//I'm trying to keep the coupling between libpnd←→Panorama as loose as possible,
-//because there might come API changes in the future...
 
 /**
  * A class for scanning the file system for PNDs, using libpnd's search system
@@ -32,8 +23,6 @@ private:
     PndScanner(const PndScanner&);
 
     PndScanner& operator=(const PndScanner&);
-
-    static QHash<QString, Pnd> _pnds;
 };
 
 #endif // PNDSCANNER_H

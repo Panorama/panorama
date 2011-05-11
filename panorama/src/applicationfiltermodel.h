@@ -1,21 +1,24 @@
 #ifndef CATEGORYFILTERMODEL_H
 #define CATEGORYFILTERMODEL_H
 
+#include "panoramainternal.h"
+
 #include <QSortFilterProxyModel>
 #include <qdeclarative.h>
 
-#include "applicationfiltermethods.h"
-#include "applicationmodel.h"
+class ApplicationFilterModelPrivate;
 
 /**
  * A proxy model for filtering an ApplicationModel
  */
 class ApplicationFilterModel : public QSortFilterProxyModel
 {
-Q_OBJECT
+    Q_OBJECT
+    PANORAMA_DECLARE_PRIVATE(ApplicationFilterModel)
 public:
     /** Constructs a new ApplicationFilterModel instance */
     explicit ApplicationFilterModel(QObject *parent = 0);
+    ~ApplicationFilterModel();
 
     /**
      * Constructs a new ApplicationFilterModel instance with the given source
@@ -31,9 +34,9 @@ public:
     bool filterAcceptsRow(int source_row,
                           const QModelIndex &source_parent) const;
 
-    void setDrop(int value) { _drop = value; }
+    void setDrop(int value);
 
-    void setTake(int value) { _take = value; }
+    void setTake(int value);
 
     /** QML helper method that applies a filter to this model */
     Q_INVOKABLE QVariant inCategory(const QString &category);
@@ -47,10 +50,6 @@ public:
     Q_INVOKABLE QVariant drop(int count);
 
     Q_INVOKABLE QVariant take(int count);
-
-private:
-    int _drop;
-    int _take;
 };
 
 #endif // CATEGORYFILTERMODEL_H

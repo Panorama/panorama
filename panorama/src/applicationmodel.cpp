@@ -1,38 +1,56 @@
 #include "applicationmodel.h"
 
-ApplicationModel::ApplicationModel(QObject *parent) :
-    QAbstractListModel(parent)
-{
-    //"id" is a QML keyword, so we use "identifier" instead.
-    _roles[ApplicationModel::Id]          = QString("identifier").toLocal8Bit();
-    _roles[ApplicationModel::Name]        = QString("name")      .toLocal8Bit();
-    _roles[ApplicationModel::Comment]     = QString("comment")   .toLocal8Bit();
-    _roles[ApplicationModel::Icon]        = QString("icon")      .toLocal8Bit();
-    _roles[ApplicationModel::Version]     = QString("version")   .toLocal8Bit();
-    _roles[ApplicationModel::Categories]  = QString("categories").toLocal8Bit();
+#include "applicationfiltermethods.h"
 
-    setRoleNames(_roles);
+class ApplicationModelPrivate
+{
+    PANORAMA_DECLARE_PUBLIC(ApplicationModel)
+public:
+    QList<Application> apps;
+    QHash<int, QByteArray> roles;
+};
+
+ApplicationModel::ApplicationModel(QObject *parent) :
+        QAbstractListModel(parent)
+{
+    PANORAMA_INITIALIZE(ApplicationModel);
+    //"id" is a QML keyword, so we use "identifier" instead.
+    priv->roles[ApplicationModel::Id]          = QString("identifier").toLocal8Bit();
+    priv->roles[ApplicationModel::Name]        = QString("name")      .toLocal8Bit();
+    priv->roles[ApplicationModel::Comment]     = QString("comment")   .toLocal8Bit();
+    priv->roles[ApplicationModel::Icon]        = QString("icon")      .toLocal8Bit();
+    priv->roles[ApplicationModel::Version]     = QString("version")   .toLocal8Bit();
+    priv->roles[ApplicationModel::Categories]  = QString("categories").toLocal8Bit();
+
+    setRoleNames(priv->roles);
+}
+
+ApplicationModel::~ApplicationModel()
+{
+    PANORAMA_UNINITIALIZE(ApplicationModel);
 }
 
 void ApplicationModel::addApp(const Application &app)
 {
+    PANORAMA_PRIVATE(ApplicationModel);
     //Store the app
-    _apps.append(app);
+    priv->apps += app;
 
     //Tell the View that it has to reload the end of the list
-    const QModelIndex idx1 = createIndex(_apps.count() - 1, 0);
-    const QModelIndex idx2 = createIndex(_apps.count(), 0);
+    const QModelIndex idx1 = createIndex(priv->apps.count() - 1, 0);
+    const QModelIndex idx2 = createIndex(priv->apps.count(), 0);
     emit dataChanged(idx1, idx2);
 }
 
 void ApplicationModel::removeApp(const Application &app)
 {
-    for(int i = 0; i < _apps.count(); i++)
+    PANORAMA_PRIVATE(ApplicationModel);
+    for(int i = 0; i < priv->apps.count(); i++)
     {
-        if(_apps.at(i).relatedFile == app.relatedFile)
+        if(priv->apps.at(i).relatedFile == app.relatedFile)
         {
             //Remove the app
-            _apps.removeAt(i);
+            priv->apps.removeAt(i);
 
             //Tell the View that it needs to reload part of the list
             const QModelIndex idx1 = createIndex(i - 1, 0);
@@ -45,14 +63,16 @@ void ApplicationModel::removeApp(const Application &app)
 
 int ApplicationModel::rowCount(const QModelIndex &) const
 {
-    return _apps.count();
+    PANORAMA_PRIVATE(const ApplicationModel);
+    return priv->apps.count();
 }
 
 QVariant ApplicationModel::data(const QModelIndex &index, int role) const
 {
-    if(index.isValid() && index.row() < _apps.size())
+    PANORAMA_PRIVATE(const ApplicationModel);
+    if(index.isValid() && index.row() < priv->apps.size())
     {
-        const Application &value = _apps[index.row()];
+        const Application &value = priv->apps[index.row()];
         switch(role)
         {
         case ApplicationModel::Name:

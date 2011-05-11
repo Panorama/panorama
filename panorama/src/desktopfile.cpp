@@ -3,16 +3,34 @@
 #include <QTemporaryFile>
 #include <QResource>
 
+class DesktopFilePrivate
+{
+    PANORAMA_DECLARE_PUBLIC(DesktopFile)
+public:
+    QString readLocalized(const QMap<QString, QVariant> &map, const QString &fieldName) const;
+    QMap<QString, QVariant> parseDesktop(const QString &file) const;
+
+    QString file;
+};
+
 DesktopFile::DesktopFile(const QString &file)
-    : _file(file)
-{}
+{
+    PANORAMA_INITIALIZE(DesktopFile);
+    priv->file = file;
+}
+
+DesktopFile::~DesktopFile()
+{
+    PANORAMA_UNINITIALIZE(DesktopFile);
+}
 
 Application DesktopFile::readToApplication()
 {
+    PANORAMA_PRIVATE(DesktopFile);
     Application result;
     result.clockspeed = 0;
 
-    const QMap<QString, QVariant> entries = parseDesktop(_file);
+    const QMap<QString, QVariant> entries = priv->parseDesktop(priv->file);
 
     //Should we not load this?
     if(!entries["Type"].toString().contains("Application") || //Not an app
@@ -22,8 +40,8 @@ Application DesktopFile::readToApplication()
         return Application();
     }
 
-    result.name = readLocalized(entries, "Name");
-    result.comment = readLocalized(entries, "Comment");
+    result.name = priv->readLocalized(entries, "Name");
+    result.comment = priv->readLocalized(entries, "Comment");
 
     result.exec = entries["Exec"].toString();
     result.icon = IconFinder::findIcon(entries["Icon"].toString());
@@ -48,14 +66,14 @@ Application DesktopFile::readToApplication()
         result.preview = pnd.preview;
     }
 
-    result.relatedFile = _file;
+    result.relatedFile = priv->file;
 
     result.id = QCryptographicHash::hash(result.exec.toUtf8(), QCryptographicHash::Sha1).toHex();
 
     return result;
 }
 
-QString DesktopFile::readLocalized(const QMap<QString, QVariant> &entries, const QString &fieldName)
+QString DesktopFilePrivate::readLocalized(const QMap<QString, QVariant> &entries, const QString &fieldName) const
 {
     /* We have 6 levels of localization, in 3 groups:
        Native:
@@ -96,7 +114,7 @@ QString DesktopFile::readLocalized(const QMap<QString, QVariant> &entries, const
     return entries[fieldName].toString();
 }
 
-QMap<QString, QVariant> DesktopFile::parseDesktop(const QString &file)
+QMap<QString, QVariant> DesktopFilePrivate::parseDesktop(const QString &file) const
 {
     QString line;
     bool inDesktopEntry = false;

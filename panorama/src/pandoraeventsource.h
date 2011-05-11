@@ -1,17 +1,21 @@
 #ifndef PANDORAEVENTSOURCE_H
 #define PANDORAEVENTSOURCE_H
 
+#include "panoramainternal.h"
+
 #include <QObject>
 #include "pandorakeyevent.h"
 
-#include "pandoraeventlistener.h"
+class PandoraEventSourcePrivate;
 
 class PandoraEventSource : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
+    PANORAMA_DECLARE_PRIVATE(PandoraEventSource)
 public:
     explicit PandoraEventSource(QObject *parent = 0);
+    ~PandoraEventSource();
 
     bool isActive();
 
@@ -20,16 +24,8 @@ signals:
     void keyPressed(const PandoraKeyEvent &event);
     void keyReleased(const PandoraKeyEvent &event);
 
-private slots:
+protected slots:
     void handleEvent(const int dpadState);
-
-private:
-    inline void emitKeyEvent(const int key, const bool press);
-    inline void testKey(const int prevState, const int currentState, const int mask, const int keyToEmit);
-    QObject *_receiver;
-    int _prevState;
-    bool _hasReceivedInput;
-    static PandoraEventListener *_eventListener;
 };
 
 #endif // PANDORAEVENTSOURCE_H

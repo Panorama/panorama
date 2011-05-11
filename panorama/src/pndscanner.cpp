@@ -1,5 +1,16 @@
 #include "pndscanner.h"
 
+#include <QDebug>
+#include <QHash>
+
+#include "pnd_conf.h"
+#include "pnd_apps.h"
+#include "pnd_container.h"
+#include "pnd_discovery.h"
+
+QHash<QString, Pnd> _pndscanner_pnds;
+#define _pnds _pndscanner_pnds
+
 void PndScanner::scanPnds()
 {
     QString configpath = pnd_conf_query_searchpath();
@@ -66,5 +77,3 @@ Pnd PndScanner::pndForUID(const QString &uid)
 {
     return _pnds[uid];
 }
-
-QHash<QString, Pnd> PndScanner::_pnds;

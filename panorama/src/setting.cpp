@@ -1,81 +1,122 @@
 #include "setting.h"
 
+#include "settingshive.h"
+#include "configuration.h"
+#include <QDebug>
+
+class SettingPrivate
+{
+    PANORAMA_DECLARE_PUBLIC(Setting)
+public:
+    void maybeInsertDefault();
+    void wire();
+
+    QString section;
+    QString key;
+    QVariant defaultValue;
+};
+
+SettingsSource *_setting_settings = 0;
+#define _settings _setting_settings
+Configuration *_setting_configuration = 0;
+#define _configuration _setting_configuration
+
 Setting::Setting(QObject *parent)
     : QObject(parent)
 {
-    connect(_settings, SIGNAL(settingChanged(QString,QString,QVariant,SettingsSource::ChangeSource)),
-            this, SLOT(handleFieldChange(QString,QString,QVariant)));
+    PANORAMA_INITIALIZE(Setting);
+    priv->wire();
+}
+
+Setting::~Setting()
+{
+    PANORAMA_UNINITIALIZE(Setting);
 }
 
 Setting::Setting(const QString &section, const QString &key, QObject *parent)
     : QObject(parent)
 {
+    PANORAMA_INITIALIZE(Setting);
     setSection(section);
     setKey(key);
-    connect(_settings, SIGNAL(settingChanged(QString,QString,QVariant,ChangeSource)),
-            this, SLOT(handleFieldChange(QString,QString,QVariant)));
+    priv->wire();
 }
 
 Setting::Setting(const QString &section, const QString &key, const QVariant &defaultValue, QObject *parent)
     : QObject(parent)
 {
+    PANORAMA_INITIALIZE(Setting);
     setSection(section);
     setKey(key);
     setDefaultValue(defaultValue);
-    connect(_settings, SIGNAL(settingChanged(QString,QString,QVariant,SettingsSource::ChangeSource)),
-            this, SLOT(handleFieldChange(QString,QString,QVariant)));
-}
-
-void Setting::setSettingsSource(SettingsSource *value)
-{
-    _settings = value;
+    priv->wire();
 }
 
 void Setting::setSection(const QString &section)
 {
-    if(_section != section)
+    PANORAMA_PRIVATE(Setting);
+    if(priv->section != section)
     {
-        _section = section;
-        maybeInsertDefault();
+        priv->section = section;
+        priv->maybeInsertDefault();
         emit sectionChanged(section);
     }
 }
 
+QString Setting::section() const
+{
+    PANORAMA_PRIVATE(const Setting);
+    return priv->section;
+}
+
 void Setting::setKey(const QString &key)
 {
-    if(_key != key)
+    PANORAMA_PRIVATE(Setting);
+    if(priv->key != key)
     {
-        _key = key;
-        maybeInsertDefault();
+        priv->key = key;
+        priv->maybeInsertDefault();
         emit keyChanged(key);
     }
 }
 
-void Setting::setDefaultValue(const QVariant &value)
+QString Setting::key() const
 {
-    if(_default != value)
+    PANORAMA_PRIVATE(const Setting);
+    return priv->key;
+}
+
+void Setting::setDefaultValue(const QVariant &defaultValue)
+{
+    PANORAMA_PRIVATE(Setting);
+    if(priv->defaultValue != defaultValue)
     {
-        _default = value;
-        maybeInsertDefault();
-        emit defaultValueChanged(_default);
+        priv->defaultValue = defaultValue;
+        priv->maybeInsertDefault();
+        emit defaultValueChanged(defaultValue);
     }
+}
+
+QVariant Setting::defaultValue() const
+{
+    PANORAMA_PRIVATE(const Setting);
+    return priv->defaultValue;
 }
 
 void Setting::setValue(const QVariant &value)
 {
+    PANORAMA_PRIVATE(Setting);
     if(_settings)
     {
-        const QString &section(_section.isEmpty() ? _defaultSection : _section);
-        _settings->setSetting(section, _key, value, SettingsSource::External);
+        _settings->setSetting(priv->section, priv->key, value, SettingsSource::External);
     }
 }
 
 QVariant Setting::value() const
 {
-    const QString &section(_section.isEmpty() ? _defaultSection : _section);
-
+    PANORAMA_PRIVATE(const Setting);
     if(_settings)
-        return _settings->setting(section, _key);
+        return _settings->setting(priv->section, priv->key);
     else
         return QVariant();
 }
@@ -83,23 +124,32 @@ QVariant Setting::value() const
 void Setting::handleFieldChange(const QString &section, const QString &key,
                                 const QVariant &value)
 {
-    const QString &s(_section.isEmpty() ? _defaultSection : _section);
-    if(s == section && _key == key)
+    PANORAMA_PRIVATE(Setting);
+    if(priv->section == section && priv->key == key)
         emit valueChanged(value);
 }
 
-void Setting::maybeInsertDefault()
+void SettingPrivate::maybeInsertDefault()
 {
-    const QString &section(_section.isEmpty() ? _defaultSection : _section);
-
-    if(!section.isEmpty() && !_key.isEmpty() && _settings &&
-       !_settings->setting(section, _key).isValid() &&
-       _default.isValid())
+    if(!section.isEmpty() && !key.isEmpty() && _settings &&
+       !_settings->setting(section, key).isValid() &&
+       defaultValue.isValid())
     {
-        _settings->setSetting(section, _key, _default, SettingsSource::External);
+        _settings->setSetting(section, key, defaultValue, SettingsSource::External);
     }
 }
 
-QString Setting::_defaultSection;
-SettingsSource *Setting::_settings;
-
+void SettingPrivate::wire()
+{
+    PANORAMA_PUBLIC(Setting);
+    if(!_settings) {
+        _configuration = new Configuration();
+        _settings = _configuration->generalConfig();
+        pub->connect(_settings, SIGNAL(settingChanged(QString,QString,QVariant,SettingsSource::ChangeSource)),
+                     pub, SLOT(handleFieldChange(QString,QString,QVariant)));
+        _configuration->loadConfiguration();
+    } else {
+        pub->connect(_settings, SIGNAL(settingChanged(QString,QString,QVariant,SettingsSource::ChangeSource)),
+                     pub, SLOT(handleFieldChange(QString,QString,QVariant)));
+    }
+}

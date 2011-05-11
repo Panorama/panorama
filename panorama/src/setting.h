@@ -1,12 +1,16 @@
 #ifndef SETTING_H
 #define SETTING_H
 
+#include "panoramainternal.h"
+
 #include <QObject>
 #include <QString>
-#include <QHash>
+#include <QVariant>
 #include <qdeclarative.h>
 
 #include "settingssource.h"
+
+class SettingPrivate;
 
 /**
  * A QML object for accessing the settings API
@@ -18,9 +22,11 @@ class Setting : public QObject
     Q_PROPERTY(QString  key READ key WRITE setKey NOTIFY keyChanged)
     Q_PROPERTY(QVariant value READ value WRITE setValue NOTIFY valueChanged)
     Q_PROPERTY(QVariant defaultValue READ defaultValue WRITE setDefaultValue NOTIFY defaultValueChanged)
+    PANORAMA_DECLARE_PRIVATE(Setting)
 public:
     /** Constructs a new Setting instance */
     explicit Setting(QObject *parent = 0);
+    ~Setting();
 
     Setting(const QString &section, const QString &key, QObject *parent = 0);
     Setting(const QString &section, const QString &key, const QVariant &defaultValue, QObject *parent = 0);
@@ -29,48 +35,25 @@ public:
     void setSection(const QString &section);
 
     /** Retrieves the section of this setting */
-    QString section() const
-    {
-        return _section;
-    }
+    QString section() const;
 
     /** Sets the key for this setting */
     void setKey(const QString &key);
 
     /** Retrieves the key for this setting */
-    QString key() const
-    {
-        return _key;
-    }
+    QString key() const;
 
     /** Sets the default value of this setting */
     void setDefaultValue(const QVariant &value);
 
     /** Retrieves the default value of this setting */
-    QVariant defaultValue() const
-    {
-        return _default;
-    }
+    QVariant defaultValue() const;
 
     /** Sets the value of this setting */
     void setValue(const QVariant &value);
 
     /** Retrieves the value of this setting */
     QVariant value() const;
-
-    /** Sets the default section for all Setting instances */
-    static void setDefaultSection(const QString &section)
-    {
-        _defaultSection = section;
-    }
-
-    /** Retrieves the default section for all Setting instances */
-    static QString defaultSection() {
-        return _defaultSection;
-    }
-
-    /** Sets the settings source for the settings API */
-    static void setSettingsSource(SettingsSource *value);
 
 signals:
     /** This setting has a new section */
@@ -85,19 +68,9 @@ signals:
     /** The value of this setting was changed */
     void valueChanged(const QVariant &value);
 
-private slots:
+protected slots:
     void handleFieldChange(const QString &section, const QString &key,
                            const QVariant &value);
-
-private:
-    void maybeInsertDefault();
-
-    QString _section;
-    QString _key;
-    QVariant _default;
-
-    static QString _defaultSection;
-    static SettingsSource *_settings;
 };
 
 QML_DECLARE_TYPE(Setting);

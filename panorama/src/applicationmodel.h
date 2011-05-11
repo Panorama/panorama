@@ -1,23 +1,27 @@
 #ifndef APPLICATIONMODEL_H
 #define APPLICATIONMODEL_H
 
+#include "panoramainternal.h"
+
 #include <QObject>
+#include <QString>
 #include <QAbstractItemModel>
 #include <qdeclarative.h>
-
-#include "appaccumulator.h"
 #include "application.h"
-#include "applicationfiltermethods.h"
+
+class ApplicationModelPrivate;
 
 /**
  * A model for modelling a source of launchable applications.
  */
 class ApplicationModel : public QAbstractListModel
 {
-Q_OBJECT
+    Q_OBJECT
+    PANORAMA_DECLARE_PRIVATE(ApplicationModel)
 public:
     /** Constructs a new ApplicationModel instance */
     explicit ApplicationModel(QObject *parent = 0);
+    ~ApplicationModel();
 
     /** The roles that an ApplicationModel accepts */
     enum Roles
@@ -29,7 +33,7 @@ public:
         Version = Qt::UserRole + 4,
         Categories = Qt::UserRole + 5,
         Preview = Qt::UserRole + 6,
-        Clockspeed = Qt::UserRole + 7
+        Clockspeed = Qt::UserRole + 7,
     };
 
     /** Returns the number of items in this model */
@@ -61,10 +65,6 @@ public slots:
 
     /** An Application should be removed, if it exists */
     void removeApp(const Application &app);
-
-private:
-    QList<Application> _apps;
-    QHash<int, QByteArray> _roles;
 };
 
 #endif // APPLICATIONMODEL_H

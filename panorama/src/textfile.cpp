@@ -1,33 +1,53 @@
 #include "textfile.h"
 
-TextFile::TextFile(QObject*parent) :
-    QObject(parent)
-{}
+class TextFilePrivate
+{
+    PANORAMA_DECLARE_PUBLIC(TextFile)
+public:
+    void loadFile(const QString &source);
+    QString source;
+    QString data;
+};
+
+TextFile::TextFile(QObject*parent)
+    : QObject(parent)
+{
+    PANORAMA_INITIALIZE(TextFile);
+}
+
+TextFile::~TextFile()
+{
+    PANORAMA_UNINITIALIZE(TextFile);
+}
 
 QString TextFile::source() const
 {
-    return _source;
+    PANORAMA_PRIVATE(const TextFile);
+    return priv->source;
 }
 
 void TextFile::setSource(const QString &value)
 {
-    if(_source != value)
+    PANORAMA_PRIVATE(TextFile);
+    if(priv->source != value)
     {
-        _source = value;
-        emit sourceChanged(_source);
-        loadFile(_source);
+        priv->source = value;
+        emit sourceChanged(priv->source);
+        priv->loadFile(priv->source);
     }
 }
 
 QString TextFile::data() const
 {
-    return _data;
+    PANORAMA_PRIVATE(const TextFile);
+    return priv->data;
 }
 
-void TextFile::loadFile(const QString &source)
+void TextFilePrivate::loadFile(const QString &source)
 {
+    PANORAMA_PUBLIC(TextFile);
     //XXX: this does not work for all themes!
-    QString path(qmlContext(this)->baseUrl().toLocalFile());
+    QString path(qmlContext(pub)->baseUrl().toLocalFile());
     path.resize(path.lastIndexOf("/") + 1);
     path.append(source);
     QFile file(path);
@@ -38,8 +58,8 @@ void TextFile::loadFile(const QString &source)
         return;
     }
     QTextStream in(&file);
-    _data = in.readAll();
+    data = in.readAll();
     file.close();
 
-    emit dataChanged(_data);
+    emit pub->dataChanged(data);
 }

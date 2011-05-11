@@ -1,36 +1,126 @@
 #include "systeminformation.h"
 #include <QStringList>
 
-SystemInformation::SystemInformation(QObject *parent) :
-    QObject(parent)
-{
-    _ram = 0;
-    _usedRam = 0;
-    _swap = 0;
-    _usedSwap = 0;
-    _sd1 = 0;
-    _usedSd1 = 0;
-    _sd2 = 0;
-    _usedSd2 = 0;
+#include <QTimer>
+#include <QFile>
+#include <QTextStream>
 
-    _lastCpuTime = 0;
-    _lastUsedCpuTime = 0;
+extern "C"
+{
+#include <sys/statvfs.h>
+}
+
+class SystemInformationPrivate
+{
+    PANORAMA_DECLARE_PUBLIC(SystemInformation)
+public:
+    SystemInformationPrivate();
+    void updateMem();
+    void updateCpu();
+    void updateSd();
+
+    QTimer timer;
+    long long lastUsedCpuTime;
+    long long lastCpuTime;
+    int cpu;
+    int usedCpu;
+    int ram;
+    int usedRam;
+    int swap;
+    int usedSwap;
+    int sd1;
+    int usedSd1;
+    int sd2;
+    int usedSd2;
+};
+
+SystemInformation::SystemInformation(QObject *parent) :
+        QObject(parent)
+{
+    PANORAMA_INITIALIZE(SystemInformation);
 
     update();
-    connect(&_timer, SIGNAL(timeout()), this, SLOT(update()));
-    _timer.setInterval(1000);
-    _timer.start();
+    connect(&priv->timer, SIGNAL(timeout()), this, SLOT(update()));
+    priv->timer.setInterval(1000);
+    priv->timer.start();
+}
+
+SystemInformation::~SystemInformation()
+{
+    PANORAMA_UNINITIALIZE(SystemInformation);
 }
 
 void SystemInformation::update()
 {
-    updateCpu();
-    updateMem();
-    updateSd();
+    PANORAMA_PRIVATE(SystemInformation);
+    priv->updateCpu();
+    priv->updateMem();
+    priv->updateSd();
 }
 
-void SystemInformation::updateCpu()
+int SystemInformation::cpu() const
 {
+    PANORAMA_PRIVATE(const SystemInformation);
+    return priv->cpu;
+}
+
+int SystemInformation::usedCpu() const
+{
+    PANORAMA_PRIVATE(const SystemInformation);
+    return priv->usedCpu;
+}
+
+int SystemInformation::ram() const
+{
+    PANORAMA_PRIVATE(const SystemInformation);
+    return priv->ram;
+}
+
+int SystemInformation::usedRam() const
+{
+    PANORAMA_PRIVATE(const SystemInformation);
+    return priv->usedRam;
+}
+
+int SystemInformation::swap() const
+{
+    PANORAMA_PRIVATE(const SystemInformation);
+    return priv->swap;
+}
+
+int SystemInformation::usedSwap() const
+{
+    PANORAMA_PRIVATE(const SystemInformation);
+    return priv->usedSwap;
+}
+
+int SystemInformation::sd1() const
+{
+    PANORAMA_PRIVATE(const SystemInformation);
+    return priv->sd1;
+}
+
+int SystemInformation::usedSd1() const
+{
+    PANORAMA_PRIVATE(const SystemInformation);
+    return priv->usedSd1;
+}
+
+int SystemInformation::sd2() const
+{
+    PANORAMA_PRIVATE(const SystemInformation);
+    return priv->sd2;
+}
+
+int SystemInformation::usedSd2() const
+{
+    PANORAMA_PRIVATE(const SystemInformation);
+    return priv->usedSd2;
+}
+
+void SystemInformationPrivate::updateCpu()
+{
+    PANORAMA_PUBLIC(SystemInformation);
     QFile stat("/proc/stat");
     if(!stat.open(QFile::Text | QFile::ReadOnly | QFile::Unbuffered))
         return;
@@ -52,33 +142,34 @@ void SystemInformation::updateCpu()
 
 
         int tmp = user + system + nice + idle;
-        if(_lastCpuTime)
+        if(lastCpuTime)
         {
-            int value = tmp - _lastCpuTime;
-            if(_cpu != value)
+            int value = tmp - lastCpuTime;
+            if(cpu != value)
             {
-                _cpu = value;
-                emit cpuUpdated(_cpu);
+                cpu = value;
+                emit pub->cpuUpdated(cpu);
             }
         }
-        _lastCpuTime = tmp;
+        lastCpuTime = tmp;
 
         tmp = user + system;
-        if(_lastUsedCpuTime)
+        if(lastUsedCpuTime)
         {
-            int value = tmp - _lastUsedCpuTime;
-            if(_usedCpu != value)
+            int value = tmp - lastUsedCpuTime;
+            if(usedCpu != value)
             {
-                _usedCpu = value;
-                emit usedCpuUpdated(_usedCpu);
+                usedCpu = value;
+                emit pub->usedCpuUpdated(usedCpu);
             }
         }
-        _lastUsedCpuTime = tmp;
+        lastUsedCpuTime = tmp;
     }
 }
 
-void SystemInformation::updateSd()
+void SystemInformationPrivate::updateSd()
 {
+    PANORAMA_PUBLIC(SystemInformation);
     struct statvfs fs;
     int newSd1(0), newUsedSd1(0), newSd2(0), newUsedSd2(0);
 
@@ -118,31 +209,32 @@ void SystemInformation::updateSd()
     }
     mounts.close();
 
-    if(_sd1 != newSd1)
+    if(sd1 != newSd1)
     {
-        _sd1 = newSd1;
-        emit sd1Updated(_sd1);
+        sd1 = newSd1;
+        emit pub->sd1Updated(sd1);
     }
-    if(_usedSd1 != newUsedSd1)
+    if(usedSd1 != newUsedSd1)
     {
-        _usedSd1 = newUsedSd1;
-        emit usedSd1Updated(_usedSd1);
+        usedSd1 = newUsedSd1;
+        emit pub->usedSd1Updated(usedSd1);
     }
 
-    if(_sd2 != newSd2)
+    if(sd2 != newSd2)
     {
-        _sd2 = newSd2;
-        emit sd2Updated(_sd2);
+        sd2 = newSd2;
+        emit pub->sd2Updated(sd2);
     }
-    if(_usedSd2 != newUsedSd2)
+    if(usedSd2 != newUsedSd2)
     {
-        _usedSd2 = newUsedSd2;
-        emit usedSd2Updated(_usedSd2);
+        usedSd2 = newUsedSd2;
+        emit pub->usedSd2Updated(usedSd2);
     }
 }
 
-void SystemInformation::updateMem()
+void SystemInformationPrivate::updateMem()
 {
+    PANORAMA_PUBLIC(SystemInformation);
     int newUsedRam, newUsedSwap;
     int freeRam = 0, bufferRam = 0, cacheRam = 0, freeSwap = 0;
     int newRam = 0, newSwap = 0;
@@ -185,28 +277,43 @@ void SystemInformation::updateMem()
     newUsedSwap = newSwap - freeSwap;
     newUsedRam = newRam - freeRam - bufferRam - cacheRam;
 
-    if(_ram != newRam)
+    if(ram != newRam)
     {
-        _ram = newRam;
-        emit ramUpdated(_ram);
+        ram = newRam;
+        emit pub->ramUpdated(ram);
     }
 
-    if(_usedRam != newUsedRam)
+    if(usedRam != newUsedRam)
     {
-        _usedRam = newUsedRam;
-        emit usedRamUpdated(_usedRam);
+        usedRam = newUsedRam;
+        emit pub->usedRamUpdated(usedRam);
     }
 
-    if(_swap != newSwap)
+    if(swap != newSwap)
     {
-        _swap = newSwap;
-        emit swapUpdated(_swap);
+        swap = newSwap;
+        emit pub->swapUpdated(swap);
     }
 
-    if(_usedSwap != newUsedSwap)
+    if(usedSwap != newUsedSwap)
     {
-        _usedSwap = newUsedSwap;
-        emit usedSwapUpdated(_usedSwap);
+        usedSwap = newUsedSwap;
+        emit pub->usedSwapUpdated(usedSwap);
     }
+}
+
+SystemInformationPrivate::SystemInformationPrivate()
+{
+    ram = 0;
+    usedRam = 0;
+    swap = 0;
+    usedSwap = 0;
+    sd1 = 0;
+    usedSd1 = 0;
+    sd2 = 0;
+    usedSd2 = 0;
+
+    lastCpuTime = 0;
+    lastUsedCpuTime = 0;
 }
 

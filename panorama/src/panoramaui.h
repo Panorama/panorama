@@ -1,6 +1,8 @@
 #ifndef PANORAMASKIN_H
 #define PANORAMASKIN_H
 
+#include "panoramainternal.h"
+
 #include <QObject>
 #include <QString>
 #include <QProcess>
@@ -11,22 +13,23 @@
 #include "constants.h"
 #include "setting.h"
 
+class PanoramaUIPrivate;
+
 /**
  * The base class for all PanoramaUI instances.
  * This class is extended from actual .qml files via the QtScript core
  */
 class PanoramaUI : public QDeclarativeItem
 {
-Q_OBJECT
-Q_PROPERTY(QString  name        READ name           WRITE setName)
-Q_PROPERTY(QString  description READ description    WRITE setDescription)
-Q_PROPERTY(QString  author      READ author         WRITE setAuthor)
-Q_PROPERTY(QString settingsSection READ settingsSection WRITE setSettingsSection)
-Q_PROPERTY(QVariant applications READ applications  NOTIFY applicationsUpdated)
-
+    Q_OBJECT
+    Q_PROPERTY(QString name        READ name        WRITE setName)
+    Q_PROPERTY(QString description READ description WRITE setDescription)
+    Q_PROPERTY(QString author      READ author      WRITE setAuthor)
+    PANORAMA_DECLARE_PRIVATE(PanoramaUI)
 public:
     /** Constructs a new PanoramaUI instance */
     explicit PanoramaUI(QDeclarativeItem *parent = 0);
+    ~PanoramaUI();
 
     /** Gets the name */
     QString name() const;
@@ -46,41 +49,13 @@ public:
     /** Sets the author */
     void setAuthor(const QString&);
 
-    /** Gets the default settings section */
-    QString settingsSection() const;
-
-    /** Sets the default settings section */
-    void setSettingsSection(const QString &);
-
-    /** Gets the current application model */
-    QVariant applications() const;
-
-    /** Sets the application model source */
-    static void setApplicationsSource(QAbstractItemModel *value);
-
-    /** QML helper method for executing the application with the given id */
-    Q_INVOKABLE void execute(const QString &sha1);
-
 public slots:
-    /** Called when application data has changed */
-    void propagateApplicationDataChange();
-
     /** Called when this instance has been loaded */
     void indicateLoadFinished();
 
 signals:
-    /** The application source has been updated */
-    void applicationsUpdated(QVariant value);
-
     /** This UI has finished loading */
     void loaded();
-
-private:
-    QString _name;
-    QString _description;
-    QString _author;
-
-    static QVariant _apps;
 };
 
 //Makes this type available in QML

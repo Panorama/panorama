@@ -4,6 +4,7 @@
 #include <QGLWidget>
 #endif
 #include <QCoreApplication>
+#include <QDir>
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent)
@@ -17,8 +18,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Create our Canvas that we'll use later for the UI
     _canvas.setParent(this);
-    _canvas.rootContext()->setContextProperty("ctxtHeight", UI_HEIGHT);
-    _canvas.rootContext()->setContextProperty("ctxtWidth", UI_WIDTH);
     _canvas.setSource(QUrl("qrc:/root.qml"));
     _canvas.setFocusPolicy(Qt::StrongFocus);
     this->setCentralWidget(&_canvas);
@@ -39,25 +38,9 @@ MainWindow::MainWindow(QWidget *parent) :
     _canvas.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     _canvas.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    _model.setParent(this);
-    PanoramaUI::setApplicationsSource(&_model);
-
-    //Set up the application loading/unloading procedure
-    _accumulator.setParent(this);
-    connect(&_accumulator, SIGNAL(appAdded(Application)),
-            &_model, SLOT(addApp(Application)));
-    connect(&_accumulator, SIGNAL(appRemoved(Application)),
-            &_model, SLOT(removeApp(Application)));
-
-    qRegisterMetaType<Application>("Application");
-
-    //Load some actual applications from paths
-    loadApps();
-
     //Set up UI loading and channel quit() events from QML
     connect(_canvas.engine(), SIGNAL(quit()), this, SLOT(close()));
     connect(this, SIGNAL(uiChanged(QString)), this, SLOT(loadUIFile(QString)));
-    Setting::setSettingsSource(_config.generalConfig());
 
     _uiSetting = new Setting("panorama", "ui", QVariant(), this);
     _uiDirSetting = new Setting("panorama", "uiDirectory", QVariant(), this);
@@ -66,8 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_uiSetting, SIGNAL(valueChanged(QVariant)), this, SLOT(changeUI()));
     connect(_uiDirSetting, SIGNAL(valueChanged(QVariant)), this, SLOT(changeUI()));
     connect(_fullscreenSetting, SIGNAL(valueChanged(QVariant)), this, SLOT(changeFullscreen()));
-
-    _config.loadConfiguration();
+    changeFullscreen();
+    changeUI();
 }
 
 void MainWindow::loadUIFile(const QString &file)
@@ -78,7 +61,6 @@ void MainWindow::loadUIFile(const QString &file)
 
     //Create a generic component from the file
     _component = new QDeclarativeComponent(_canvas.engine(), file, this);
-
 
     //Check if the component has errors and print them
     printError(_component);
@@ -132,10 +114,7 @@ void MainWindow::continueLoadingUI()
         if(_ui)
         {
             _ui->setParentItem(qobject_cast<QDeclarativeItem*>(_canvas.rootObject()));
-            connect(&_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
-                    _ui, SLOT(propagateApplicationDataChange()));
             _ui->indicateLoadFinished();
-            _ui->propagateApplicationDataChange();
         }
         else
             qWarning() << "The specified UI file does not contain "
@@ -183,19 +162,4 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
     {
         _fullscreenSetting->setValue(!_fullscreenSetting->value().toBool());
     }
-}
-
-void MainWindow::loadApps() {
-    QStringList list;
-    QStringList tmp;
-
-    //XXX add whatever additional path that pndnotifyd spits .desktop files into
-    tmp << QDir::root().filePath("usr") << "share" << "applications";
-    list.append(tmp.join(QDir::separator()));
-
-    tmp.clear();
-    tmp << QDir::homePath() << ".local" << "share" << "applications";
-    list.append(tmp.join(QDir::separator()));
-
-    _accumulator.loadFrom(list);
 }

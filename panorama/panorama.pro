@@ -67,6 +67,7 @@ HEADERS += src/mainwindow.h \
     src/pandoraeventsource.h \
     src/pandora.h \
     src/pandoraattached.h \
-    src/pandoraeventlistener.h
+    src/pandoraeventlistener.h \
+    src/panoramainternal.h
 OTHER_FILES += qrc/root.qml
 RESOURCES += qrc/default.qrc

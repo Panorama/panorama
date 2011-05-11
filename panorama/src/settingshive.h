@@ -1,20 +1,23 @@
 #ifndef SETTINGSHIVE_H
 #define SETTINGSHIVE_H
 
-#include "settingssource.h"
+#include "panoramainternal.h"
 
 #include <QObject>
 #include <QString>
-#include <QTextStream>
-#include <QHash>
 #include <QSettings>
+
+#include "settingssource.h"
+
+class SettingsHivePrivate;
 
 class SettingsHive : public SettingsSource
 {
-Q_OBJECT
+    Q_OBJECT
+    PANORAMA_DECLARE_PRIVATE(SettingsHive)
 public:
     explicit SettingsHive(QObject *parent = 0);
-
+    SettingsHive(const QSettings &in, QObject *parent = 0);
     ~SettingsHive();
 
     void writeSettings(QSettings &out) const;
@@ -25,9 +28,6 @@ public:
 public slots:
     void setSetting(const QString &section, const QString &key,
                     const QVariant &value, SettingsSource::ChangeSource source = SettingsSource::Unknown);
-
-private:
-    QHash<QString, QHash<QString, QVariant> *> *_store;
 };
 
 #endif // SETTINGSHIVE_H

@@ -1,27 +1,42 @@
 #include "settingshive.h"
-#include <QStringList>
-#include <QDebug>
 
-SettingsHive::SettingsHive(QObject *parent) :
-        SettingsSource(parent)
+#include <QStringList>
+
+class SettingsHivePrivate
 {
-    _store = new QHash<QString, QHash<QString, QVariant> *>;
+    PANORAMA_DECLARE_PUBLIC(SettingsHive)
+public:
+    explicit SettingsHivePrivate();
+    ~SettingsHivePrivate();
+    QHash<QString, QHash<QString, QVariant> *> *store;
+};
+
+SettingsHive::SettingsHive(QObject *parent)
+    : SettingsSource(parent)
+{
+    PANORAMA_INITIALIZE(SettingsHive);
+}
+
+SettingsHive::SettingsHive(const QSettings &in, QObject *parent)
+    : SettingsSource(parent)
+{
+    PANORAMA_INITIALIZE(SettingsHive);
+    readSettings(in);
 }
 
 SettingsHive::~SettingsHive()
 {
-    foreach(const QString &key, _store->keys())
-        delete _store->value(key);
-    delete _store;
+    PANORAMA_UNINITIALIZE(SettingsHive);
 }
 
 void SettingsHive::writeSettings(QSettings &out) const
 {
-    foreach(const QString &section, _store->keys())
+    PANORAMA_PRIVATE(const SettingsHive);
+    foreach(const QString &section, priv->store->keys())
     {
-        foreach(const QString &key, _store->value(section)->keys())
+        foreach(const QString &key, priv->store->value(section)->keys())
         {
-            const QVariant value =  _store->value(section)->value(key);
+            const QVariant value =  priv->store->value(section)->value(key);
             const QString actualKey = QString(section).append("/").append(key);
             if(value.isValid())
                 out.setValue(actualKey, value);
@@ -44,9 +59,10 @@ void SettingsHive::readSettings(const QSettings &in)
 
 QVariant SettingsHive::setting(const QString &section, const QString &key) const
 {
-    if(_store && _store->contains(section) &&
-       _store->value(section)->contains(key))
-        return _store->value(section)->value(key);
+    PANORAMA_PRIVATE(const SettingsHive);
+    if(priv->store && priv->store->contains(section) &&
+       priv->store->value(section)->contains(key))
+        return priv->store->value(section)->value(key);
     else
         return QVariant();
 }
@@ -55,15 +71,28 @@ void SettingsHive::setSetting(const QString &section, const QString &key,
                               const QVariant &value,
                               SettingsHive::ChangeSource source)
 {
-    if(_store)
+    PANORAMA_PRIVATE(const SettingsHive);
+    if(priv->store)
     {
-        if(!_store->contains(section))
-            _store->insert(section, new QHash<QString, QVariant>);
+        if(!priv->store->contains(section))
+            priv->store->insert(section, new QHash<QString, QVariant>);
 
-        if(_store->value(section)->value(key) != value)
+        if(priv->store->value(section)->value(key) != value)
         {
-            _store->value(section)->insert(key, value);
+            priv->store->value(section)->insert(key, value);
             emit settingChanged(section, key, value, source);
         }
     }
+}
+
+SettingsHivePrivate::SettingsHivePrivate()
+{
+    store = new QHash<QString, QHash<QString, QVariant> *>;
+}
+
+SettingsHivePrivate::~SettingsHivePrivate()
+{
+    foreach(const QString &key, store->keys())
+        delete store->value(key);
+    delete store;
 }

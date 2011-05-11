@@ -22,8 +22,6 @@ public:
      * already
      */
     static QString findIcon(const QString &iconName, const QString &fallback = "");
-
-private:
 };
 
 #endif // ICONFINDER_H

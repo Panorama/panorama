@@ -5,11 +5,27 @@
 
 #include "pandora.h"
 #include "pnd_io_evdev.h"
+#include "pandoraeventlistener.h"
+
+class PandoraEventSourcePrivate
+{
+    PANORAMA_DECLARE_PUBLIC(PandoraEventSource)
+public:
+    explicit PandoraEventSourcePrivate();
+    inline void emitKeyEvent(const int key, const bool press);
+    inline void testKey(const int prevState, const int currentState, const int mask, const int keyToEmit);
+
+    int prevState;
+    bool hasReceivedInput;
+};
+
+PandoraEventListener *_pandoraeventsource_eventListener;
+#define _eventListener _pandoraeventsource_eventListener
 
 PandoraEventSource::PandoraEventSource(QObject *parent) :
-        QObject(parent), _prevState(0),
-        _hasReceivedInput(false)
+        QObject(parent)
 {
+    PANORAMA_INITIALIZE(PandoraEventSource);
     if(!_eventListener)
     {
         _eventListener = new PandoraEventListener();
@@ -20,6 +36,11 @@ PandoraEventSource::PandoraEventSource(QObject *parent) :
     connect(_eventListener, SIGNAL(newEvent(int)), this, SLOT(handleEvent(int)));
 }
 
+PandoraEventSource::~PandoraEventSource()
+{
+    PANORAMA_UNINITIALIZE(PandoraEventSource);
+}
+
 bool PandoraEventSource::isActive()
 {
     return _eventListener->isActive();
@@ -27,45 +48,53 @@ bool PandoraEventSource::isActive()
 
 void PandoraEventSource::handleEvent(const int dpadState)
 {
-    if(!_hasReceivedInput)
+    PANORAMA_PRIVATE(PandoraEventSource);
+    if(!priv->hasReceivedInput)
     {
-        _prevState = dpadState;
-        _hasReceivedInput = true;
+        priv->prevState = dpadState;
+        priv->hasReceivedInput = true;
         return;
     }
 
-    if(dpadState == _prevState)
+    int prevState = priv->prevState;
+
+    if(dpadState == prevState)
         return;
 
-    testKey(_prevState, dpadState, pnd_evdev_left, Pandora::DPadLeft);
-    testKey(_prevState, dpadState, pnd_evdev_right, Pandora::DPadRight);
-    testKey(_prevState, dpadState, pnd_evdev_up, Pandora::DPadUp);
-    testKey(_prevState, dpadState, pnd_evdev_down, Pandora::DPadDown);
-    testKey(_prevState, dpadState, pnd_evdev_x, Pandora::ButtonX);
-    testKey(_prevState, dpadState, pnd_evdev_y, Pandora::ButtonY);
-    testKey(_prevState, dpadState, pnd_evdev_a, Pandora::ButtonA);
-    testKey(_prevState, dpadState, pnd_evdev_b, Pandora::ButtonB);
-    testKey(_prevState, dpadState, pnd_evdev_start, Pandora::ButtonStart);
-    testKey(_prevState, dpadState, pnd_evdev_select, Pandora::ButtonSelect);
-    testKey(_prevState, dpadState, pnd_evdev_pandora, Pandora::ButtonPandora);
-    testKey(_prevState, dpadState, pnd_evdev_ltrigger, Pandora::TriggerL);
-    testKey(_prevState, dpadState, pnd_evdev_rtrigger, Pandora::TriggerR);
+    priv->testKey(prevState, dpadState, pnd_evdev_left, Pandora::DPadLeft);
+    priv->testKey(prevState, dpadState, pnd_evdev_right, Pandora::DPadRight);
+    priv->testKey(prevState, dpadState, pnd_evdev_up, Pandora::DPadUp);
+    priv->testKey(prevState, dpadState, pnd_evdev_down, Pandora::DPadDown);
+    priv->testKey(prevState, dpadState, pnd_evdev_x, Pandora::ButtonX);
+    priv->testKey(prevState, dpadState, pnd_evdev_y, Pandora::ButtonY);
+    priv->testKey(prevState, dpadState, pnd_evdev_a, Pandora::ButtonA);
+    priv->testKey(prevState, dpadState, pnd_evdev_b, Pandora::ButtonB);
+    priv->testKey(prevState, dpadState, pnd_evdev_start, Pandora::ButtonStart);
+    priv->testKey(prevState, dpadState, pnd_evdev_select, Pandora::ButtonSelect);
+    priv->testKey(prevState, dpadState, pnd_evdev_pandora, Pandora::ButtonPandora);
+    priv->testKey(prevState, dpadState, pnd_evdev_ltrigger, Pandora::TriggerL);
+    priv->testKey(prevState, dpadState, pnd_evdev_rtrigger, Pandora::TriggerR);
 
-    _prevState = dpadState;
+    priv->prevState = dpadState;
 }
 
-void PandoraEventSource::emitKeyEvent(const int key, const bool press)
+void PandoraEventSourcePrivate::emitKeyEvent(const int key, const bool press)
 {
+    PANORAMA_PUBLIC(PandoraEventSource);
     if(press)
-        emit keyPressed(QKeyEvent(QKeyEvent::KeyPress, key, Qt::NoModifier));
+        emit pub->keyPressed(QKeyEvent(QKeyEvent::KeyPress, key, Qt::NoModifier));
     else
-        emit keyReleased(QKeyEvent(QKeyEvent::KeyRelease, key, Qt::NoModifier));
+        emit pub->keyReleased(QKeyEvent(QKeyEvent::KeyRelease, key, Qt::NoModifier));
 }
 
-void PandoraEventSource::testKey(const int prevState, const int currentState, const int mask, const int keyToEmit)
+void PandoraEventSourcePrivate::testKey(const int prevState, const int currentState, const int mask, const int keyToEmit)
 {
     if((currentState ^ prevState) & mask) //Key changed
         emitKeyEvent(keyToEmit, currentState & mask);
 }
 
-PandoraEventListener *PandoraEventSource::_eventListener(0);
+PandoraEventSourcePrivate::PandoraEventSourcePrivate()
+{
+    prevState = 0;
+    hasReceivedInput = false;
+}

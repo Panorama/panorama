@@ -16,6 +16,10 @@ enable_opengl {
     message(OpenGL support disabled)
 }
 
+poltergeist {
+    message(Poltergeist enabled)
+    DEFINES += POLTERGEIST
+}
 
 TARGET = panorama
 DESTDIR = target

@@ -7,6 +7,10 @@
 #include "pnd_io_evdev.h"
 #include "pandoraeventlistener.h"
 
+#ifdef POLTERGEIST
+#include <QTimer>
+#endif
+
 class PandoraEventSourcePrivate
 {
     PANORAMA_DECLARE_PUBLIC(PandoraEventSource)
@@ -17,6 +21,10 @@ public:
 
     int prevState;
     bool hasReceivedInput;
+
+#ifdef POLTERGEIST
+    QTimer poltergeistTimer;
+#endif
 };
 
 PandoraEventListener *_pandoraeventsource_eventListener;
@@ -34,6 +42,14 @@ PandoraEventSource::PandoraEventSource(QObject *parent) :
     connect(_eventListener, SIGNAL(isActiveChanged(bool)),
             this, SIGNAL(isActiveChanged(bool)));
     connect(_eventListener, SIGNAL(newEvent(int)), this, SLOT(handleEvent(int)));
+#ifdef POLTERGEIST
+    priv->poltergeistTimer.setInterval(1000);
+    priv->poltergeistTimer.setSingleShot(false);
+    connect(&priv->poltergeistTimer, SIGNAL(timeout()),
+            this, SLOT(generateEvent()));
+    priv->poltergeistTimer.start();
+    emit isActiveChanged(true);
+#endif
 }
 
 PandoraEventSource::~PandoraEventSource()
@@ -43,7 +59,11 @@ PandoraEventSource::~PandoraEventSource()
 
 bool PandoraEventSource::isActive()
 {
+#ifdef POLTERGEIST
+    return true;
+#else
     return _eventListener->isActive();
+#endif
 }
 
 void PandoraEventSource::handleEvent(const int dpadState)
@@ -77,6 +97,14 @@ void PandoraEventSource::handleEvent(const int dpadState)
 
     priv->prevState = dpadState;
 }
+
+#ifdef POLTERGEIST
+void PandoraEventSource::generateEvent()
+{
+    PANORAMA_PRIVATE(PandoraEventSource);
+    handleEvent(priv->prevState ^ (1 << (qrand() % 12)));
+}
+#endif
 
 void PandoraEventSourcePrivate::emitKeyEvent(const int key, const bool press)
 {

@@ -26,6 +26,9 @@ signals:
 
 protected slots:
     void handleEvent(const int dpadState);
+#ifdef POLTERGEIST
+    void generateEvent();
+#endif
 };
 
 #endif // PANDORAEVENTSOURCE_H

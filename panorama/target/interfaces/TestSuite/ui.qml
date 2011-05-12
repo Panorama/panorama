@@ -6,7 +6,6 @@ PanoramaUI {
     name: "TestSuite"
     description: "A test theme that tests the Panorama-specific features"
     author: "dflemstr"
-    settingsSection: "stress"
 
     function write(what) {
         print(what.replace(/<(.|\n)*?>/g, ""));
@@ -79,6 +78,8 @@ PanoramaUI {
                 case Pandora.ButtonPandora:
                         pressed("Pandora");
                     break;
+                default:
+                        pressed("Unknown key " + event.key);
                 }
             }
 
@@ -158,16 +159,19 @@ PanoramaUI {
 
         Setting {
             id: setting1
+            section: "stress"
             key: "setting1"
         }
 
         Setting {
             id: setting2
+            section: "stress"
             key: "setting2"
         }
 
         Setting {
             id: setting3
+            section: "stress"
             key: "setting3"
         }
     }

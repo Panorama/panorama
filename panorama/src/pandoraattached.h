@@ -13,9 +13,13 @@ public:
     bool controlsActive() const;
 
 signals:
-    void pressed(const PandoraKeyEvent &event);
-    void released(const PandoraKeyEvent &event);
+    void pressed(const QVariant &event);
+    void released(const QVariant &event);
     void controlsActiveUpdated(const bool state);
+
+protected slots:
+    void keyPressed(const PandoraKeyEvent &event);
+    void keyReleased(const PandoraKeyEvent &event);
 };
 
 #endif // PANDORAATTACHED_H

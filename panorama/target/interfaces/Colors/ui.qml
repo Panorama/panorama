@@ -7,7 +7,6 @@ PanoramaUI {
     name: "Colors (from PMenu)"
     description: "Put this file inside of a PMenu theme to make a Panorama UI out of it!"
     author: "dflemstr"
-    settingsSection: "pmenu-colors"
 
     TextFile { //TextFile isn't standard QML, but part of Panorama 1.0
         id: skinCfg
@@ -370,7 +369,7 @@ PanoramaUI {
             width: parent.width - 40
             height: parent.height - 20
             text: appBrowser.currentItem === null ? "" : (
-                (ui.selectedIndex != 4) ? ("Do you want to add \"" + appBrowser.currentItem.friendlyName + "\" to your favorites?") : 
+                (ui.selectedIndex != 4) ? ("Do you want to add \"" + appBrowser.currentItem.friendlyName + "\" to your favorites?") :
                 ("Do you want to remove \"" + appBrowser.currentItem.friendlyName + "\" from your favorites?"))
             wrapMode: Text.Wrap
 
@@ -438,30 +437,32 @@ PanoramaUI {
         width: applicationsBoxWidth + 10
         height: (iconScaleMin + applicationsSpacing * 0.5) * maxAppsPerPage + 40
         clip: true
-        Keys.onDigit2Pressed: { //The rightmost Pandora button
-            ui.showFavDialog = true;
-        }
-        Keys.onDigit1Pressed: {
-            execute(appBrowser.currentItem.ident);
+        Pandora.onPressed: {
+            if(event.key == Pandora.ButtonB) {
+                ui.showFavDialog = true;
+                event.handled = true;
+            } else if(event.key == Pandora.ButtonA) {
+                Applications.execute(appBrowser.currentItem.ident);
+            }
         }
 
         ListView {
             function determineModel(x) {
                 switch(x) {
                     case 0:
-                        return ui.applications.inCategory("Emulator").sortedBy("name", true);
+                        return Applications.list.inCategory("Emulator").sortedBy("name", true);
                     case 1:
-                        return ui.applications.inCategory("Game").sortedBy("name", true);
+                        return Applications.list.inCategory("Game").sortedBy("name", true);
                     case 2:
-                        return ui.applications.sortedBy("name", true);
+                        return Applications.list.sortedBy("name", true);
                     case 4:
                         if(favorites.value.length > 0)
-                            return ui.applications.matching("identifier", favorites.value).sortedBy("name", true);
+                            return Applications.list.matching("identifier", favorites.value).sortedBy("name", true);
                     default:
-                        return ui.applications.matching("identifier", "^$") //Lists nothing
+                        return Applications.list.matching("identifier", "^$") //Lists nothing
                 }
             }
-            
+
             id: appBrowser
             anchors.fill: parent
             anchors.topMargin: 20

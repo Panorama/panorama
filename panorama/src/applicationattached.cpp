@@ -3,6 +3,13 @@
 #include "pnd_conf.h"
 #include "pnd_apps.h"
 
+#ifdef Q_OS_UNIX
+extern "C"
+{
+#include <wordexp.h>
+}
+#endif
+
 #include "appaccumulator.h"
 #include "applicationmodel.h"
 #include <QDir>
@@ -49,18 +56,20 @@ ApplicationsAttached::ApplicationsAttached(QObject *parent) :
         paths.append((QStringList() << QDir::root().filePath("usr") << "share" << "applications").join(QDir::separator()));
         paths.append((QStringList() << QDir::homePath() << ".local" << "share" << "applications").join(QDir::separator()));
 
+#ifdef Q_OS_UNIX
+        //Check whether some paths contain home directory references à la "~/foo/" or "~david/foo"
         QStringList absolutePaths;
-        foreach(QString path, paths)
+        foreach(const QString &path, paths)
         {
-            QDir dir(path);
-            if(path.startsWith('~'))
-            {
-                dir.setPath(path.replace("~", QDir::homePath()));
-            }
-            absolutePaths << dir.absolutePath();
+            wordexp_t result;
+            wordexp(path.toLocal8Bit(), &result, 0);
+            absolutePaths << QDir(QString::fromLocal8Bit(result.we_wordv[0])).absolutePath();
         }
 
         _accumulator->loadFrom(absolutePaths);
+#else
+        _accumulator->loadFrom(paths);
+#endif
     }
 }
 

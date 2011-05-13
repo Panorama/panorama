@@ -45,16 +45,9 @@ ApplicationsAttached::ApplicationsAttached(QObject *parent) :
             QString menuPath = pnd_conf_get_as_char(h, (char *)PND_MENU_DOTDESKTOP_PATH_KEY);
             paths << menuPath.split(QRegExp(":"), QString::SkipEmptyParts);
         }
-        else
-        {
-            QStringList tmp;
-            tmp << QDir::root().filePath("usr") << "share" << "applications";
-            paths.append(tmp.join(QDir::separator()));
 
-            tmp.clear();
-            tmp << QDir::homePath() << ".local" << "share" << "applications";
-            paths.append(tmp.join(QDir::separator()));
-        }
+        paths.append((QStringList() << QDir::root().filePath("usr") << "share" << "applications").join(QDir::separator()));
+        paths.append((QStringList() << QDir::homePath() << ".local" << "share" << "applications").join(QDir::separator()));
 
         QStringList absolutePaths;
         foreach(QString path, paths)

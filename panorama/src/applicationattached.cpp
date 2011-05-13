@@ -14,6 +14,7 @@ extern "C"
 #include "applicationmodel.h"
 #include <QDir>
 #include <QProcess>
+#include <QDebug>
 
 AppAccumulator *_applicationattached_accumulator = 0;
 #define _accumulator _applicationattached_accumulator
@@ -52,6 +53,9 @@ ApplicationsAttached::ApplicationsAttached(QObject *parent) :
             QString menuPath = pnd_conf_get_as_char(h, (char *)PND_MENU_DOTDESKTOP_PATH_KEY);
             paths << menuPath.split(QRegExp(":"), QString::SkipEmptyParts);
         }
+        else
+            qWarning() << "Warning: No PND search path file found. "
+                    "This means that applications in non-default places won't be found.";
 
         paths.append((QStringList() << QDir::root().filePath("usr") << "share" << "applications").join(QDir::separator()));
         paths.append((QStringList() << QDir::homePath() << ".local" << "share" << "applications").join(QDir::separator()));

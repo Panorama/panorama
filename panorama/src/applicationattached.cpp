@@ -1,5 +1,8 @@
 #include "applicationattached.h"
 
+#include "pnd_conf.h"
+#include "pnd_apps.h"
+
 #include "appaccumulator.h"
 #include "applicationmodel.h"
 #include <QDir>
@@ -29,18 +32,42 @@ ApplicationsAttached::ApplicationsAttached(QObject *parent) :
         connect(_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
                 this, SIGNAL(listChanged()));
 
-        QStringList list;
-        QStringList tmp;
+        QStringList paths;
 
-        //XXX add whatever additional path that pndnotifyd spits .desktop files into
-        tmp << QDir::root().filePath("usr") << "share" << "applications";
-        list.append(tmp.join(QDir::separator()));
+        QString configpath = pnd_conf_query_searchpath();
+        pnd_conf_handle h = pnd_conf_fetch_by_id(pnd_conf_desktop, configpath.toUtf8().data());
 
-        tmp.clear();
-        tmp << QDir::homePath() << ".local" << "share" << "applications";
-        list.append(tmp.join(QDir::separator()));
+        if(h)
+        {
+            QString desktopPath = pnd_conf_get_as_char(h, (char *)PND_DESKTOP_DOTDESKTOP_PATH_KEY);
+            paths << desktopPath.split(QRegExp(":"), QString::SkipEmptyParts);
 
-        _accumulator->loadFrom(list);
+            QString menuPath = pnd_conf_get_as_char(h, (char *)PND_MENU_DOTDESKTOP_PATH_KEY);
+            paths << menuPath.split(QRegExp(":"), QString::SkipEmptyParts);
+        }
+        else
+        {
+            QStringList tmp;
+            tmp << QDir::root().filePath("usr") << "share" << "applications";
+            paths.append(tmp.join(QDir::separator()));
+
+            tmp.clear();
+            tmp << QDir::homePath() << ".local" << "share" << "applications";
+            paths.append(tmp.join(QDir::separator()));
+        }
+
+        QStringList absolutePaths;
+        foreach(QString path, paths)
+        {
+            QDir dir(path);
+            if(path.startsWith('~'))
+            {
+                dir.setPath(path.replace("~", QDir::homePath()));
+            }
+            absolutePaths << dir.absolutePath();
+        }
+
+        _accumulator->loadFrom(absolutePaths);
     }
 }
 

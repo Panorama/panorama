@@ -121,6 +121,10 @@ void AppAccumulator::rescanDir(const QString &d)
                 //Retain file with new time stamp
                 newFiles += AppAccumulatorPrivate::FileInfo(oldFile.name, lm);
             }
+            else
+            {
+                newFiles += oldFile;
+            }
 
             //Remove "new file mark"
             diff.removeOne(oldFile.name);

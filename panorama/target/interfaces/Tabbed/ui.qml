@@ -145,10 +145,10 @@ PanoramaUI {
             }
 
             Pandora.onPressed: {
-                if(event.key == Pandora.TriggerR) {
+                if(event.key == Pandora.TriggerL) {
                     prevTab();
                     event.accepted = true;
-                } else if(event.key == Pandora.TriggerL) {
+                } else if(event.key == Pandora.TriggerR) {
                     nextTab();
                     event.accepted = true;
                 }

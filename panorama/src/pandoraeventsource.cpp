@@ -20,7 +20,6 @@ public:
     inline void testKey(const int prevState, const int currentState, const int mask, const int keyToEmit);
 
     int prevState;
-    bool hasReceivedInput;
 
 #ifdef POLTERGEIST
     QTimer poltergeistTimer;
@@ -69,12 +68,6 @@ bool PandoraEventSource::isActive()
 void PandoraEventSource::handleEvent(const int dpadState)
 {
     PANORAMA_PRIVATE(PandoraEventSource);
-    if(!priv->hasReceivedInput)
-    {
-        priv->prevState = dpadState;
-        priv->hasReceivedInput = true;
-        return;
-    }
 
     int prevState = priv->prevState;
 
@@ -124,5 +117,4 @@ void PandoraEventSourcePrivate::testKey(const int prevState, const int currentSt
 PandoraEventSourcePrivate::PandoraEventSourcePrivate()
 {
     prevState = 0;
-    hasReceivedInput = false;
 }

@@ -43,7 +43,7 @@ ApplicationsAttached::ApplicationsAttached(QObject *parent) :
         QStringList paths;
 
         QString configpath = pnd_conf_query_searchpath();
-        pnd_conf_handle h = pnd_conf_fetch_by_id(pnd_conf_desktop, configpath.toUtf8().data());
+        pnd_conf_handle h = pnd_conf_fetch_by_id(pnd_conf_desktop, configpath.toLocal8Bit().data());
 
         if(h)
         {

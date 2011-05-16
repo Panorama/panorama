@@ -13,8 +13,6 @@
 
 #include "configuration.h"
 #include "panoramaui.h"
-#include "applicationmodel.h"
-#include "appaccumulator.h"
 #include "constants.h"
 #include "setting.h"
 #include "pandoraeventsource.h"

@@ -5,8 +5,6 @@
 #include "setting.h"
 #include "systeminformation.h"
 #include "pandora.h"
-#include "application.h"
-#include "applications.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,8 +18,6 @@ int main(int argc, char *argv[])
     qmlRegisterType<Setting>("Panorama",1,0,"Setting");
     qmlRegisterType<SystemInformation>("Panorama",1,0,"SystemInformation");
     qmlRegisterType<Pandora>("Panorama",1,0,"Pandora");
-    qmlRegisterType<Applications>("Panorama",1,0,"Applications");
-    qRegisterMetaType<Application>("Application");
 
     //Show the main window
     MainWindow w;

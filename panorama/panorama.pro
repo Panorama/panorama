@@ -34,15 +34,6 @@ SOURCES += \
     src/mainwindow.cpp \
     src/configuration.cpp \
     src/panoramaui.cpp \
-    src/appaccumulator.cpp \
-    src/applicationmodel.cpp \
-    src/application.cpp \
-    src/iconfinder.cpp \
-    src/desktopfile.cpp \
-    src/applicationfiltermodel.cpp \
-    src/applicationfiltermethods.cpp \
-    src/pndscanner.cpp \
-    src/pnd.cpp \
     src/setting.cpp \
     src/systeminformation.cpp \
     src/settingshive.cpp \
@@ -51,24 +42,13 @@ SOURCES += \
     src/pandora.cpp \
     src/pandoraattached.cpp \
     src/pandoraeventlistener.cpp \
-    src/applicationattached.cpp \
-    src/applications.cpp \
     src/pandorakeyevent.cpp
 HEADERS += \
     include/panoramainternal.h \
     src/mainwindow.h \
     src/configuration.h \
     src/panoramaui.h \
-    src/application.h \
-    src/appaccumulator.h \
-    src/applicationmodel.h \
-    src/iconfinder.h \
-    src/desktopfile.h \
-    src/applicationfiltermodel.h \
-    src/applicationfiltermethods.h \
     src/constants.h \
-    src/pndscanner.h \
-    src/pnd.h \
     src/setting.h \
     src/systeminformation.h \
     src/settingshive.h \
@@ -77,8 +57,6 @@ HEADERS += \
     src/pandora.h \
     src/pandoraattached.h \
     src/pandoraeventlistener.h \
-    src/applicationattached.h \
-    src/applications.h \
     src/pandorakeyevent.h
 OTHER_FILES += qrc/root.qml
 RESOURCES += qrc/default.qrc

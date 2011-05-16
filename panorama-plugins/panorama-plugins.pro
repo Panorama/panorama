@@ -1,3 +1,5 @@
 TEMPLATE = subdirs
 
-SUBDIRS = textfile-plugin
+SUBDIRS = \
+    textfile-plugin \
+    applications-plugin

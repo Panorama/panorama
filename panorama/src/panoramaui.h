@@ -9,7 +9,6 @@
 #include <QAbstractItemModel>
 #include <QDeclarativeItem>
 
-#include "appaccumulator.h"
 #include "constants.h"
 #include "setting.h"
 

@@ -14,5 +14,4 @@ SOURCES += \
 
 HEADERS += \
     src/textfileplugin.h \
-    src/textfile.h \
-    src/textfileplugin.h
+    src/textfile.h

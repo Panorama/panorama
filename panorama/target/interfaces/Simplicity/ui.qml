@@ -12,8 +12,6 @@ PanoramaUI {
     Keys.onUpPressed: appView.decrementCurrentIndex()
     Keys.onDownPressed: appView.incrementCurrentIndex()
 
-    SystemInformation { id: sysinfo }
-
     Image {
         anchors.fill: parent
         source: "images/background.png"
@@ -34,7 +32,7 @@ PanoramaUI {
             width: 30; height: 5; border.width: 1; border.color: "white"
             color: "transparent"; clip: true
             Rectangle {
-                width: parent.width * (sysinfo.usedRam / sysinfo.ram)
+                width: parent.width * (SystemInformation.usedRam / SystemInformation.ram)
                 height: parent.height; color: "white"
             }
         }
@@ -47,7 +45,7 @@ PanoramaUI {
             width: 30; height: 5; border.width: 1; border.color: "white"
             color: "transparent"; clip: true
             Rectangle {
-                width: parent.width * (sysinfo.usedSd1 / sysinfo.sd1)
+                width: parent.width * (SystemInformation.usedSd1 / SystemInformation.sd1)
                 height: parent.height; color: "white"
             }
         }
@@ -60,7 +58,7 @@ PanoramaUI {
             width: 30; height: 5; border.width: 1; border.color: "white"
             color: "transparent"; clip: true
             Rectangle {
-                width: parent.width * (sysinfo.usedSd2 / sysinfo.sd2)
+                width: parent.width * (SystemInformation.usedSd2 / SystemInformation.sd2)
                 height: parent.height; color: "white"
             }
         }
@@ -73,7 +71,7 @@ PanoramaUI {
             width: 30; height: 5; border.width: 1; border.color: "white"
             color: "transparent"; clip: true
             Rectangle {
-                width: parent.width * (sysinfo.usedCpu / sysinfo.cpu)
+                width: parent.width * (SystemInformation.usedCpu / SystemInformation.cpu)
                 height: parent.height; color: "white"
             }
         }

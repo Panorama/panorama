@@ -24,11 +24,13 @@ poltergeist {
 TARGET = panorama
 DESTDIR = target
 TEMPLATE = app
-INCLUDEPATH += ../pandora-libraries/pnd/include
+INCLUDEPATH += ../pandora-libraries/pnd/include include
 OTHER_FILES += root.qml
-LIBS += -L../pandora-libraries/pnd \
+LIBS += \
+    -L../pandora-libraries/pnd \
     -lpnd
-SOURCES += src/main.cpp \
+SOURCES += \
+    src/main.cpp \
     src/mainwindow.cpp \
     src/configuration.cpp \
     src/panoramaui.cpp \
@@ -39,7 +41,6 @@ SOURCES += src/main.cpp \
     src/desktopfile.cpp \
     src/applicationfiltermodel.cpp \
     src/applicationfiltermethods.cpp \
-    src/textfile.cpp \
     src/pndscanner.cpp \
     src/pnd.cpp \
     src/setting.cpp \
@@ -53,7 +54,9 @@ SOURCES += src/main.cpp \
     src/applicationattached.cpp \
     src/applications.cpp \
     src/pandorakeyevent.cpp
-HEADERS += src/mainwindow.h \
+HEADERS += \
+    include/panoramainternal.h \
+    src/mainwindow.h \
     src/configuration.h \
     src/panoramaui.h \
     src/application.h \
@@ -64,7 +67,6 @@ HEADERS += src/mainwindow.h \
     src/applicationfiltermodel.h \
     src/applicationfiltermethods.h \
     src/constants.h \
-    src/textfile.h \
     src/pndscanner.h \
     src/pnd.h \
     src/setting.h \
@@ -75,7 +77,6 @@ HEADERS += src/mainwindow.h \
     src/pandora.h \
     src/pandoraattached.h \
     src/pandoraeventlistener.h \
-    src/panoramainternal.h \
     src/applicationattached.h \
     src/applications.h \
     src/pandorakeyevent.h

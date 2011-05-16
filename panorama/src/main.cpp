@@ -2,7 +2,6 @@
 #include "mainwindow.h"
 
 #include "panoramaui.h"
-#include "textfile.h"
 #include "setting.h"
 #include "systeminformation.h"
 #include "pandora.h"
@@ -18,7 +17,6 @@ int main(int argc, char *argv[])
     const QApplication a(argc, argv);
 
     qmlRegisterType<PanoramaUI>("Panorama", 1,0, "PanoramaUI");
-    qmlRegisterType<TextFile>("Panorama",1,0,"TextFile");
     qmlRegisterType<Setting>("Panorama",1,0,"Setting");
     qmlRegisterType<SystemInformation>("Panorama",1,0,"SystemInformation");
     qmlRegisterType<Pandora>("Panorama",1,0,"Pandora");

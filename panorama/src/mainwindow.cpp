@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _canvas.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     _canvas.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    _canvas.engine()->addImportPath("plugins");
+    _canvas.engine()->addImportPath(QCoreApplication::applicationDirPath() + "/plugins");
 
     //Set up UI loading and channel quit() events from QML
     connect(_canvas.engine(), SIGNAL(quit()), this, SLOT(close()));

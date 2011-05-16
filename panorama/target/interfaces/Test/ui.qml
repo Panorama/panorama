@@ -1,5 +1,6 @@
 import Qt 4.7                   //Import Qt
 import Panorama 1.0             //Import Panorama extensions
+import Panorama.Applications 1.0
 import "widgets" as Widgets     //Import widgets from "widgets/"
 import "pages" as Pages         //Import page prototypes from "pages/"
 
@@ -8,7 +9,6 @@ PanoramaUI {
     name: "Test"
     description: "A test Panorama UI that shows what Panorama is capable of"
     author: "dflemstr"
-    settingsSection: "test-theme" //The [section] that this theme gets in the config file
 
     //Gain access to the desktop's theme colors
     SystemPalette { id: palette }
@@ -17,7 +17,7 @@ PanoramaUI {
         print("Welcome to the UI named " + name + "!");
     }
 
-    Setting { id: lastExecuted; key: "lastExecuted" }
+    Setting { id: lastExecuted; section: "test-theme"; key: "lastExecuted" }
     Setting { id: clockspeed; section: "system"; key: "clockspeed" }
 
     Widgets.Book {
@@ -99,7 +99,7 @@ PanoramaUI {
                 anchors.fill: parent
                 highlightColor: palette.highlight
                 textColor: palette.light
-                appSource: ui.applications.inCategory(categoryFilter)
+                appSource: Applications.list.inCategory(categoryFilter)
                     .matching("name", (nameFilter.length == 0) ? ".*" : ".*" + nameFilter + ".*")
                     .sortedBy("name", true)
                 onSelected: {

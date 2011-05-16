@@ -2,13 +2,14 @@ import Qt 4.7
 import Panorama 1.0
 import "qml" as Extensions
 import Qt.labs.particles 1.0
+import Panorama.SystemInformation 1.0
+import Panorama.Applications 1.0
 
 PanoramaUI {
     id: ui
     name: "Magma"
     description: "An UI that will burn your fingers"
     author: "dflemstr"
-    settingsSection: "magma"
 
     property int level: 0
     property string topSection: ""
@@ -21,12 +22,14 @@ PanoramaUI {
 
     Setting {
         id: magmaStream
+        section: "magma"
         key: "magmaStream"
         defaultValue: "false"
     }
 
     Setting {
         id: volcano
+        section: "magma"
         key: "volcano"
         defaultValue: "true"
     }
@@ -310,7 +313,7 @@ PanoramaUI {
 
                     id: appsViewer
                     anchors.fill: parent
-                    model: ui.applications.matching("name", nameFilter).sortedBy("name", true)
+                    model: Applications.list.matching("name", nameFilter).sortedBy("name", true)
                     onSelected: ui.execute(id);
                     onFavStarClicked: toggleFavorite(id);
                     onPressed2: level = 0;
@@ -336,7 +339,8 @@ PanoramaUI {
 
                     id: favsViewer
                     anchors.fill: parent
-                    model: ui.applications.matching("name", nameFilter).matching("identifier", "^" + favorites.value + "$").sortedBy("name", true)
+                    model: Applications.list.matching("name", nameFilter).matching("identifier", "^" + favorites.value + "$").sortedBy("name", true)
+
                     onSelected: ui.execute(id);
                     onFavStarClicked: removeFavorite(id);
                     focus: true

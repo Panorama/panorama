@@ -1,5 +1,7 @@
 import Qt 4.7                   //Import Qt
 import Panorama 1.0             //Import Panorama extensions
+import Panorama.Pandora 1.0
+import Panorama.Applications 1.0
 
 PanoramaUI {
     id: ui

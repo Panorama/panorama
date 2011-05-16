@@ -15,7 +15,6 @@
 #include "panoramaui.h"
 #include "constants.h"
 #include "setting.h"
-#include "pandoraeventsource.h"
 
 /**
  * A MainWindow that is capable of displaying the Panorama's GUI

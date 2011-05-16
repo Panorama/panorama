@@ -3,7 +3,6 @@
 
 #include "panoramaui.h"
 #include "setting.h"
-#include "pandora.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,7 +14,6 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<PanoramaUI>("Panorama", 1,0, "PanoramaUI");
     qmlRegisterType<Setting>("Panorama",1,0,"Setting");
-    qmlRegisterType<Pandora>("Panorama",1,0,"Pandora");
 
     //Show the main window
     MainWindow w;

@@ -24,8 +24,7 @@ poltergeist {
 TARGET = panorama
 DESTDIR = target
 TEMPLATE = app
-INCLUDEPATH += ../pandora-libraries/pnd/include include
-OTHER_FILES += root.qml
+INCLUDEPATH += include
 LIBS += \
     -L../pandora-libraries/pnd \
     -lpnd
@@ -36,12 +35,7 @@ SOURCES += \
     src/panoramaui.cpp \
     src/setting.cpp \
     src/settingshive.cpp \
-    src/settingssource.cpp \
-    src/pandoraeventsource.cpp \
-    src/pandora.cpp \
-    src/pandoraattached.cpp \
-    src/pandoraeventlistener.cpp \
-    src/pandorakeyevent.cpp
+    src/settingssource.cpp
 HEADERS += \
     include/panoramainternal.h \
     src/mainwindow.h \
@@ -50,11 +44,6 @@ HEADERS += \
     src/constants.h \
     src/setting.h \
     src/settingshive.h \
-    src/settingssource.h \
-    src/pandoraeventsource.h \
-    src/pandora.h \
-    src/pandoraattached.h \
-    src/pandoraeventlistener.h \
-    src/pandorakeyevent.h
+    src/settingssource.h
 OTHER_FILES += qrc/root.qml
 RESOURCES += qrc/default.qrc

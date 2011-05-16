@@ -3,8 +3,6 @@ QT += declarative
 
 pandora {
     message(Building for Pandora)
-    QMAKE_LFLAGS = -L$$(PND_BASEDIR)/$$(PRJ)/lib -L$$(SDK_PATH)/$$(TARGET_SYS)/usr/lib -Wl,-O2,-rpath,$$(PND_BASEDIR)/$$(PRJ)/lib:$$(SDK_PATH)/$$(TARGET_SYS)/usr/lib
-    QMAKE_INCDIR_QT = $$(PND_BASEDIR)/$$(PRJ)/include
     DEFINES += PANDORA
 }
 

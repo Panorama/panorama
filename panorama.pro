@@ -7,4 +7,7 @@ SUBDIRS = panorama \
 pandora-libraries.subdir = pandora-libraries
 
 panorama.subdir = panorama
-panorama.depends = pandora-libraries
+panorama.depends = panorama-plugins
+
+panorama-plugins.subdir = panorama-plugins
+panorama-plugins.depends = pandora-libraries

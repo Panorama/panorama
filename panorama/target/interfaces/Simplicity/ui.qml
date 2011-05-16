@@ -1,12 +1,13 @@
 import Qt 4.7
 import Panorama 1.0
+import Panorama.SystemInformation 1.0
+import Panorama.Applications 1.0
 
 PanoramaUI {
     id: ui
     name: "Simplicity"
     description: "A simple theme"
     author: "dflemstr"
-    settingsSection: "simplicity"
 
     Keys.onUpPressed: appView.decrementCurrentIndex()
     Keys.onDownPressed: appView.incrementCurrentIndex()
@@ -115,7 +116,7 @@ PanoramaUI {
         width: parent.width / 2
         //overShoot: false
         clip: true
-        model: applications
+        model: Applications.list
             .matching("name", box.text.length > 0 ? ".*" + box.text + ".*" : "^$")
             .sortedBy("name", true)
         highlight: Rectangle {

@@ -9,4 +9,4 @@ void ApplicationsPlugin::registerTypes(const char *uri)
     qRegisterMetaType<Application>("Application");
 }
 
-Q_EXPORT_PLUGIN(Applications);
+Q_EXPORT_PLUGIN2(applications,ApplicationsPlugin);

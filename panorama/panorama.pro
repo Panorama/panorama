@@ -25,9 +25,6 @@ TARGET = panorama
 DESTDIR = target
 TEMPLATE = app
 INCLUDEPATH += include
-LIBS += \
-    -L../pandora-libraries/pnd \
-    -lpnd
 SOURCES += \
     src/main.cpp \
     src/mainwindow.cpp \

@@ -6,4 +6,4 @@ void TextFilePlugin::registerTypes(const char *uri)
     qmlRegisterType<TextFile>(uri, 1, 0, "TextFile");
 }
 
-Q_EXPORT_PLUGIN(TextFile);
+Q_EXPORT_PLUGIN2(textfile,TextFilePlugin);

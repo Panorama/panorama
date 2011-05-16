@@ -2,4 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS = \
     textfile-plugin \
-    applications-plugin
+    applications-plugin \
+    systeminformation-plugin

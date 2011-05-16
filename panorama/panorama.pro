@@ -35,7 +35,6 @@ SOURCES += \
     src/configuration.cpp \
     src/panoramaui.cpp \
     src/setting.cpp \
-    src/systeminformation.cpp \
     src/settingshive.cpp \
     src/settingssource.cpp \
     src/pandoraeventsource.cpp \
@@ -50,7 +49,6 @@ HEADERS += \
     src/panoramaui.h \
     src/constants.h \
     src/setting.h \
-    src/systeminformation.h \
     src/settingshive.h \
     src/settingssource.h \
     src/pandoraeventsource.h \

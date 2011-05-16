@@ -10,8 +10,10 @@ INCLUDEPATH += ../../panorama/include
 
 SOURCES += \
     src/systeminformationplugin.cpp \
-    src/systeminformation.cpp
+    src/systeminformation.cpp \
+    src/systeminformationattached.cpp
 
 HEADERS += \
     src/systeminformationplugin.h \
-    src/systeminformation.h
+    src/systeminformation.h \
+    src/systeminformationattached.h

@@ -362,9 +362,6 @@ PanoramaUI {
                 anchors.fill: parent
                 focus: level == 1 && topSection == "sys"
                 opacity: topSection == "sys" ? 1 : 0
-                SystemInformation {
-                    id: sysinfo
-                }
                 Column {
                     anchors.fill: parent
                     Text {
@@ -378,8 +375,8 @@ PanoramaUI {
                     }
                     Extensions.ProgressBar {
                         width: parent.width - 10
-                        maximum: sysinfo.cpu
-                        value: sysinfo.usedCpu
+                        maximum: SystemInformation.cpu
+                        value: SystemInformation.usedCpu
                         unit: "%"
                         color: "#f7c767"
                         secondColor: "#ed8d06"
@@ -399,8 +396,8 @@ PanoramaUI {
                     }
                     Extensions.ProgressBar {
                         width: parent.width - 10
-                        maximum: sysinfo.ram
-                        value: sysinfo.usedRam
+                        maximum: SystemInformation.ram
+                        value: SystemInformation.usedRam
                         unit: "MiB"
                         color: "#ed8d06"
                         secondColor: "#d84800"
@@ -419,8 +416,8 @@ PanoramaUI {
                     }
                     Extensions.ProgressBar {
                         width: parent.width - 10
-                        maximum: sysinfo.swap
-                        value: sysinfo.usedSwap
+                        maximum: SystemInformation.swap
+                        value: SystemInformation.usedSwap
                         unit: "MiB"
                         color: "#d84800"
                         secondColor: "#900000"
@@ -439,8 +436,8 @@ PanoramaUI {
                     }
                     Extensions.ProgressBar {
                         width: parent.width - 10
-                        maximum: sysinfo.sd1
-                        value: sysinfo.usedSd1
+                        maximum: SystemInformation.sd1
+                        value: SystemInformation.usedSd1
                         unit: "MiB"
                         color: "#900000"
                         secondColor: "#300000"
@@ -459,8 +456,8 @@ PanoramaUI {
                     }
                     Extensions.ProgressBar {
                         width: parent.width - 10
-                        maximum: sysinfo.sd2
-                        value: sysinfo.usedSd2
+                        maximum: SystemInformation.sd2
+                        value: SystemInformation.usedSd2
                         unit: "MiB"
                         color: "#6F0B00"
                         secondColor: "#370400"

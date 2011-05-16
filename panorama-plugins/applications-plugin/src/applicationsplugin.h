@@ -11,4 +11,4 @@ public:
     void registerTypes(const char *uri);
 };
 
-#endif // TEXTFILEPLUGIN_H
+#endif // APPLICATIONSPLUGIN_H

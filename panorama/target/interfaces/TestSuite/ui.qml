@@ -1,5 +1,6 @@
 import Qt 4.7
 import Panorama 1.0
+import Panorama.Pandora 1.0
 
 PanoramaUI {
     id: ui

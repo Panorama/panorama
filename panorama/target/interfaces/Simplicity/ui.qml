@@ -1,17 +1,16 @@
 import Qt 4.7
 import Panorama 1.0
+import Panorama.SystemInformation 1.0
+import Panorama.Applications 1.0
 
 PanoramaUI {
     id: ui
     name: "Simplicity"
     description: "A simple theme"
     author: "dflemstr"
-    settingsSection: "simplicity"
 
     Keys.onUpPressed: appView.decrementCurrentIndex()
     Keys.onDownPressed: appView.incrementCurrentIndex()
-
-    SystemInformation { id: sysinfo }
 
     Image {
         anchors.fill: parent
@@ -33,7 +32,7 @@ PanoramaUI {
             width: 30; height: 5; border.width: 1; border.color: "white"
             color: "transparent"; clip: true
             Rectangle {
-                width: parent.width * (sysinfo.usedRam / sysinfo.ram)
+                width: parent.width * (SystemInformation.usedRam / SystemInformation.ram)
                 height: parent.height; color: "white"
             }
         }
@@ -46,7 +45,7 @@ PanoramaUI {
             width: 30; height: 5; border.width: 1; border.color: "white"
             color: "transparent"; clip: true
             Rectangle {
-                width: parent.width * (sysinfo.usedSd1 / sysinfo.sd1)
+                width: parent.width * (SystemInformation.usedSd1 / SystemInformation.sd1)
                 height: parent.height; color: "white"
             }
         }
@@ -59,7 +58,7 @@ PanoramaUI {
             width: 30; height: 5; border.width: 1; border.color: "white"
             color: "transparent"; clip: true
             Rectangle {
-                width: parent.width * (sysinfo.usedSd2 / sysinfo.sd2)
+                width: parent.width * (SystemInformation.usedSd2 / SystemInformation.sd2)
                 height: parent.height; color: "white"
             }
         }
@@ -72,7 +71,7 @@ PanoramaUI {
             width: 30; height: 5; border.width: 1; border.color: "white"
             color: "transparent"; clip: true
             Rectangle {
-                width: parent.width * (sysinfo.usedCpu / sysinfo.cpu)
+                width: parent.width * (SystemInformation.usedCpu / SystemInformation.cpu)
                 height: parent.height; color: "white"
             }
         }
@@ -102,8 +101,8 @@ PanoramaUI {
             opacity: 0.5
             radius: 8
             focus: true
-            Keys.onEnterPressed: ui.execute(appView.currentItem.ident)
-            Keys.onReturnPressed: ui.execute(appView.currentItem.ident)
+            Keys.onEnterPressed: Applications.execute(appView.currentItem.ident)
+            Keys.onReturnPressed: Applications.execute(appView.currentItem.ident)
         }
     }
     ListView {
@@ -115,7 +114,7 @@ PanoramaUI {
         width: parent.width / 2
         //overShoot: false
         clip: true
-        model: applications
+        model: Applications.list
             .matching("name", box.text.length > 0 ? ".*" + box.text + ".*" : "^$")
             .sortedBy("name", true)
         highlight: Rectangle {

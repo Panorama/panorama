@@ -1,6 +1,6 @@
-#include "systeminformation.h"
-#include <QStringList>
+#include "systeminformationattached.h"
 
+#include <QStringList>
 #include <QTimer>
 #include <QFile>
 #include <QTextStream>
@@ -10,11 +10,11 @@ extern "C"
 #include <sys/statvfs.h>
 }
 
-class SystemInformationPrivate
+class SystemInformationAttachedPrivate
 {
-    PANORAMA_DECLARE_PUBLIC(SystemInformation)
+    PANORAMA_DECLARE_PUBLIC(SystemInformationAttached)
 public:
-    SystemInformationPrivate();
+    SystemInformationAttachedPrivate();
     void updateMem();
     void updateCpu();
     void updateSd();
@@ -34,10 +34,10 @@ public:
     int usedSd2;
 };
 
-SystemInformation::SystemInformation(QObject *parent) :
+SystemInformationAttached::SystemInformationAttached(QObject *parent) :
         QObject(parent)
 {
-    PANORAMA_INITIALIZE(SystemInformation);
+    PANORAMA_INITIALIZE(SystemInformationAttached);
 
     update();
     connect(&priv->timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -45,82 +45,82 @@ SystemInformation::SystemInformation(QObject *parent) :
     priv->timer.start();
 }
 
-SystemInformation::~SystemInformation()
+SystemInformationAttached::~SystemInformationAttached()
 {
-    PANORAMA_UNINITIALIZE(SystemInformation);
+    PANORAMA_UNINITIALIZE(SystemInformationAttached);
 }
 
-void SystemInformation::update()
+void SystemInformationAttached::update()
 {
-    PANORAMA_PRIVATE(SystemInformation);
+    PANORAMA_PRIVATE(SystemInformationAttached);
     priv->updateCpu();
     priv->updateMem();
     priv->updateSd();
 }
 
-int SystemInformation::cpu() const
+int SystemInformationAttached::cpu() const
 {
-    PANORAMA_PRIVATE(const SystemInformation);
+    PANORAMA_PRIVATE(const SystemInformationAttached);
     return priv->cpu;
 }
 
-int SystemInformation::usedCpu() const
+int SystemInformationAttached::usedCpu() const
 {
-    PANORAMA_PRIVATE(const SystemInformation);
+    PANORAMA_PRIVATE(const SystemInformationAttached);
     return priv->usedCpu;
 }
 
-int SystemInformation::ram() const
+int SystemInformationAttached::ram() const
 {
-    PANORAMA_PRIVATE(const SystemInformation);
+    PANORAMA_PRIVATE(const SystemInformationAttached);
     return priv->ram;
 }
 
-int SystemInformation::usedRam() const
+int SystemInformationAttached::usedRam() const
 {
-    PANORAMA_PRIVATE(const SystemInformation);
+    PANORAMA_PRIVATE(const SystemInformationAttached);
     return priv->usedRam;
 }
 
-int SystemInformation::swap() const
+int SystemInformationAttached::swap() const
 {
-    PANORAMA_PRIVATE(const SystemInformation);
+    PANORAMA_PRIVATE(const SystemInformationAttached);
     return priv->swap;
 }
 
-int SystemInformation::usedSwap() const
+int SystemInformationAttached::usedSwap() const
 {
-    PANORAMA_PRIVATE(const SystemInformation);
+    PANORAMA_PRIVATE(const SystemInformationAttached);
     return priv->usedSwap;
 }
 
-int SystemInformation::sd1() const
+int SystemInformationAttached::sd1() const
 {
-    PANORAMA_PRIVATE(const SystemInformation);
+    PANORAMA_PRIVATE(const SystemInformationAttached);
     return priv->sd1;
 }
 
-int SystemInformation::usedSd1() const
+int SystemInformationAttached::usedSd1() const
 {
-    PANORAMA_PRIVATE(const SystemInformation);
+    PANORAMA_PRIVATE(const SystemInformationAttached);
     return priv->usedSd1;
 }
 
-int SystemInformation::sd2() const
+int SystemInformationAttached::sd2() const
 {
-    PANORAMA_PRIVATE(const SystemInformation);
+    PANORAMA_PRIVATE(const SystemInformationAttached);
     return priv->sd2;
 }
 
-int SystemInformation::usedSd2() const
+int SystemInformationAttached::usedSd2() const
 {
-    PANORAMA_PRIVATE(const SystemInformation);
+    PANORAMA_PRIVATE(const SystemInformationAttached);
     return priv->usedSd2;
 }
 
-void SystemInformationPrivate::updateCpu()
+void SystemInformationAttachedPrivate::updateCpu()
 {
-    PANORAMA_PUBLIC(SystemInformation);
+    PANORAMA_PUBLIC(SystemInformationAttached);
     QFile stat("/proc/stat");
     if(!stat.open(QFile::Text | QFile::ReadOnly | QFile::Unbuffered))
         return;
@@ -167,9 +167,9 @@ void SystemInformationPrivate::updateCpu()
     }
 }
 
-void SystemInformationPrivate::updateSd()
+void SystemInformationAttachedPrivate::updateSd()
 {
-    PANORAMA_PUBLIC(SystemInformation);
+    PANORAMA_PUBLIC(SystemInformationAttached);
     struct statvfs fs;
     int newSd1(0), newUsedSd1(0), newSd2(0), newUsedSd2(0);
 
@@ -232,9 +232,9 @@ void SystemInformationPrivate::updateSd()
     }
 }
 
-void SystemInformationPrivate::updateMem()
+void SystemInformationAttachedPrivate::updateMem()
 {
-    PANORAMA_PUBLIC(SystemInformation);
+    PANORAMA_PUBLIC(SystemInformationAttached);
     int newUsedRam, newUsedSwap;
     int freeRam = 0, bufferRam = 0, cacheRam = 0, freeSwap = 0;
     int newRam = 0, newSwap = 0;
@@ -302,7 +302,7 @@ void SystemInformationPrivate::updateMem()
     }
 }
 
-SystemInformationPrivate::SystemInformationPrivate()
+SystemInformationAttachedPrivate::SystemInformationAttachedPrivate()
 {
     ram = 0;
     usedRam = 0;

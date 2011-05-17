@@ -1,14 +1,13 @@
-#ifndef SYSTEMINFORMATION_H
-#define SYSTEMINFORMATION_H
+#ifndef SYSTEMINFORMATIONATTACHED_H
+#define SYSTEMINFORMATIONATTACHED_H
 
 #include "panoramainternal.h"
 
 #include <QObject>
-#include <qdeclarative.h>
 
-class SystemInformationPrivate;
+class SystemInformationAttachedPrivate;
 
-class SystemInformation : public QObject
+class SystemInformationAttached : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int cpu      READ cpu        NOTIFY cpuUpdated)
@@ -21,10 +20,10 @@ class SystemInformation : public QObject
     Q_PROPERTY(int usedSd1  READ usedSd1    NOTIFY usedSd1Updated)
     Q_PROPERTY(int sd2      READ sd2        NOTIFY sd2Updated)
     Q_PROPERTY(int usedSd2  READ usedSd2    NOTIFY usedSd2Updated)
-    PANORAMA_DECLARE_PRIVATE(SystemInformation)
+    PANORAMA_DECLARE_PRIVATE(SystemInformationAttached)
 public:
-    explicit SystemInformation(QObject *parent = 0);
-    ~SystemInformation();
+    explicit SystemInformationAttached(QObject *parent = 0);
+    ~SystemInformationAttached();
 
     /**
      * Returns a number representing the maximum CPU time for any given
@@ -93,8 +92,7 @@ signals:
 
 protected slots:
     void update();
+
 };
 
-QML_DECLARE_TYPE(SystemInformation);
-
-#endif // SYSTEMINFORMATION_H
+#endif // SYSTEMINFORMATIONATTACHED_H

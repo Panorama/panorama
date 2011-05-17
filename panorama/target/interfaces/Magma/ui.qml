@@ -2,13 +2,14 @@ import Qt 4.7
 import Panorama 1.0
 import "qml" as Extensions
 import Qt.labs.particles 1.0
+import Panorama.SystemInformation 1.0
+import Panorama.Applications 1.0
 
 PanoramaUI {
     id: ui
     name: "Magma"
     description: "An UI that will burn your fingers"
     author: "dflemstr"
-    settingsSection: "magma"
 
     property int level: 0
     property string topSection: ""
@@ -21,12 +22,14 @@ PanoramaUI {
 
     Setting {
         id: magmaStream
+        section: "magma"
         key: "magmaStream"
         defaultValue: "false"
     }
 
     Setting {
         id: volcano
+        section: "magma"
         key: "volcano"
         defaultValue: "true"
     }
@@ -310,7 +313,7 @@ PanoramaUI {
 
                     id: appsViewer
                     anchors.fill: parent
-                    model: ui.applications.matching("name", nameFilter).sortedBy("name", true)
+                    model: Applications.list.matching("name", nameFilter).sortedBy("name", true)
                     onSelected: ui.execute(id);
                     onFavStarClicked: toggleFavorite(id);
                     onPressed2: level = 0;
@@ -336,7 +339,8 @@ PanoramaUI {
 
                     id: favsViewer
                     anchors.fill: parent
-                    model: ui.applications.matching("name", nameFilter).matching("identifier", "^" + favorites.value + "$").sortedBy("name", true)
+                    model: Applications.list.matching("name", nameFilter).matching("identifier", "^" + favorites.value + "$").sortedBy("name", true)
+
                     onSelected: ui.execute(id);
                     onFavStarClicked: removeFavorite(id);
                     focus: true
@@ -358,9 +362,6 @@ PanoramaUI {
                 anchors.fill: parent
                 focus: level == 1 && topSection == "sys"
                 opacity: topSection == "sys" ? 1 : 0
-                SystemInformation {
-                    id: sysinfo
-                }
                 Column {
                     anchors.fill: parent
                     Text {
@@ -374,8 +375,8 @@ PanoramaUI {
                     }
                     Extensions.ProgressBar {
                         width: parent.width - 10
-                        maximum: sysinfo.cpu
-                        value: sysinfo.usedCpu
+                        maximum: SystemInformation.cpu
+                        value: SystemInformation.usedCpu
                         unit: "%"
                         color: "#f7c767"
                         secondColor: "#ed8d06"
@@ -395,8 +396,8 @@ PanoramaUI {
                     }
                     Extensions.ProgressBar {
                         width: parent.width - 10
-                        maximum: sysinfo.ram
-                        value: sysinfo.usedRam
+                        maximum: SystemInformation.ram
+                        value: SystemInformation.usedRam
                         unit: "MiB"
                         color: "#ed8d06"
                         secondColor: "#d84800"
@@ -415,8 +416,8 @@ PanoramaUI {
                     }
                     Extensions.ProgressBar {
                         width: parent.width - 10
-                        maximum: sysinfo.swap
-                        value: sysinfo.usedSwap
+                        maximum: SystemInformation.swap
+                        value: SystemInformation.usedSwap
                         unit: "MiB"
                         color: "#d84800"
                         secondColor: "#900000"
@@ -435,8 +436,8 @@ PanoramaUI {
                     }
                     Extensions.ProgressBar {
                         width: parent.width - 10
-                        maximum: sysinfo.sd1
-                        value: sysinfo.usedSd1
+                        maximum: SystemInformation.sd1
+                        value: SystemInformation.usedSd1
                         unit: "MiB"
                         color: "#900000"
                         secondColor: "#300000"
@@ -455,8 +456,8 @@ PanoramaUI {
                     }
                     Extensions.ProgressBar {
                         width: parent.width - 10
-                        maximum: sysinfo.sd2
-                        value: sysinfo.usedSd2
+                        maximum: SystemInformation.sd2
+                        value: SystemInformation.usedSd2
                         unit: "MiB"
                         color: "#6F0B00"
                         secondColor: "#370400"

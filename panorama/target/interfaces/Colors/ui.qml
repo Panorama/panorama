@@ -1,5 +1,9 @@
 import Qt 4.7
 import Panorama 1.0
+import Panorama.TextFile 1.0
+import Panorama.SystemInformation 1.0
+import Panorama.Pandora 1.0
+import Panorama.Applications 1.0
 import "qml" as Helpers
 import "qml/parser.js" as Parser
 PanoramaUI {
@@ -232,11 +236,6 @@ PanoramaUI {
         intensity: settingsOpacity
     }
 
-    //System info icons:
-    SystemInformation {
-        id: sysinfo
-    }
-
     Helpers.PositionedImage {
         id: cpuIcon
         z: 2
@@ -247,7 +246,7 @@ PanoramaUI {
         z: 2
         function accessor(x) { return Parser.readField(skinCfg.data, "cpu_text" + x); }
         function styleField(x) { return cpuStyle.getField(x); }
-        text: (sysinfo.usedCpu * 100 / sysinfo.cpu).toFixed(2) + "%"
+        text: (SystemInformation.usedCpu * 100 / SystemInformation.cpu).toFixed(2) + "%"
     }
 
     Helpers.PositionedImage {
@@ -260,7 +259,7 @@ PanoramaUI {
         z: 2
         function accessor(x) { return Parser.readField(skinCfg.data, "sd1_text" + x); }
         function styleField(x) { return sd1Style.getField(x); }
-        text: (sysinfo.sd1 - sysinfo.usedSd1) + " MiB"
+        text: (SystemInformation.sd1 - SystemInformation.usedSd1) + " MiB"
     }
 
     Helpers.PositionedImage {
@@ -273,7 +272,7 @@ PanoramaUI {
         z: 2
         function accessor(x) { return Parser.readField(skinCfg.data, "sd2_text" + x); }
         function styleField(x) { return sd2Style.getField(x); }
-        text: (sysinfo.sd2 - sysinfo.usedSd2) + " MiB"
+        text: (SystemInformation.sd2 - SystemInformation.usedSd2) + " MiB"
     }
 
     Helpers.PositionedImage {

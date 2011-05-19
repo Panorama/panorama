@@ -10,6 +10,7 @@ PanoramaUI {
     name: "Magma"
     description: "An UI that will burn your fingers"
     author: "dflemstr"
+    anchors.fill: parent
 
     property int level: 0
     property string topSection: ""

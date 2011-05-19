@@ -9,6 +9,7 @@ PanoramaUI {
     name: "Test"
     description: "A test Panorama UI that shows what Panorama is capable of"
     author: "dflemstr"
+    anchors.fill: parent
 
     //Gain access to the desktop's theme colors
     SystemPalette { id: palette }

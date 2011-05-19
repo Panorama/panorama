@@ -16,12 +16,17 @@ MainWindow::MainWindow(QWidget *parent) :
     //Create our Canvas that we'll use later for the UI
     setSource(QUrl("qrc:/root.qml"));
     setFocusPolicy(Qt::StrongFocus);
+    if(!errors().isEmpty())
+        qWarning() << errors();
 
 #ifdef ENABLE_OPENGL
     setViewport(new QGLWidget());
 #endif
     setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
     setOptimizationFlag(QGraphicsView::DontSavePainterState);
+
+    setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    resize(UI_WIDTH, UI_HEIGHT);
 
     viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
     viewport()->setAttribute(Qt::WA_NoSystemBackground);

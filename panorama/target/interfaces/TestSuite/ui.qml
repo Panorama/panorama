@@ -7,6 +7,7 @@ PanoramaUI {
     name: "TestSuite"
     description: "A test theme that tests the Panorama-specific features"
     author: "dflemstr"
+    anchors.fill: parent
 
     function write(what) {
         print(what.replace(/<(.|\n)*?>/g, ""));

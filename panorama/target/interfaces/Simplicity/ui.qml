@@ -8,6 +8,7 @@ PanoramaUI {
     name: "Simplicity"
     description: "A simple theme"
     author: "dflemstr"
+    anchors.fill: parent
 
     Keys.onUpPressed: appView.decrementCurrentIndex()
     Keys.onDownPressed: appView.incrementCurrentIndex()

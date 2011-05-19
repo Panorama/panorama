@@ -11,6 +11,7 @@ PanoramaUI {
     name: "Colors (from PMenu)"
     description: "Put this file inside of a PMenu theme to make a Panorama UI out of it!"
     author: "dflemstr"
+    anchors.fill: parent
 
     TextFile { //TextFile isn't standard QML, but part of Panorama 1.0
         id: skinCfg

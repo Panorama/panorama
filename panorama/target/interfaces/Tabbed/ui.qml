@@ -8,6 +8,7 @@ PanoramaUI {
     name: "Tabbed"
     description: "A tab based UI"
     author: "B-ZaR"
+    anchors.fill: parent
 
     Item {
         id: keyHandler

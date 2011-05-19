@@ -7,41 +7,36 @@
 #include <QDir>
 
 MainWindow::MainWindow(QWidget *parent) :
-        QMainWindow(parent)
+        QDeclarativeView(parent)
 {
     //"Clear" some memory
     _component = 0;
     _ui = 0;
 
-    //Resize the window
-    resize(UI_WIDTH, UI_HEIGHT);
-
     //Create our Canvas that we'll use later for the UI
-    _canvas.setParent(this);
-    _canvas.setSource(QUrl("qrc:/root.qml"));
-    _canvas.setFocusPolicy(Qt::StrongFocus);
-    this->setCentralWidget(&_canvas);
+    setSource(QUrl("qrc:/root.qml"));
+    setFocusPolicy(Qt::StrongFocus);
 
 #ifdef ENABLE_OPENGL
-    _canvas.setViewport(new QGLWidget());
+    setViewport(new QGLWidget());
 #endif
-    _canvas.setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
-    _canvas.setOptimizationFlag(QGraphicsView::DontSavePainterState);
+    setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
+    setOptimizationFlag(QGraphicsView::DontSavePainterState);
 
-    _canvas.viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
-    _canvas.viewport()->setAttribute(Qt::WA_NoSystemBackground);
-    _canvas.viewport()->setAttribute(Qt::WA_PaintUnclipped);
-    _canvas.viewport()->setAttribute(Qt::WA_TranslucentBackground, false);
+    viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+    viewport()->setAttribute(Qt::WA_NoSystemBackground);
+    viewport()->setAttribute(Qt::WA_PaintUnclipped);
+    viewport()->setAttribute(Qt::WA_TranslucentBackground, false);
 
-    _canvas.setStyleSheet("QGraphicsView { border-style: none; }");
-    _canvas.setFrameStyle(0);
-    _canvas.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    _canvas.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setStyleSheet("border-style: none;");
+    setFrameStyle(0);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    _canvas.engine()->addImportPath(QCoreApplication::applicationDirPath() + "/plugins");
+    engine()->addImportPath(QCoreApplication::applicationDirPath() + "/plugins");
 
     //Set up UI loading and channel quit() events from QML
-    connect(_canvas.engine(), SIGNAL(quit()), this, SLOT(close()));
+    connect(engine(), SIGNAL(quit()), this, SLOT(close()));
     connect(this, SIGNAL(uiChanged(QString)), this, SLOT(loadUIFile(QString)));
 
     _uiSetting = new Setting("panorama", "ui", QVariant(), this);
@@ -62,7 +57,7 @@ void MainWindow::loadUIFile(const QString &file)
         _component->deleteLater();
 
     //Create a generic component from the file
-    _component = new QDeclarativeComponent(_canvas.engine(), file, this);
+    _component = new QDeclarativeComponent(engine(), file, this);
 
     //Check if the component has errors and print them
     printError(_component);
@@ -97,7 +92,7 @@ void MainWindow::continueLoadingUI()
     printError(_component);
 
     //Create an instance of the component
-    QObject *obj(_component->create(_canvas.rootContext()));
+    QObject *obj(_component->create(rootContext()));
 
     //Check errors again (now that the component is created)
     printError(_component);
@@ -115,7 +110,7 @@ void MainWindow::continueLoadingUI()
         //didn't put a Panorama UI in the file at all
         if(_ui)
         {
-            _ui->setParentItem(qobject_cast<QDeclarativeItem*>(_canvas.rootObject()));
+            _ui->setParentItem(qobject_cast<QDeclarativeItem*>(rootObject()));
             _ui->indicateLoadFinished();
         }
         else
@@ -159,9 +154,15 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
     if(e->key() == Qt::Key_Q && e->modifiers() & Qt::ControlModifier)
     {
         close();
+        e->accept();
     }
     else if(e->key() == Qt::Key_F && e->modifiers() & Qt::ControlModifier)
     {
         _fullscreenSetting->setValue(!_fullscreenSetting->value().toBool());
+        e->accept();
+    }
+    else
+    {
+        QDeclarativeView::keyPressEvent(e);
     }
 }

@@ -1,8 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtGui/QMainWindow>
-#include <QtGui/QWidget>
 #include <QDeclarativeEngine>
 #include <QDeclarativeView>
 #include <QDeclarativeComponent>
@@ -19,7 +17,7 @@
 /**
  * A MainWindow that is capable of displaying the Panorama's GUI
  */
-class MainWindow : public QMainWindow
+class MainWindow : public QDeclarativeView
 {
     Q_OBJECT
 
@@ -51,7 +49,6 @@ private:
 
     void loadApps();
 
-    QDeclarativeView _canvas;
     QDeclarativeComponent *_component;
     PanoramaUI *_ui;
 

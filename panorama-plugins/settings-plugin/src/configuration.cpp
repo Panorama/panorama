@@ -4,6 +4,7 @@
 #include <QFileInfo>
 #include <QStringList>
 #include <QDebug>
+#include <QCoreApplication>
 #include "constants.h"
 
 class ConfigurationPrivate
@@ -80,13 +81,12 @@ void ConfigurationPrivate::initConfiguration()
 #endif
         if(settings->allKeys().isEmpty()) {
             qWarning() << "Warning: No configuration file detected, creating default configuration.";
-            settings->setValue("panorama/uiDirectory", "interfaces");
-            settings->setValue("panorama/ui", "Test");
-            settings->setValue("panorama/fullscreen", false);
-            settings->setValue("system/clockspeed", 600);
-            settings->setValue("system/favorites", "");
             settings->sync();
         }
+
+        //XXX Hack, add different method for "virtual" settings?
+        settings->setValue("panorama/dataDirectory", QCoreApplication::applicationDirPath());
+
         watcher.addPath(settings->fileName());
         qDebug() << "Settings are saved in" << settings->fileName();
     }

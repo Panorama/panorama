@@ -1,7 +1,7 @@
 import Qt 4.7
-import Panorama 1.0
 import "qml" as Extensions
 import Qt.labs.particles 1.0
+import Panorama.Settings 1.0
 import Panorama.UI 1.0
 import Panorama.SystemInformation 1.0
 import Panorama.Applications 1.0
@@ -316,7 +316,7 @@ PanoramaUI {
                     id: appsViewer
                     anchors.fill: parent
                     model: Applications.list.matching("name", nameFilter).sortedBy("name", true)
-                    onSelected: ui.execute(id);
+                    onSelected: Applications.execute(id);
                     onFavStarClicked: toggleFavorite(id);
                     onPressed2: level = 0;
                     onPressed3: toggleFavorite(appsViewer.currentItem.ident);
@@ -343,7 +343,7 @@ PanoramaUI {
                     anchors.fill: parent
                     model: Applications.list.matching("name", nameFilter).matching("identifier", "^" + favorites.value + "$").sortedBy("name", true)
 
-                    onSelected: ui.execute(id);
+                    onSelected: Applications.execute(id);
                     onFavStarClicked: removeFavorite(id);
                     focus: true
                     onPressed2: level = 0;

@@ -9,9 +9,7 @@
 #include <QFile>
 #include <QKeyEvent>
 
-#include "configuration.h"
 #include "constants.h"
-#include "setting.h"
 
 /**
  * A MainWindow that is capable of displaying the Panorama's GUI

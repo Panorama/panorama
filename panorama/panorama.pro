@@ -25,18 +25,10 @@ TEMPLATE = app
 INCLUDEPATH += include
 SOURCES += \
     src/main.cpp \
-    src/mainwindow.cpp \
-    src/configuration.cpp \
-    src/setting.cpp \
-    src/settingshive.cpp \
-    src/settingssource.cpp
+    src/mainwindow.cpp
 HEADERS += \
     include/panoramainternal.h \
     include/constants.h \
-    src/mainwindow.h \
-    src/configuration.h \
-    src/setting.h \
-    src/settingshive.h \
-    src/settingssource.h
+    src/mainwindow.h
 OTHER_FILES += qrc/root.qml
 RESOURCES += qrc/default.qrc

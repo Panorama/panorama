@@ -2,6 +2,7 @@ import Qt 4.7
 import Panorama 1.0
 import "qml" as Extensions
 import Qt.labs.particles 1.0
+import Panorama.UI 1.0
 import Panorama.SystemInformation 1.0
 import Panorama.Applications 1.0
 

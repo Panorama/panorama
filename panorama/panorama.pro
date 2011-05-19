@@ -27,16 +27,14 @@ SOURCES += \
     src/main.cpp \
     src/mainwindow.cpp \
     src/configuration.cpp \
-    src/panoramaui.cpp \
     src/setting.cpp \
     src/settingshive.cpp \
     src/settingssource.cpp
 HEADERS += \
     include/panoramainternal.h \
+    include/constants.h \
     src/mainwindow.h \
     src/configuration.h \
-    src/panoramaui.h \
-    src/constants.h \
     src/setting.h \
     src/settingshive.h \
     src/settingssource.h

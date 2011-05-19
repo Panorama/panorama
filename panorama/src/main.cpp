@@ -1,7 +1,6 @@
 #include <QtGui/QApplication>
 #include "mainwindow.h"
 
-#include "panoramaui.h"
 #include "setting.h"
 
 int main(int argc, char *argv[])
@@ -12,7 +11,6 @@ int main(int argc, char *argv[])
     //handling
     const QApplication a(argc, argv);
 
-    qmlRegisterType<PanoramaUI>("Panorama", 1,0, "PanoramaUI");
     qmlRegisterType<Setting>("Panorama",1,0,"Setting");
 
     //Show the main window

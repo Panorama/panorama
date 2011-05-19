@@ -61,8 +61,3 @@ QString PanoramaUI::author() const
     PANORAMA_PRIVATE(const PanoramaUI);
     return priv->author;
 }
-
-void PanoramaUI::indicateLoadFinished()
-{
-    emit loaded();
-}

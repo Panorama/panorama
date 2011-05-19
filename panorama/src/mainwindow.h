@@ -10,7 +10,6 @@
 #include <QKeyEvent>
 
 #include "configuration.h"
-#include "panoramaui.h"
 #include "constants.h"
 #include "setting.h"
 
@@ -25,36 +24,8 @@ public:
     /** Constructs a new MainWindow instance */
     MainWindow(QWidget *parent = 0);
 
-signals:
-    /** A new UI file should be loaded */
-    void uiChanged(const QString &uiFile);
-
-public slots:
-    /** Load the specified UI file */
-    void loadUIFile(const QString &file);
-
-    /** Change to the UI in the specified directory */
-    void switchToUI(const QString &uiDir, const QString &uiName);
-
 protected:
     void keyPressEvent(QKeyEvent* e);
-
-private slots:
-    void continueLoadingUI();
-    void changeFullscreen();
-    void changeUI();
-
-private:
-    void printError(const QDeclarativeComponent *obj) const;
-
-    void loadApps();
-
-    QDeclarativeComponent *_component;
-    PanoramaUI *_ui;
-
-    Setting *_fullscreenSetting;
-    Setting *_uiSetting;
-    Setting *_uiDirSetting;
 };
 
 #endif // MAINWINDOW_H

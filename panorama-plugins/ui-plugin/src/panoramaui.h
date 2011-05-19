@@ -10,7 +10,6 @@
 #include <QDeclarativeItem>
 
 #include "constants.h"
-#include "setting.h"
 
 class PanoramaUIPrivate;
 
@@ -47,14 +46,6 @@ public:
 
     /** Sets the author */
     void setAuthor(const QString&);
-
-public slots:
-    /** Called when this instance has been loaded */
-    void indicateLoadFinished();
-
-signals:
-    /** This UI has finished loading */
-    void loaded();
 };
 
 //Makes this type available in QML

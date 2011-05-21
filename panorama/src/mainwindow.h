@@ -13,6 +13,7 @@
 #include "panoramaui.h"
 #include "constants.h"
 #include "setting.h"
+#include "runtime.h"
 
 /**
  * A MainWindow that is capable of displaying the Panorama's GUI
@@ -38,6 +39,7 @@ public slots:
 
 protected:
     void keyPressEvent(QKeyEvent* e);
+    void changeEvent(QEvent* e);
 
 private slots:
     void continueLoadingUI();
@@ -55,6 +57,7 @@ private:
     Setting *_fullscreenSetting;
     Setting *_uiSetting;
     Setting *_uiDirSetting;
+    Runtime runtimeObject;
 };
 
 #endif // MAINWINDOW_H

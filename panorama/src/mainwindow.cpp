@@ -7,11 +7,12 @@
 #include <QDir>
 
 MainWindow::MainWindow(QWidget *parent) :
-        QDeclarativeView(parent)
+        QDeclarativeView(parent), _component(0), _ui(0),
+        _fullscreenSetting(0), _uiSetting(0), _uiDirSetting(0),
+        runtimeObject(this)
 {
-    //"Clear" some memory
-    _component = 0;
-    _ui = 0;
+    //Set the runtime object context property
+    rootContext()->setContextProperty("runtime", &runtimeObject);
 
     //Create our Canvas that we'll use later for the UI
     setSource(QUrl("qrc:/root.qml"));
@@ -170,4 +171,13 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
     {
         QDeclarativeView::keyPressEvent(e);
     }
+}
+
+void MainWindow::changeEvent(QEvent *e)
+{
+    if(e->type() == QEvent::ActivationChange)
+    {
+        runtimeObject.setIsActiveWindow(isActiveWindow());
+    }
+    QDeclarativeView::changeEvent(e);
 }

@@ -30,7 +30,8 @@ SOURCES += \
     src/panoramaui.cpp \
     src/setting.cpp \
     src/settingshive.cpp \
-    src/settingssource.cpp
+    src/settingssource.cpp \
+    src/runtime.cpp
 HEADERS += \
     include/panoramainternal.h \
     src/mainwindow.h \
@@ -39,6 +40,7 @@ HEADERS += \
     src/constants.h \
     src/setting.h \
     src/settingshive.h \
-    src/settingssource.h
+    src/settingssource.h \
+    src/runtime.h
 OTHER_FILES += qrc/root.qml
 RESOURCES += qrc/default.qrc

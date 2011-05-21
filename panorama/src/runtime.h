@@ -7,20 +7,25 @@
 class Runtime : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool _isActiveWindow READ getIsActiveWindow WRITE setIsActiveWindow NOTIFY isActiveWindowChanged)
+    Q_PROPERTY(bool isActiveWindow READ isActiveWindow NOTIFY isActiveWindowChanged)
+    Q_PROPERTY(bool fullscreen READ fullscreen WRITE setFullscreen NOTIFY fullscreenChanged)
 
 public:
     explicit Runtime(QObject *parent = 0);
 
-    bool getIsActiveWindow();
-    void setIsActiveWindow(bool const value);
+    bool isActiveWindow() const;
+    void setIsActiveWindow(bool value);
+
+    bool fullscreen() const;
+    void setFullscreen(bool value);
 
 signals:
-    void isActiveWindowChanged(bool const value);
+    void isActiveWindowChanged(bool value);
+    void fullscreenChanged(bool value);
 
 private:
     bool _isActiveWindow;
-
+    bool _fullscreen;
 };
 
 #endif // RUNTIME_H

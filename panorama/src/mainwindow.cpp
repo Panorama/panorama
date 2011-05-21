@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     //Set the runtime object context property
     rootContext()->setContextProperty("runtime", &_runtimeObject);
-    connect(&_runtimeObject, SIGNAL(fullscreenChanged(bool)),
+    connect(&_runtimeObject, SIGNAL(fullscreenRequested(bool)),
             this, SLOT(setFullscreen(bool)));
 
 #ifdef ENABLE_OPENGL
@@ -44,23 +44,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Resize to default size
     resize(UI_WIDTH, UI_HEIGHT);
-}
-
-void MainWindow::keyPressEvent(QKeyEvent* e)
-{
-    if(e->key() == Qt::Key_Q && e->modifiers() & Qt::ControlModifier)
-    {
-        close();
-        e->accept();
-    }
-    else if(e->key() == Qt::Key_F && e->modifiers() & Qt::ControlModifier)
-    {
-        _runtimeObject.setFullscreen(!_runtimeObject.fullscreen());
-    }
-    else
-    {
-        QDeclarativeView::keyPressEvent(e);
-    }
 }
 
 void MainWindow::changeEvent(QEvent *e)

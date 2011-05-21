@@ -1,7 +1,7 @@
 #include "runtime.h"
 
 Runtime::Runtime(QObject *parent) :
-        QObject(parent), _isActiveWindow(false), _fullscreen(false)
+        QObject(parent), _isActiveWindow(false)
 {
 }
 
@@ -19,16 +19,7 @@ void Runtime::setIsActiveWindow(bool const value)
     }
 }
 
-bool Runtime::fullscreen() const
-{
-    return _fullscreen;
-}
-
 void Runtime::setFullscreen(bool fullscreen)
 {
-    if(_fullscreen != fullscreen)
-    {
-        _fullscreen = fullscreen;
-        emit fullscreenChanged(fullscreen);
-    }
+    emit fullscreenRequested(fullscreen);
 }

@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Make plugins available
     engine()->addImportPath(QCoreApplication::applicationDirPath() + "/plugins");
+    engine()->addImportPath("/usr/lib/panorama/plugins");
+    engine()->addImportPath(QDir::homePath() + "/.panorama/plugins");
 
     //Load the main QML file
     setSource(QUrl("qrc:/root.qml"));

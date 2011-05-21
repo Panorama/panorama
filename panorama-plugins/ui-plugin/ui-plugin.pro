@@ -4,7 +4,7 @@ QT += declarative
 CONFIG += qt plugin
 
 TARGET = $$qtLibraryTarget($$TARGET)
-DESTDIR = ../../panorama/target/plugins/Panorama/UI
+DESTDIR = ../../target/plugins/Panorama/UI
 
 INCLUDEPATH += ../../panorama/include
 

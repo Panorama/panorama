@@ -1,5 +1,10 @@
 import Qt 4.7
-import Panorama 1.0
+import Panorama.Settings 1.0
+import Panorama.UI 1.0
+import Panorama.TextFile 1.0
+import Panorama.SystemInformation 1.0
+import Panorama.Pandora 1.0
+import Panorama.Applications 1.0
 import "qml" as Helpers
 import "qml/parser.js" as Parser
 PanoramaUI {
@@ -7,7 +12,7 @@ PanoramaUI {
     name: "Colors (from PMenu)"
     description: "Put this file inside of a PMenu theme to make a Panorama UI out of it!"
     author: "dflemstr"
-    settingsSection: "pmenu-colors"
+    anchors.fill: parent
 
     TextFile { //TextFile isn't standard QML, but part of Panorama 1.0
         id: skinCfg
@@ -233,11 +238,6 @@ PanoramaUI {
         intensity: settingsOpacity
     }
 
-    //System info icons:
-    SystemInformation {
-        id: sysinfo
-    }
-
     Helpers.PositionedImage {
         id: cpuIcon
         z: 2
@@ -248,7 +248,7 @@ PanoramaUI {
         z: 2
         function accessor(x) { return Parser.readField(skinCfg.data, "cpu_text" + x); }
         function styleField(x) { return cpuStyle.getField(x); }
-        text: (sysinfo.usedCpu * 100 / sysinfo.cpu).toFixed(2) + "%"
+        text: (SystemInformation.usedCpu * 100 / SystemInformation.cpu).toFixed(2) + "%"
     }
 
     Helpers.PositionedImage {
@@ -261,7 +261,7 @@ PanoramaUI {
         z: 2
         function accessor(x) { return Parser.readField(skinCfg.data, "sd1_text" + x); }
         function styleField(x) { return sd1Style.getField(x); }
-        text: (sysinfo.sd1 - sysinfo.usedSd1) + " MiB"
+        text: (SystemInformation.sd1 - SystemInformation.usedSd1) + " MiB"
     }
 
     Helpers.PositionedImage {
@@ -274,7 +274,7 @@ PanoramaUI {
         z: 2
         function accessor(x) { return Parser.readField(skinCfg.data, "sd2_text" + x); }
         function styleField(x) { return sd2Style.getField(x); }
-        text: (sysinfo.sd2 - sysinfo.usedSd2) + " MiB"
+        text: (SystemInformation.sd2 - SystemInformation.usedSd2) + " MiB"
     }
 
     Helpers.PositionedImage {
@@ -370,7 +370,7 @@ PanoramaUI {
             width: parent.width - 40
             height: parent.height - 20
             text: appBrowser.currentItem === null ? "" : (
-                (ui.selectedIndex != 4) ? ("Do you want to add \"" + appBrowser.currentItem.friendlyName + "\" to your favorites?") : 
+                (ui.selectedIndex != 4) ? ("Do you want to add \"" + appBrowser.currentItem.friendlyName + "\" to your favorites?") :
                 ("Do you want to remove \"" + appBrowser.currentItem.friendlyName + "\" from your favorites?"))
             wrapMode: Text.Wrap
 
@@ -438,30 +438,32 @@ PanoramaUI {
         width: applicationsBoxWidth + 10
         height: (iconScaleMin + applicationsSpacing * 0.5) * maxAppsPerPage + 40
         clip: true
-        Keys.onDigit2Pressed: { //The rightmost Pandora button
-            ui.showFavDialog = true;
-        }
-        Keys.onDigit1Pressed: {
-            execute(appBrowser.currentItem.ident);
+        Pandora.onPressed: {
+            if(event.key == Pandora.ButtonB) {
+                ui.showFavDialog = true;
+                event.handled = true;
+            } else if(event.key == Pandora.ButtonA) {
+                Applications.execute(appBrowser.currentItem.ident);
+            }
         }
 
         ListView {
             function determineModel(x) {
                 switch(x) {
                     case 0:
-                        return ui.applications.inCategory("Emulator").sortedBy("name", true);
+                        return Applications.list.inCategory("Emulator").sortedBy("name", true);
                     case 1:
-                        return ui.applications.inCategory("Game").sortedBy("name", true);
+                        return Applications.list.inCategory("Game").sortedBy("name", true);
                     case 2:
-                        return ui.applications.sortedBy("name", true);
+                        return Applications.list.sortedBy("name", true);
                     case 4:
                         if(favorites.value.length > 0)
-                            return ui.applications.matching("identifier", favorites.value).sortedBy("name", true);
+                            return Applications.list.matching("identifier", favorites.value).sortedBy("name", true);
                     default:
-                        return ui.applications.matching("identifier", "^$") //Lists nothing
+                        return Applications.list.matching("identifier", "^$") //Lists nothing
                 }
             }
-            
+
             id: appBrowser
             anchors.fill: parent
             anchors.topMargin: 20

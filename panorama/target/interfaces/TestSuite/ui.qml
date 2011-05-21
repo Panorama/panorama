@@ -1,12 +1,14 @@
 import Qt 4.7
-import Panorama 1.0
+import Panorama.Settings 1.0
+import Panorama.UI 1.0
+import Panorama.Pandora 1.0
 
 PanoramaUI {
     id: ui
     name: "TestSuite"
     description: "A test theme that tests the Panorama-specific features"
     author: "dflemstr"
-    settingsSection: "stress"
+    anchors.fill: parent
 
     function write(what) {
         print(what.replace(/<(.|\n)*?>/g, ""));
@@ -35,18 +37,11 @@ PanoramaUI {
             color: "white"
 
             focus: true
-            Keys.onPressed: {
-                var test;
+            Pandora.onPressed: {
                 var pressed = function(key) {
                     write("Pressed the <span style\"color: yellow;\">" + key + "</span> button.");
                 }
                 switch(event.key) {
-                case Qt.Key_S:
-                        test = settingsTest;
-                    break;
-                case Qt.Key_F:
-                        test = fullscreenTest;
-                    break;
                 case Pandora.ButtonX:
                         pressed("X");
                     break;
@@ -85,6 +80,20 @@ PanoramaUI {
                     break;
                 case Pandora.ButtonPandora:
                         pressed("Pandora");
+                    break;
+                default:
+                        pressed("Unknown key " + event.key);
+                }
+            }
+
+            Keys.onPressed: {
+                var test;
+                switch(event.key) {
+                case Qt.Key_S:
+                        test = settingsTest;
+                    break;
+                case Qt.Key_F:
+                        test = fullscreenTest;
                     break;
                 }
                 if(test) {
@@ -153,16 +162,19 @@ PanoramaUI {
 
         Setting {
             id: setting1
+            section: "stress"
             key: "setting1"
         }
 
         Setting {
             id: setting2
+            section: "stress"
             key: "setting2"
         }
 
         Setting {
             id: setting3
+            section: "stress"
             key: "setting3"
         }
     }

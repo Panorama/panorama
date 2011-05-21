@@ -7,8 +7,11 @@
 #include <QDir>
 
 MainWindow::MainWindow(QWidget *parent) :
-        QDeclarativeView(parent)
+        QDeclarativeView(parent), runtimeObject(this)
 {
+    //Set the runtime object context property
+    rootContext()->setContextProperty("runtime", &runtimeObject);
+
 #ifdef ENABLE_OPENGL
     setViewport(new QGLWidget());
 #endif
@@ -50,4 +53,13 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
     {
         QDeclarativeView::keyPressEvent(e);
     }
+}
+
+void MainWindow::changeEvent(QEvent *e)
+{
+    if(e->type() == QEvent::ActivationChange)
+    {
+        runtimeObject.setIsActiveWindow(isActiveWindow());
+    }
+    QDeclarativeView::changeEvent(e);
 }

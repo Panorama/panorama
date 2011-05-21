@@ -25,10 +25,12 @@ TEMPLATE = app
 INCLUDEPATH += include
 SOURCES += \
     src/main.cpp \
-    src/mainwindow.cpp
+    src/mainwindow.cpp \
+    src/runtime.cpp
 HEADERS += \
     include/panoramainternal.h \
     include/constants.h \
-    src/mainwindow.h
+    src/mainwindow.h \
+    src/runtime.h
 OTHER_FILES += qrc/root.qml
 RESOURCES += qrc/default.qrc

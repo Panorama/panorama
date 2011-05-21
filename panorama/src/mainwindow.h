@@ -10,6 +10,7 @@
 #include <QKeyEvent>
 
 #include "constants.h"
+#include "runtime.h"
 
 /**
  * A MainWindow that is capable of displaying the Panorama's GUI
@@ -24,6 +25,10 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent* e);
+    void changeEvent(QEvent* e);
+
+private:
+    Runtime runtimeObject;
 };
 
 #endif // MAINWINDOW_H

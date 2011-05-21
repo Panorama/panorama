@@ -20,6 +20,11 @@ signals:
 protected slots:
     void keyPressed(const PandoraKeyEvent &event);
     void keyReleased(const PandoraKeyEvent &event);
+
+    void setActive(bool const value);
+
+private:
+    bool active;
 };
 
 #endif // PANDORAATTACHED_H

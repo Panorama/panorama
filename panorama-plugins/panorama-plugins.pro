@@ -7,3 +7,4 @@ SUBDIRS = \
     applications-plugin \
     systeminformation-plugin \
     pandora-plugin
+

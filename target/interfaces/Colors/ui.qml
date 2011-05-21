@@ -7,6 +7,7 @@ import Panorama.Pandora 1.0
 import Panorama.Applications 1.0
 import "qml" as Helpers
 import "qml/parser.js" as Parser
+
 PanoramaUI {
     id: ui
     name: "Colors (from PMenu)"

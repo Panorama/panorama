@@ -9,9 +9,6 @@
 # Preserve files used by Git!
 !.git*
 
-# Preserve ".initial", just for the memories...
-!.initial
-
 # Ignore build-process related files
 Makefile
 *.o
@@ -19,10 +16,8 @@ Makefile
 *.a
 moc_*
 qrc_*
-panorama/target/panorama
+target/panorama
 
 # Ignore project-related user-generated files
 *.user
 
-# Ignore that #¤#% config file that is modified every time we test the application
-panorama/target/settings.cfg

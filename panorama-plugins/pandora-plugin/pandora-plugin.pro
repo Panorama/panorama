@@ -4,7 +4,7 @@ QT += declarative
 CONFIG += qt plugin
 
 TARGET = $$qtLibraryTarget($$TARGET)
-DESTDIR = ../../panorama/target/plugins/Panorama/Pandora
+DESTDIR = ../../target/plugins/Panorama/Pandora
 
 INCLUDEPATH += ../../panorama/include
 INCLUDEPATH += ../../pandora-libraries/pnd/include

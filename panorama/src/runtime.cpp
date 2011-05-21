@@ -5,7 +5,7 @@ Runtime::Runtime(QObject *parent) :
 {
 }
 
-bool Runtime::getIsActiveWindow()
+bool Runtime::isActiveWindow() const
 {
     return _isActiveWindow;
 }
@@ -17,4 +17,9 @@ void Runtime::setIsActiveWindow(bool const value)
         _isActiveWindow = value;
         emit isActiveWindowChanged(value);
     }
+}
+
+void Runtime::setFullscreen(bool fullscreen)
+{
+    emit fullscreenRequested(fullscreen);
 }

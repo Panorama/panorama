@@ -1,17 +1,20 @@
 #include "runtime.h"
 
 Runtime::Runtime(QObject *parent) :
-        QObject(parent), isActiveWindow(false)
+        QObject(parent), _isActiveWindow(false)
 {
 }
 
 bool Runtime::getIsActiveWindow()
 {
-    return isActiveWindow;
+    return _isActiveWindow;
 }
 
 void Runtime::setIsActiveWindow(bool const value)
 {
-    isActiveWindow = value;
-    emit isActiveWindowChanged(value);
+    if(_isActiveWindow != value)
+    {
+        _isActiveWindow = value;
+        emit isActiveWindowChanged(value);
+    }
 }

@@ -3,12 +3,21 @@
 #include <QDeclarativeContext>
 #include <QDebug>
 
+class PandoraAttachedPrivate
+{
+    PANORAMA_DECLARE_PUBLIC(PandoraAttached)
+public:
+    PandoraAttachedPrivate();
+    bool active;
+};
+
 PandoraEventSource *_pandoraattached_pandoraEventSource;
 #define _pandoraEventSource _pandoraattached_pandoraEventSource
 
 PandoraAttached::PandoraAttached(QObject *parent) :
-    QObject(parent), active(true)
+    QObject(parent)
 {
+    PANORAMA_INITIALIZE(PandoraAttached);
     if(!_pandoraEventSource)
         _pandoraEventSource = new PandoraEventSource();
     connect(_pandoraEventSource, SIGNAL(isActiveChanged(bool)),
@@ -18,7 +27,7 @@ PandoraAttached::PandoraAttached(QObject *parent) :
     connect(_pandoraEventSource, SIGNAL(keyReleased(PandoraKeyEvent)),
             this, SLOT(keyReleased(PandoraKeyEvent)));
 
-    QDeclarativeContext* context = QDeclarativeEngine::contextForObject(parent);
+    QDeclarativeContext* context = QDeclarativeEngine::contextForObject(this);
     if(context)
     {
         QVariant runtime = context->contextProperty("runtime");
@@ -33,6 +42,11 @@ PandoraAttached::PandoraAttached(QObject *parent) :
     }
 }
 
+PandoraAttached::~PandoraAttached()
+{
+    PANORAMA_UNINITIALIZE(PandoraAttached);
+}
+
 bool PandoraAttached::controlsActive() const
 {
     return _pandoraEventSource->isActive();
@@ -40,17 +54,24 @@ bool PandoraAttached::controlsActive() const
 
 void PandoraAttached::keyPressed(const PandoraKeyEvent &event)
 {
-    if(active)
+    PANORAMA_PRIVATE(PandoraAttached);
+    if(priv->active)
         emit pressed(QVariant::fromValue((QObject *) &event));
 }
 
 void PandoraAttached::keyReleased(const PandoraKeyEvent &event)
 {
-    if(active)
+    PANORAMA_PRIVATE(PandoraAttached);
+    if(priv->active)
         emit released(QVariant::fromValue((QObject *) &event));
 }
 
 void PandoraAttached::setActive(bool const value)
 {
-    active = value;
+    PANORAMA_PRIVATE(PandoraAttached);
+    priv->active = value;
 }
+
+PandoraAttachedPrivate::PandoraAttachedPrivate()
+    : active(true)
+{}

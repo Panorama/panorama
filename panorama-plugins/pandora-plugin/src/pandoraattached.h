@@ -1,15 +1,21 @@
 #ifndef PANDORAATTACHED_H
 #define PANDORAATTACHED_H
 
+#include "panoramainternal.h"
+
 #include <QObject>
 #include "pandoraeventsource.h"
+
+class PandoraAttachedPrivate;
 
 class PandoraAttached : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool controlsActive READ controlsActive NOTIFY controlsActiveUpdated)
+    PANORAMA_DECLARE_PRIVATE(PandoraAttached)
 public:
     explicit PandoraAttached(QObject *parent = 0);
+    ~PandoraAttached();
     bool controlsActive() const;
 
 signals:
@@ -20,11 +26,7 @@ signals:
 protected slots:
     void keyPressed(const PandoraKeyEvent &event);
     void keyReleased(const PandoraKeyEvent &event);
-
-    void setActive(bool const value);
-
-private:
-    bool active;
+    void setActive(bool value);
 };
 
 #endif // PANDORAATTACHED_H

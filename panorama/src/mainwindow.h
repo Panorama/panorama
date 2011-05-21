@@ -28,7 +28,7 @@ protected:
     void changeEvent(QEvent* e);
 
 private:
-    Runtime runtimeObject;
+    Runtime _runtimeObject;
 };
 
 #endif // MAINWINDOW_H

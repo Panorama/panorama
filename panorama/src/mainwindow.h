@@ -27,6 +27,9 @@ protected:
     void keyPressEvent(QKeyEvent* e);
     void changeEvent(QEvent* e);
 
+private slots:
+    void setFullscreen(bool fullscreen);
+
 private:
     Runtime _runtimeObject;
 };

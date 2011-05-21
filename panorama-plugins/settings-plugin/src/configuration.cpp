@@ -85,7 +85,11 @@ void ConfigurationPrivate::initConfiguration()
         }
 
         //XXX Hack, add different method for "virtual" settings?
+#if defined(PANDORA) || (!defined(PANDORA) && !defined(RELEASE))
         settings->setValue("panorama/dataDirectory", QCoreApplication::applicationDirPath());
+#else
+        settings->setValue("panorama/dataDirectory", "/usr/share/panorama");
+#endif
 
         watcher.addPath(settings->fileName());
         qDebug() << "Settings are saved in" << settings->fileName();

@@ -11,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     //Set the runtime object context property
     rootContext()->setContextProperty("runtime", &_runtimeObject);
+    connect(&_runtimeObject, SIGNAL(fullscreenChanged(bool)),
+            this, SLOT(setFullscreen(bool)));
 
 #ifdef ENABLE_OPENGL
     setViewport(new QGLWidget());
@@ -34,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Make plugins available
     engine()->addImportPath(QCoreApplication::applicationDirPath() + "/plugins");
+    engine()->addImportPath("/usr/lib/panorama/plugins");
+    engine()->addImportPath(QDir::homePath() + "/.panorama/plugins");
 
     //Load the main QML file
     setSource(QUrl("qrc:/root.qml"));
@@ -49,6 +53,10 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
         close();
         e->accept();
     }
+    else if(e->key() == Qt::Key_F && e->modifiers() & Qt::ControlModifier)
+    {
+        _runtimeObject.setFullscreen(!_runtimeObject.fullscreen());
+    }
     else
     {
         QDeclarativeView::keyPressEvent(e);
@@ -62,4 +70,12 @@ void MainWindow::changeEvent(QEvent *e)
         _runtimeObject.setIsActiveWindow(isActiveWindow());
     }
     QDeclarativeView::changeEvent(e);
+}
+
+void MainWindow::setFullscreen(bool fullscreen)
+{
+    if(fullscreen)
+        showFullScreen();
+    else
+        showNormal();
 }

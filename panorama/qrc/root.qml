@@ -21,6 +21,7 @@ Item {
         section: "panorama"
         key: "fullscreen"
         defaultValue: false
+        onValueChanged: runtime.fullscreen = value
     }
     Setting {
         id: dataDirectory

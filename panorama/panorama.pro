@@ -20,7 +20,7 @@ poltergeist {
 }
 
 TARGET = panorama
-DESTDIR = target
+DESTDIR = ../target
 TEMPLATE = app
 INCLUDEPATH += include
 SOURCES += \

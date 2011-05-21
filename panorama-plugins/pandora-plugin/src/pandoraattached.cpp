@@ -27,7 +27,7 @@ PandoraAttached::PandoraAttached(QObject *parent) :
     connect(_pandoraEventSource, SIGNAL(keyReleased(PandoraKeyEvent)),
             this, SLOT(keyReleased(PandoraKeyEvent)));
 
-    QDeclarativeContext* context = QDeclarativeEngine::contextForObject(this);
+    QDeclarativeContext* context = QDeclarativeEngine::contextForObject(parent);
     if(context)
     {
         QVariant runtime = context->contextProperty("runtime");

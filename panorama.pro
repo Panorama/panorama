@@ -2,7 +2,8 @@
 TEMPLATE = subdirs
 SUBDIRS = panorama \
     pandora-libraries \
-    panorama-plugins
+    panorama-plugins \
+    panorama-control
 
 pandora-libraries.subdir = pandora-libraries
 

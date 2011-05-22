@@ -58,7 +58,7 @@ void MainWindow::changeEvent(QEvent *e)
 void MainWindow::setFullscreen(bool fullscreen)
 {
     if(fullscreen)
-        showFullScreen();
+        setWindowState(windowState() | Qt::WindowFullScreen);
     else
-        showNormal();
+        setWindowState(windowState() & ~Qt::WindowFullScreen);
 }

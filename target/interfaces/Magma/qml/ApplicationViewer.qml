@@ -1,5 +1,6 @@
 import Qt 4.7
-import Panorama 1.0
+import Panorama.Applications 1.0
+import Panorama.Settings 1.0
 
 Item {
     id: apps

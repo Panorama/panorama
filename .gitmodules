@@ -2,3 +2,9 @@
 	path = pandora-libraries
 	url = git://github.com/dflemstr/pandora-libraries.git
         branch = clean
+[submodule "panorama-plugins/milky-plugin/libmilky/src"]
+	path = panorama-plugins/milky-plugin/libmilky/src
+	url = git://github.com/Cloudef/milkyhelper.git
+[submodule "panorama-plugins/milky-plugin/libjansson/src"]
+	path = panorama-plugins/milky-plugin/libjansson/src
+	url = git://github.com/akheron/jansson.git

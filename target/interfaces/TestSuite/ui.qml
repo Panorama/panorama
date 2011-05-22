@@ -84,10 +84,13 @@ PanoramaUI {
                 default:
                         pressed("Unknown key " + event.key);
                 }
+                event.accepted = true;
             }
 
             Keys.onPressed: {
                 var test;
+                if(event.modifiers)
+                    return;
                 switch(event.key) {
                 case Qt.Key_S:
                         test = settingsTest;
@@ -97,6 +100,7 @@ PanoramaUI {
                     break;
                 }
                 if(test) {
+                    event.accepted = true;
                     if(!test.running) {
                         write("<span style=\"color: blue;\">Starting <span style=\"color: teal;\">" + test.name + "</span> test.</span>");
                         test.start();

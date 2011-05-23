@@ -15,21 +15,21 @@ PanoramaUI {
         id: minimumNumberOfColumns
         section: "Tabbed"
         key: "minimumNumberOfColumns"
-        defaultValue: "8"
+        defaultValue: 8
     }
 
     Setting {
         id: maximumIconSize
         section: "Tabbed"
         key: "maximumIconSize"
-        defaultValue: "96"
+        defaultValue: 96
     }
 
     Setting {
         id: iconSpacing
         section: "Tabbed"
         key: "iconSpacing"
-        defaultValue: "8"
+        defaultValue: 8
     }
 
     Item {
@@ -141,8 +141,8 @@ PanoramaUI {
         Column {
             id: tabs
             property int selected: 0
-            property string selectedName: tabs.children[selected].fullName
-            property string selectedRawName: tabs.children[selected].rawName
+            property string selectedName: tabs.children[selected].fullName ? tabs.children[selected].fullName : ""
+            property string selectedRawName: tabs.children[selected].rawName ? tabs.children[selected].rawName : ""
             anchors.fill: parent
             anchors.topMargin: (parent.height % 10) / 2
             anchors.bottomMargin: (parent.height % 10) / 2

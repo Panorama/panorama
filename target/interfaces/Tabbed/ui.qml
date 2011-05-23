@@ -11,6 +11,27 @@ PanoramaUI {
     author: "B-ZaR"
     anchors.fill: parent
 
+    Setting {
+        id: minimumNumberOfColumns
+        section: "Tabbed"
+        key: "minimumNumberOfColumns"
+        defaultValue: "8"
+    }
+
+    Setting {
+        id: maximumIconSize
+        section: "Tabbed"
+        key: "maximumIconSize"
+        defaultValue: "96"
+    }
+
+    Setting {
+        id: iconSpacing
+        section: "Tabbed"
+        key: "iconSpacing"
+        defaultValue: "8"
+    }
+
     Item {
         id: keyHandler
         focus: true
@@ -189,11 +210,11 @@ PanoramaUI {
                         raw: "Development"
                     }
                     ListElement {
-                        name: "Sound & Video"
+                        name: "Media"
                         raw: "AudioVideo|Audio|Video"
                     }
                     ListElement {
-                        name: "System Tools"
+                        name: "System"
                         raw: "System"
                     }
                     ListElement {
@@ -214,11 +235,10 @@ PanoramaUI {
                     height: tabs.height/10
                     width: tabs.width
                     color: "#444"
-
+                    z: 2
                     selected: tabs.selected == tabIndex
                     Rectangle {
-                        x: 63
-                        y: -63
+                        anchors.centerIn: parent
                         width:parent.height
                         height:parent.width
                         rotation: 90
@@ -238,7 +258,7 @@ PanoramaUI {
                         verticalAlignment: Text.AlignVCenter
                         anchors.fill: parent
                         anchors.margins: 2
-                        font.pixelSize: parent.height/2
+                        font.pixelSize: parent.width/10
                         color: parent.selected ? "#111" : "#eee"
                         font.bold: true
                     }
@@ -268,9 +288,27 @@ PanoramaUI {
 
         GridView {
             id: applications
-            highlight: Rectangle { color: "#555"; opacity: 0.5; radius: 8; width: 64; height: 64 }
+
+            function calculateItemSize() {
+                var width = applications.width - 2 * applications.anchors.margins;
+                var cols = applications.minNumColumns;
+                if(width/cols > applications.maxItemSize) {
+                    var cols = Math.ceil(width/applications.maxItemSize);
+                }
+                return parseInt(width / cols);
+            }
+
+            property int maxItemSize: maximumIconSize.value
+            property int minNumColumns: minimumNumberOfColumns.value
+            property int itemSize: calculateItemSize()
+            property int itemSpacing: iconSpacing.value
+
+            cellWidth: itemSize
+            cellHeight: itemSize
+
+            highlight: Rectangle { color: "#555"; opacity: 0.5; radius: width/8; width: applications.itemSize; height: applications.itemSize }
             anchors.fill: parent
-            anchors.margins: 10
+            anchors.margins: 5
 
             model: Applications.list.inCategory(tabs.selectedRawName)
                     .matching("name", (search.text.length == 0) ? ".*" : ".*" + search.text + ".*")
@@ -300,6 +338,7 @@ PanoramaUI {
                         applications.moveCurrentIndexRight();
                         break;
                     case Qt.Key_Return:
+                    case Qt.Key_Enter:
                         Applications.execute(applications.currentItem.ident);
                         break;
                     default:
@@ -334,8 +373,8 @@ PanoramaUI {
 
             delegate: Item {
                 property string ident: identifier
-                width: parent.width/8
-                height: parent.width/8
+                width: applications.itemSize - applications.itemSpacing/2
+                height: applications.itemSize - applications.itemSpacing/2
 
                 MouseArea {
                     anchors.fill: parent
@@ -349,15 +388,14 @@ PanoramaUI {
                 Image {
                     id: iconField
                     source: icon ? icon : "images/application-x-executable.png"
-                    smooth: true
+                    smooth: false
                     anchors.fill: parent
-                    anchors.margins: 4
-
+                    anchors.margins: 4                
                 }
                 Text {
                     text: name
 
-                    font.pixelSize: 10
+                    font.pixelSize: parent.height / 8
                     style: Text.Outline; styleColor: "#ddd"
                     color: "#222"
                     anchors.bottom: parent.bottom

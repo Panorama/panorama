@@ -131,112 +131,91 @@ PanoramaUI {
     }
 
     Rectangle {
-        id: tabContainer
+        id: tabs
         color: "#222"
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         width: 170
 
+        function selectedTab() {
+            // A hack to compensate for Repeater's weird behavior. For some reason Repeater can be either the first or last child
+            // of its parent after loading, but is somewhere in between immediately after creating the elements.
+            // The below hack takes into account all of the cases assuming the first child is wanted at load time
+            return tabColumn.children[0].fullName !== undefined ? tabColumn.children[selected] : tabColumn.children[selected+1];
+        }
+
+        property int selected: 0
+        property string selectedName: selectedTab().fullName ? selectedTab().fullName : "Error"
+        property string selectedRawName: selectedTab().rawName ? selectedTab().rawName : "None"
+
+        function nextTab() {
+            selected = (selected+1) % tabModel.count;
+            applications.currentIndex = 0;
+        }
+
+        function prevTab() {
+            selected = (selected > 0) ? (selected - 1) : tabModel.count - 1;
+            applications.currentIndex = 0;
+        }
+
+        Keys.onPressed: {
+            if(Pandora.controlsActive)
+                return;
+            if(event.key == Qt.Key_PageUp) {
+                prevTab();
+                event.accepted = true;
+            } else if(event.key == Qt.Key_PageDown) {
+                nextTab();
+                event.accepted = true;
+            }
+        }
+
+        Pandora.onPressed: {
+            if(event.key == Pandora.TriggerL) {
+                prevTab();
+                event.accepted = true;
+            } else if(event.key == Pandora.TriggerR) {
+                nextTab();
+                event.accepted = true;
+            }
+        }
         Column {
-            id: tabs
-            property int selected: 0
-            property string selectedName: tabs.children[selected].fullName ? tabs.children[selected].fullName : ""
-            property string selectedRawName: tabs.children[selected].rawName ? tabs.children[selected].rawName : ""
+            id: tabColumn
+
             anchors.fill: parent
             anchors.topMargin: (parent.height % 10) / 2
             anchors.bottomMargin: (parent.height % 10) / 2
 
-            function nextTab() {
-                selected = (selected + 1) % 10;
-                applications.currentIndex = 0;
-            }
-
-            function prevTab() {
-                selected = (selected > 0) ? (selected - 1) : 9;
-                applications.currentIndex = 0;
-            }
-
-            Keys.onPressed: {
-                if(Pandora.controlsActive)
-                    return;
-                if(event.key == Qt.Key_PageUp) {
-                    prevTab();
-                    event.accepted = true;
-                } else if(event.key == Qt.Key_PageDown) {
-                    nextTab();
-                    event.accepted = true;
-                }
-            }
-
-            Pandora.onPressed: {
-                if(event.key == Pandora.TriggerL) {
-                    prevTab();
-                    event.accepted = true;
-                } else if(event.key == Pandora.TriggerR) {
-                    nextTab();
-                    event.accepted = true;
-                }
-            }
-
             Repeater {
                 model: ListModel {
-                    ListElement {
-                        name: "All"
-                        raw: ".*"
-                    }
-                    ListElement {
-                        name: "Accessories"
-                        raw: "Utility"
-                    }
-                    ListElement {
-                        name: "Games"
-                        raw: "Game"
-                    }
-                    ListElement {
-                        name: "Graphics"
-                        raw: "Graphics"
-                    }
-                    ListElement {
-                        name: "Internet"
-                        raw: "Network"
-                    }
-                    ListElement {
-                        name: "Office"
-                        raw: "Office"
-                    }
-                    ListElement {
-                        name: "Programming"
-                        raw: "Development"
-                    }
-                    ListElement {
-                        name: "Media"
-                        raw: "AudioVideo|Audio|Video"
-                    }
-                    ListElement {
-                        name: "System"
-                        raw: "System"
-                    }
-                    ListElement {
-                        name: "Other"
-                        raw: "NoCategory"
-                    }
+                    id: tabModel
+                    ListElement { name: "All"; raw: ".*" }
+                    ListElement { name: "Accessories"; raw: "Utility" }
+                    ListElement { name: "Games"; raw: "Game"}
+                    ListElement { name: "Graphics"; raw: "Graphics" }
+                    ListElement { name: "Internet"; raw: "Network" }
+                    ListElement { name: "Office"; raw: "Office" }
+                    ListElement { name: "Programming"; raw: "Development" }
+                    ListElement { name: "Media"; raw: "AudioVideo|Audio|Video" }
+                    ListElement { name: "System"; raw: "System" }
+                    ListElement { name: "Other"; raw: "NoCategory" }
                 }
                 delegate: Rectangle {
                     property string rawName: raw
                     property string fullName: name
-                    property string tabIndex: index
-                    property bool selected
+
+                    property bool selected: tabs.selected == index
 
                     border {
                         color: "#333"
                         width: 1
                     }
-                    height: tabs.height/10
-                    width: tabs.width
+                    height: tabColumn.height/10
+                    width: tabColumn.width
                     color: "#444"
                     z: 2
-                    selected: tabs.selected == tabIndex
+
                     Rectangle {
                         anchors.centerIn: parent
                         width:parent.height
@@ -249,7 +228,7 @@ PanoramaUI {
                         anchors.fill: parent
 
                         onClicked: {
-                            tabs.selected = parent.tabIndex;
+                            tabs.selected = index;
                             applications.currentIndex = 0;
                         }
                     }
@@ -271,9 +250,9 @@ PanoramaUI {
         id: content
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
-        anchors.left: tabContainer.right
+        anchors.left: tabs.right
         anchors.right: parent.right
-        radius: (tabContainer.height % 10) / 2
+        radius: (tabs.height % 10) / 2
         color: "#eee"
 
         Text {

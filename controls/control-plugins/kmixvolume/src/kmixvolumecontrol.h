@@ -11,7 +11,7 @@ class KMixVolumeControl : public Control
 public:
     explicit KMixVolumeControl(QObject *parent = 0);
     ~KMixVolumeControl();
-    QList<Concept *> concepts() const;
+    QSet<Concept *> concepts() const;
     QString name() const;
 
 private slots:
@@ -19,7 +19,7 @@ private slots:
     void refreshVolume();
 
 private:
-    QList<Concept *> _concepts;
+    QSet<Concept *> _concepts;
     QDBusConnection _dbus;
     QTimer _timer;
 };

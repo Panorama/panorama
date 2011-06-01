@@ -25,7 +25,7 @@ KMixVolumeControl::~KMixVolumeControl()
     }
 }
 
-QList<Concept *> KMixVolumeControl::concepts() const
+QSet<Concept *> KMixVolumeControl::concepts() const
 {
     return _concepts;
 }

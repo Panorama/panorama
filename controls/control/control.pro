@@ -1,6 +1,6 @@
 QT       -= gui
 
-TARGET = panorama-control
+TARGET = control
 TEMPLATE = lib
 CONFIG += staticlib
 

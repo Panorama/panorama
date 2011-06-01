@@ -6,7 +6,7 @@ KMixVolumePlugin::KMixVolumePlugin()
     _controls << new KMixVolumeControl();
 }
 
-QList<Control *> KMixVolumePlugin::controls() const
+QSet<Control *> KMixVolumePlugin::controls() const
 {
     return _controls;
 }

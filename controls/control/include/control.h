@@ -2,7 +2,7 @@
 #define CONTROL_H
 
 #include <QObject>
-#include <QList>
+#include <QSet>
 #include "concept.h"
 
 class Control : public QObject
@@ -13,7 +13,7 @@ public:
     Control(QObject *parent = 0);
     Control(const QVariant &value, QObject *parent = 0);
     virtual ~Control() {}
-    virtual QList<Concept *> concepts() const = 0;
+    virtual QSet<Concept *> concepts() const = 0;
 
     QVariant value() const;
     void setValue(const QVariant &value);

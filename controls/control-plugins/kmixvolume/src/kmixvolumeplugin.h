@@ -12,9 +12,9 @@ public:
     KMixVolumePlugin();
     ~KMixVolumePlugin();
 
-    QList<Control *> controls() const;
+    QSet<Control *> controls() const;
 private:
-    QList<Control *> _controls;
+    QSet<Control *> _controls;
 };
 
 #endif // KMIXVOLUMEPLUGIN_H

@@ -114,11 +114,11 @@ void Setting::setValue(const QVariant &value)
 
 QVariant Setting::value() const
 {
+    QVariant result;
     PANORAMA_PRIVATE(const Setting);
     if(_settings)
-        return _settings->setting(priv->section, priv->key);
-    else
-        return QVariant();
+        result = _settings->setting(priv->section, priv->key);
+    return result;
 }
 
 void Setting::handleFieldChange(const QString &section, const QString &key,

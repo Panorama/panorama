@@ -53,7 +53,21 @@ void SettingsHive::readSettings(const QSettings &in)
         const int slash = key.indexOf('/');
         const QString section = key.left(slash);
         const QString sectionKey = key.right(key.length() - slash - 1);
-        setSetting(section, sectionKey, in.value(key), SettingsSource::File);
+        static const QRegExp boolean("(true|false)\\b");
+        static const QRegExp integer("[+-]?\\b\\d+\\b");
+        static const QRegExp real("((\\b[0-9]+)?\\.)?\\b[0-9]+([eE][-+]?[0-9]+)?\\b");
+
+        const QVariant value = in.value(key);
+        QVariant result(value);
+
+        if(boolean.exactMatch(value.toString()))
+            result = QVariant(result.toBool());
+        else if(integer.exactMatch(value.toString()))
+            result = QVariant(result.toInt());
+        else if(real.exactMatch(value.toString()))
+            result = QVariant(result.toDouble());
+
+        setSetting(section, sectionKey, result, SettingsSource::File);
     }
 }
 

@@ -8,7 +8,7 @@ class MilkyModelPrivate
 {
     PANORAMA_DECLARE_PUBLIC(MilkyModel)
 public:
-
+    MilkyListenerThread* listenerThread;
 };
 
 MilkyModel::MilkyModel(QObject *parent) :
@@ -17,6 +17,10 @@ MilkyModel::MilkyModel(QObject *parent) :
     PANORAMA_INITIALIZE(MilkyModel);
     milky_init();
     milky_set_verbose(1);
+
+    priv->listenerThread = new MilkyListenerThread(this);
+    connect(this, SIGNAL(notifyListener()), priv->listenerThread, SIGNAL(notifyListener()));
+    priv->listenerThread->start();
 
     // Apply configuration after properties have been set
     QTimer* initTimer = new QTimer(this);
@@ -28,6 +32,9 @@ MilkyModel::MilkyModel(QObject *parent) :
 
 MilkyModel::~MilkyModel()
 {
+    PANORAMA_PRIVATE(MilkyModel);
+    priv->listenerThread->exit();
+
     milky_deinit();
 }
 
@@ -53,15 +60,15 @@ void MilkyModel::setTargetDir(QString const newTargetDir)
     emit targetDirChanged(newTargetDir);
 }
 
-QString MilkyModel::getDatabaseFile()
+QString MilkyModel::getRepositoryUrl()
 {
     return QString(milky_get_db());
 }
 
-void MilkyModel::setDatabaseFile(QString const newDatabaseFile)
+void MilkyModel::setRepositoryUrl(QString const newRepositoryUrl)
 {
-    milky_set_db(newDatabaseFile.toLocal8Bit());
-    emit databaseFileChanged(newDatabaseFile);
+    milky_set_db(newRepositoryUrl.toLocal8Bit());
+    emit repositoryUrlChanged(newRepositoryUrl);
 }
 
 
@@ -88,7 +95,32 @@ void MilkyModel::setLogFile(QString const newLogFile)
     emit logFileChanged(newLogFile);
 }
 
+MilkyListener* MilkyModel::getListener()
+{
+    PANORAMA_PRIVATE(MilkyModel);
+    return priv->listenerThread->listener;
+}
+
 void MilkyModel::applyConfiguration()
 {
     milky_check_config();
+}
+
+void MilkyModel::updateDatabase()
+{
+    milky_sync_database();
+    emit notifyListener();
+}
+
+void MilkyModel::install(QString pndId)
+{
+    milky_add_target(pndId.toLocal8Bit());
+    milky_install();
+    emit notifyListener();
+}
+
+void MilkyModel::answer(bool value)
+{
+    PANORAMA_PRIVATE(MilkyModel);
+    priv->listenerThread->listener->answer(value);
 }

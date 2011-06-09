@@ -57,6 +57,10 @@ public slots:
     void updateDatabase();
     void install(QString pndId);
     void answer(bool value);
+
+private slots:
+    void refreshModel();
+    void finishInitialization();
 };
 
 QML_DECLARE_TYPE(MilkyModel)

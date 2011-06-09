@@ -4,11 +4,14 @@
 #include <QDebug>
 #include <QTimer>
 
+#include "milkypackage.h"
+
 class MilkyModelPrivate
 {
     PANORAMA_DECLARE_PUBLIC(MilkyModel)
 public:
     MilkyListenerThread* listenerThread;
+    QList<MilkyPackage*> packages;
 };
 
 MilkyModel::MilkyModel(QObject *parent) :
@@ -19,7 +22,7 @@ MilkyModel::MilkyModel(QObject *parent) :
     milky_set_verbose(1);
 
     priv->listenerThread = new MilkyListenerThread(this);
-    connect(this, SIGNAL(notifyListener()), priv->listenerThread, SIGNAL(notifyListener()));
+    connect(priv->listenerThread, SIGNAL(ready()), this, SLOT(finishInitialization()));
     priv->listenerThread->start();
 
     // Apply configuration after properties have been set
@@ -108,6 +111,7 @@ void MilkyModel::applyConfiguration()
 
 void MilkyModel::updateDatabase()
 {
+    PANORAMA_PRIVATE(MilkyModel);
     milky_sync_database();
     emit notifyListener();
 }
@@ -123,4 +127,65 @@ void MilkyModel::answer(bool value)
 {
     PANORAMA_PRIVATE(MilkyModel);
     priv->listenerThread->listener->answer(value);
+}
+
+void MilkyModel::refreshModel()
+{
+    PANORAMA_PRIVATE(MilkyModel);
+
+    foreach(MilkyPackage* mp, priv->packages)
+    {
+        delete mp;
+    }
+    priv->packages.clear();
+
+    alpm_list_t* packageList = milky_get_package_list();
+    alpm_list_t* package = packageList;
+
+    if(package)
+    {
+        do
+        {
+            _pnd_package* p = reinterpret_cast<_pnd_package*>(package->data);
+            MilkyPackage* mp = new MilkyPackage();
+
+            mp->setId(p->id);
+            mp->setTitle(p->title);
+            mp->setDescription(p->desc);
+            mp->setInfo(p->info);
+            mp->setIcon(p->icon);
+            mp->setUri(p->uri);
+            mp->setmd5(p->md5);
+            mp->setVendor(p->vendor);
+            mp->setGroup(p->group);
+            mp->setModified(QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(p->modified_time) * 1000));
+            mp->setRating(p->rating);
+            mp->setSize(p->size);
+            mp->setAuthorName(p->author->name);
+            mp->setAuthorSite(p->author->website);
+            mp->setAuthorEmail(p->author->email);
+            mp->setInstalledVersionMajor(p->local_version->major);
+            mp->setInstalledVersionMinor(p->local_version->minor);
+            mp->setInstalledVersionRelease(p->local_version->release);
+            mp->setInstalledVersionBuild(p->local_version->build);
+            mp->setInstalledVersionType(p->local_version->type);
+            mp->setCurrentVersionMajor(p->version->major);
+            mp->setCurrentVersionMinor(p->version->minor);
+            mp->setCurrentVersionRelease(p->version->release);
+            mp->setCurrentVersionBuild(p->version->build);
+            mp->setCurrentVersionType(p->version->type);
+            mp->setInstalled(p->installed);
+            mp->setHasUpdate(p->hasupdate);
+            mp->setInstallPath(p->install_path);
+
+            priv->packages << mp;
+        } while(package = package->next);
+    }
+}
+
+void MilkyModel::finishInitialization()
+{
+    PANORAMA_PRIVATE(MilkyModel);
+    connect(this, SIGNAL(notifyListener()), priv->listenerThread->listener, SLOT(listen()));
+    connect(priv->listenerThread->listener, SIGNAL(syncDone()), this, SLOT(refreshModel()));
 }

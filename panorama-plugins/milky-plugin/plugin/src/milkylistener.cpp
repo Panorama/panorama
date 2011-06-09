@@ -31,7 +31,7 @@ MilkyListenerThread::~MilkyListenerThread()
 void MilkyListenerThread::run()
 {
     listener = new MilkyListener();
-    connect(this, SIGNAL(notifyListener()), listener, SLOT(listen()));
+    emit ready();
     exec();
 }
 
@@ -186,6 +186,7 @@ void MilkyListener::listen()
                 break;
             }
             case M_SIG_WAIT:
+            default:
             {
 
                 break;

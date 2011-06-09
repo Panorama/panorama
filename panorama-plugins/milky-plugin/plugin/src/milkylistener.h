@@ -81,7 +81,7 @@ public:
     MilkyListener* listener;
 
 signals:
-    void notifyListener();
+    void ready();
 };
 
 #endif // MILKYLISTENER_H

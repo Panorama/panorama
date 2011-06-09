@@ -14,12 +14,14 @@ INCLUDEPATH += ../libjansson/src/src
 SOURCES += \
     src/milkyplugin.cpp \
     src/milkymodel.cpp \
-    src/milkylistener.cpp
+    src/milkylistener.cpp \
+    src/milkypackage.cpp
 
 HEADERS += \
     src/milkyplugin.h \
     src/milkymodel.h \
-    src/milkylistener.h
+    src/milkylistener.h \
+    src/milkypackage.h
 
 LIBS += -L../libmilky -lmilky
 LIBS += -L../libjansson -ljansson

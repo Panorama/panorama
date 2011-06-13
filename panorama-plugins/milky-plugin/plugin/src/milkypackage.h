@@ -13,7 +13,7 @@ class MilkyPackage : public QObject
     Q_PROPERTY(QString info READ getInfo WRITE setInfo NOTIFY infoChanged);
     Q_PROPERTY(QString icon READ getIcon WRITE setIcon NOTIFY iconChanged);
     Q_PROPERTY(QString uri READ getUri WRITE setUri NOTIFY uriChanged);
-    Q_PROPERTY(QString md5 READ getmd5 WRITE setmd5 NOTIFY md5Changed);
+    Q_PROPERTY(QString md5 READ getMD5 WRITE setMD5 NOTIFY md5Changed);
     Q_PROPERTY(QString vendor READ getVendor WRITE setVendor NOTIFY vendorChanged);
     Q_PROPERTY(QString group READ getGroup WRITE setGroup NOTIFY groupChanged);
     Q_PROPERTY(QDateTime modified READ getModified WRITE setModified NOTIFY modifiedChanged);
@@ -40,39 +40,41 @@ class MilkyPackage : public QObject
     Q_PROPERTY(bool installed READ getInstalled WRITE setInstalled NOTIFY installedChanged);
     Q_PROPERTY(bool hasUpdate READ getHasUpdate WRITE setHasUpdate NOTIFY hasUpdateChanged);
     Q_PROPERTY(QString installPath READ getInstallPath WRITE setInstallPath NOTIFY installPathChanged);
+    Q_PROPERTY(QString categories READ getCategories WRITE setCategories NOTIFY categoriesChanged);
 
 public:
     explicit MilkyPackage(QObject *parent = 0);
 
 public slots:
-    QString getId();
-    QString getTitle();
-    QString getDescription();
-    QString getInfo();
-    QString getIcon();
-    QString getUri();
-    QString getmd5();
-    QString getVendor();
-    QString getGroup();
-    QDateTime getModified();
-    int getRating();
-    int getSize();
-    QString getAuthorName();
-    QString getAuthorSite();
-    QString getAuthorEmail();
-    QString getInstalledVersionMajor();
-    QString getInstalledVersionMinor();
-    QString getInstalledVersionRelease();
-    QString getInstalledVersionBuild();
-    QString getInstalledVersionType();
-    QString getCurrentVersionMajor();
-    QString getCurrentVersionMinor();
-    QString getCurrentVersionRelease();
-    QString getCurrentVersionBuild();
-    QString getCurrentVersionType();
-    bool getInstalled();
-    bool getHasUpdate();
-    QString getInstallPath();
+    QString getId() const;
+    QString getTitle() const;
+    QString getDescription() const;
+    QString getInfo() const;
+    QString getIcon() const;
+    QString getUri() const;
+    QString getMD5() const;
+    QString getVendor() const;
+    QString getGroup() const;
+    QDateTime getModified() const;
+    int getRating() const;
+    int getSize() const;
+    QString getAuthorName() const;
+    QString getAuthorSite() const;
+    QString getAuthorEmail() const;
+    QString getInstalledVersionMajor() const;
+    QString getInstalledVersionMinor() const;
+    QString getInstalledVersionRelease() const;
+    QString getInstalledVersionBuild() const;
+    QString getInstalledVersionType() const;
+    QString getCurrentVersionMajor() const;
+    QString getCurrentVersionMinor() const;
+    QString getCurrentVersionRelease() const;
+    QString getCurrentVersionBuild() const;
+    QString getCurrentVersionType() const;
+    bool getInstalled() const;
+    bool getHasUpdate() const;
+    QString getInstallPath() const;
+    QString getCategories() const;
 
     void setId(QString newId);
     void setTitle(QString newTitle);
@@ -80,7 +82,7 @@ public slots:
     void setInfo(QString newInfo);
     void setIcon(QString newIcon);
     void setUri(QString newUri);
-    void setmd5(QString newMd5);
+    void setMD5(QString newMD5);
     void setVendor(QString newVendor);
     void setGroup(QString newGroup);
     void setModified(QDateTime newModified);
@@ -102,6 +104,7 @@ public slots:
     void setInstalled(bool newInstalled);
     void setHasUpdate(bool newHasUpdate);
     void setInstallPath(QString newInstallPath);
+    void setCategories(QString newCategory);
 
 signals:
     void idChanged(QString);
@@ -132,6 +135,7 @@ signals:
     void installedChanged(bool);
     void hasUpdateChanged(bool);
     void installPathChanged(QString);
+    void categoriesChanged(QString);
 
 private:
     struct Author {
@@ -168,6 +172,7 @@ private:
     bool installed;
     bool hasUpdate;
     QString installPath;
+    QString categories;
 };
 
 #endif // MILKYPACKAGE_H

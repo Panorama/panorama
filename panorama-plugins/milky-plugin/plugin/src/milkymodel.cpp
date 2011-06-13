@@ -3,8 +3,10 @@
 
 #include <QDebug>
 #include <QTimer>
+#include <QStringListModel>
 
 #include "milkypackage.h"
+#include "packagefiltermethods.h"
 
 class MilkyModelPrivate
 {
@@ -12,12 +14,46 @@ class MilkyModelPrivate
 public:
     MilkyListenerThread* listenerThread;
     QList<MilkyPackage*> packages;
+    QStringListModel categories;
 };
 
 MilkyModel::MilkyModel(QObject *parent) :
-    QObject(parent)
+    QAbstractListModel(parent)
 {
     PANORAMA_INITIALIZE(MilkyModel);
+
+    QHash<int, QByteArray> roles;
+    roles[MilkyModel::Id] = QString("identifier").toLocal8Bit();
+    roles[MilkyModel::Title] = QString("title").toLocal8Bit();
+    roles[MilkyModel::Description] = QString("description").toLocal8Bit();
+    roles[MilkyModel::Info] = QString("info").toLocal8Bit();
+    roles[MilkyModel::Icon] = QString("icon").toLocal8Bit();
+    roles[MilkyModel::Uri] = QString("uri").toLocal8Bit();
+    roles[MilkyModel::MD5] = QString("md5").toLocal8Bit();
+    roles[MilkyModel::Vendor] = QString("vendor").toLocal8Bit();
+    roles[MilkyModel::Group] = QString("group").toLocal8Bit();
+    roles[MilkyModel::Modified] = QString("modified").toLocal8Bit();
+    roles[MilkyModel::Rating] = QString("rating").toLocal8Bit();
+    roles[MilkyModel::Size] = QString("size").toLocal8Bit();
+    roles[MilkyModel::AuthorName] = QString("authorName").toLocal8Bit();
+    roles[MilkyModel::AuthorSite] = QString("authorSite").toLocal8Bit();
+    roles[MilkyModel::AuthorEmail] = QString("authorEmail").toLocal8Bit();
+    roles[MilkyModel::InstalledVersionMajor] = QString("installedVersionMajor").toLocal8Bit();
+    roles[MilkyModel::InstalledVersionMinor] = QString("installedVersionMinor").toLocal8Bit();
+    roles[MilkyModel::InstalledVersionRelease] = QString("installedVersionRelease").toLocal8Bit();
+    roles[MilkyModel::InstalledVersionBuild] = QString("installedVersionBuild").toLocal8Bit();
+    roles[MilkyModel::InstalledVersionType] = QString("installedVersionType").toLocal8Bit();
+    roles[MilkyModel::CurrentVersionMajor] = QString("currentVersionMajor").toLocal8Bit();
+    roles[MilkyModel::CurrentVersionMinor] = QString("currentVersionMinor").toLocal8Bit();
+    roles[MilkyModel::CurrentVersionRelease] = QString("currentVersionRelease").toLocal8Bit();
+    roles[MilkyModel::CurrentVersionBuild] = QString("currentVersionBuild").toLocal8Bit();
+    roles[MilkyModel::CurrentVersionType] = QString("currentVersionType").toLocal8Bit();
+    roles[MilkyModel::Installed] = QString("installed").toLocal8Bit();
+    roles[MilkyModel::HasUpdate] = QString("hasUpdate").toLocal8Bit();
+    roles[MilkyModel::InstallPath] = QString("installPath").toLocal8Bit();
+    roles[MilkyModel::Categories] = QString("categories").toLocal8Bit();
+    setRoleNames(roles);
+
     milky_init();
     milky_set_verbose(1);
 
@@ -39,6 +75,184 @@ MilkyModel::~MilkyModel()
     priv->listenerThread->exit();
 
     milky_deinit();
+}
+
+
+QVariant MilkyModel::inCategory(const QString &category)
+{
+    return PackageFilterMethods::inCategory(this, category);
+}
+
+QVariant MilkyModel::matching(const QString &role, const QString &value)
+{
+    return PackageFilterMethods::matching(this, role, value);
+}
+
+QVariant MilkyModel::sortedBy(const QString &role, bool ascending)
+{
+    return PackageFilterMethods::sortedBy(this, role, ascending);
+}
+
+QVariant MilkyModel::drop(int count)
+{
+    return PackageFilterMethods::drop(this, count);
+}
+
+QVariant MilkyModel::take(int count)
+{
+    return PackageFilterMethods::take(this, count);
+}
+
+int MilkyModel::rowCount(const QModelIndex &) const
+{
+    PANORAMA_PRIVATE(const MilkyModel);
+    return priv->packages.count();
+}
+
+QVariant MilkyModel::data(const QModelIndex &index, int role) const
+{
+    PANORAMA_PRIVATE(const MilkyModel);
+    if(index.isValid() && index.row() < priv->packages.size())
+    {
+        const MilkyPackage* value = priv->packages.at(index.row());
+        switch(role)
+        {
+        case Id:
+            return value->getId();
+        case Title:
+            return value->getTitle();
+        case Description:
+            return value->getDescription();
+        case Info:
+            return value->getInfo();
+        case Icon:
+            return value->getIcon();
+        case Uri:
+            return value->getUri();
+        case MD5:
+            return value->getMD5();
+        case Vendor:
+            return value->getVendor();
+        case Group:
+            return value->getGroup();
+        case Modified:
+            return value->getModified();
+        case Rating:
+            return value->getRating();
+        case Size:
+            return value->getSize();
+        case AuthorName:
+            return value->getAuthorName();
+        case AuthorSite:
+            return value->getAuthorSite();
+        case AuthorEmail:
+            return value->getAuthorEmail();
+        case InstalledVersionMajor:
+            return value->getInstalledVersionMajor();
+        case InstalledVersionMinor:
+            return value->getInstalledVersionMinor();
+        case InstalledVersionRelease:
+            return value->getInstalledVersionRelease();
+        case InstalledVersionBuild:
+            return value->getInstalledVersionBuild();
+        case InstalledVersionType:
+            return value->getInstalledVersionType();
+        case CurrentVersionMajor:
+            return value->getCurrentVersionMajor();
+        case CurrentVersionMinor:
+            return value->getCurrentVersionMinor();
+        case CurrentVersionRelease:
+            return value->getCurrentVersionRelease();
+        case CurrentVersionBuild:
+            return value->getCurrentVersionBuild();
+        case CurrentVersionType:
+            return value->getCurrentVersionType();
+        case Installed:
+            return value->getInstalled();
+        case HasUpdate:
+            return value->getHasUpdate();
+        case InstallPath:
+            return value->getInstallPath();
+        case Categories:
+            return value->getCategories();
+        default:
+            return QVariant();
+        }
+    }
+
+    return QVariant();
+}
+
+QVariant MilkyModel::headerData(int, Qt::Orientation, int role) const
+{
+    switch(role)
+    {
+    case Id:
+        return QString("Id");
+    case Title:
+        return QString("Title");
+    case Description:
+        return QString("Description");
+    case Info:
+        return QString("Info");
+    case Icon:
+        return QString("Icon");
+    case Uri:
+        return QString("Uri");
+    case MD5:
+        return QString("MD5");
+    case Vendor:
+        return QString("Vendor");
+    case Group:
+        return QString("Group");
+    case Modified:
+        return QString("Modified");
+    case Rating:
+        return QString("Rating");
+    case Size:
+        return QString("Size");
+    case AuthorName:
+        return QString("AuthorName");
+    case AuthorSite:
+        return QString("AuthorSite");
+    case AuthorEmail:
+        return QString("AuthorEmail");
+    case InstalledVersionMajor:
+        return QString("InstalledVersionMajor");
+    case InstalledVersionMinor:
+        return QString("InstalledVersionMinor");
+    case InstalledVersionRelease:
+        return QString("InstalledVersionRelease");
+    case InstalledVersionBuild:
+        return QString("InstalledVersionBuild");
+    case InstalledVersionType:
+        return QString("InstalledVersionType");
+    case CurrentVersionMajor:
+        return QString("CurrentVersionMajor");
+    case CurrentVersionMinor:
+        return QString("CurrentVersionMinor");
+    case CurrentVersionRelease:
+        return QString("CurrentVersionRelease");
+    case CurrentVersionBuild:
+        return QString("CurrentVersionBuild");
+    case CurrentVersionType:
+        return QString("CurrentVersionType");
+    case Installed:
+        return QString("Installed");
+    case HasUpdate:
+        return QString("HasUpdate");
+    case InstallPath:
+        return QString("InstallPath");
+    case Categories:
+        return QString("Categories");
+    default:
+        return QVariant();
+    }
+}
+
+QStringListModel* MilkyModel::getCategories() {
+    PANORAMA_PRIVATE(MilkyModel);
+    return &(priv->categories);
 }
 
 QString MilkyModel::getDevice()
@@ -106,12 +320,13 @@ MilkyListener* MilkyModel::getListener()
 
 void MilkyModel::applyConfiguration()
 {
+    qDebug() << "Check config";
     milky_check_config();
+    refreshModel();
 }
 
 void MilkyModel::updateDatabase()
 {
-    PANORAMA_PRIVATE(MilkyModel);
     milky_sync_database();
     emit notifyListener();
 }
@@ -133,10 +348,15 @@ void MilkyModel::refreshModel()
 {
     PANORAMA_PRIVATE(MilkyModel);
 
+    beginResetModel();
+
     foreach(MilkyPackage* mp, priv->packages)
     {
         delete mp;
     }
+
+    QStringList categoryList;
+
     priv->packages.clear();
 
     alpm_list_t* packageList = milky_get_package_list();
@@ -155,7 +375,7 @@ void MilkyModel::refreshModel()
             mp->setInfo(p->info);
             mp->setIcon(p->icon);
             mp->setUri(p->uri);
-            mp->setmd5(p->md5);
+            mp->setMD5(p->md5);
             mp->setVendor(p->vendor);
             mp->setGroup(p->group);
             mp->setModified(QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(p->modified_time) * 1000));
@@ -178,9 +398,30 @@ void MilkyModel::refreshModel()
             mp->setHasUpdate(p->hasupdate);
             mp->setInstallPath(p->install_path);
 
+            QStringList packageCategories;
+
+            alpm_list_t* categoryNode = p->categories;
+            do
+            {
+                char* category = static_cast<char*>(categoryNode->data);
+                packageCategories << category;
+                if(!categoryList.contains(category))
+                {
+                    categoryList.append(category);
+                }
+            } while((categoryNode = categoryNode->next));
+
+            mp->setCategories(packageCategories.join(";"));
             priv->packages << mp;
-        } while(package = package->next);
+
+
+        } while((package = package->next));
     }
+
+    categoryList.sort();
+    priv->categories.setStringList(categoryList);
+
+    endResetModel();
 }
 
 void MilkyModel::finishInitialization()
@@ -188,4 +429,5 @@ void MilkyModel::finishInitialization()
     PANORAMA_PRIVATE(MilkyModel);
     connect(this, SIGNAL(notifyListener()), priv->listenerThread->listener, SLOT(listen()));
     connect(priv->listenerThread->listener, SIGNAL(syncDone()), this, SLOT(refreshModel()));
+    //updateDatabase();
 }

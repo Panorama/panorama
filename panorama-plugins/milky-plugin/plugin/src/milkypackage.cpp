@@ -5,122 +5,127 @@ MilkyPackage::MilkyPackage(QObject *parent) :
 {
 }
 
-QString MilkyPackage::getId()
+QString MilkyPackage::getId() const
 {
     return id;
 }
-QString MilkyPackage::getTitle()
+QString MilkyPackage::getTitle() const
 {
     return title;
 }
-QString MilkyPackage::getDescription()
+QString MilkyPackage::getDescription() const
 {
     return description;
 }
-QString MilkyPackage::getInfo()
+QString MilkyPackage::getInfo() const
 {
     return info;
 }
-QString MilkyPackage::getIcon()
+QString MilkyPackage::getIcon() const
 {
     return icon;
 }
-QString MilkyPackage::getUri()
+QString MilkyPackage::getUri() const
 {
     return uri;
 }
-QString MilkyPackage::getmd5()
+QString MilkyPackage::getMD5() const
 {
     return md5;
 }
-QString MilkyPackage::getVendor()
+QString MilkyPackage::getVendor() const
 {
     return vendor;
 }
-QString MilkyPackage::getGroup()
+QString MilkyPackage::getGroup() const
 {
     return group;
 }
-QDateTime MilkyPackage::getModified()
+QDateTime MilkyPackage::getModified() const
 {
     return modified;
 }
 
-int MilkyPackage::getRating()
+int MilkyPackage::getRating() const
 {
     return rating;
 }
-int MilkyPackage::getSize()
+int MilkyPackage::getSize() const
 {
     return size;
 }
 
-QString MilkyPackage::getAuthorName()
+QString MilkyPackage::getAuthorName() const
 {
     return author.name;
 }
-QString MilkyPackage::getAuthorSite()
+QString MilkyPackage::getAuthorSite() const
 {
     return author.site;
 }
-QString MilkyPackage::getAuthorEmail()
+QString MilkyPackage::getAuthorEmail() const
 {
     return author.email;
 }
 
-QString MilkyPackage::getInstalledVersionMajor()
+QString MilkyPackage::getInstalledVersionMajor() const
 {
     return installedVersion.major;
 }
-QString MilkyPackage::getInstalledVersionMinor()
+QString MilkyPackage::getInstalledVersionMinor() const
 {
     return installedVersion.minor;
 }
-QString MilkyPackage::getInstalledVersionRelease()
+QString MilkyPackage::getInstalledVersionRelease() const
 {
     return installedVersion.release;
 }
-QString MilkyPackage::getInstalledVersionBuild()
+QString MilkyPackage::getInstalledVersionBuild() const
 {
     return installedVersion.build;
 }
-QString MilkyPackage::getInstalledVersionType()
+QString MilkyPackage::getInstalledVersionType() const
 {
     return installedVersion.type;
 }
 
-QString MilkyPackage::getCurrentVersionMajor()
+QString MilkyPackage::getCurrentVersionMajor() const
 {
     return currentVersion.major;
 }
-QString MilkyPackage::getCurrentVersionMinor()
+QString MilkyPackage::getCurrentVersionMinor() const
 {
     return currentVersion.minor;
 }
-QString MilkyPackage::getCurrentVersionRelease()
+QString MilkyPackage::getCurrentVersionRelease() const
 {
     return currentVersion.release;
 }
-QString MilkyPackage::getCurrentVersionBuild()
+QString MilkyPackage::getCurrentVersionBuild() const
 {
     return currentVersion.build;
 }
-QString MilkyPackage::getCurrentVersionType()
+QString MilkyPackage::getCurrentVersionType() const
 {
     return currentVersion.type;
 }
 
-bool MilkyPackage::getInstalled()
+bool MilkyPackage::getInstalled() const
 {
     return installed;
 }
-bool MilkyPackage::getHasUpdate()
+bool MilkyPackage::getHasUpdate() const
 {
     return hasUpdate;
 }
-QString MilkyPackage::getInstallPath()
+QString MilkyPackage::getInstallPath() const
 {
     return installPath;
+}
+
+QString MilkyPackage::getCategories() const
+{
+    return categories;
 }
 
 void MilkyPackage::setId(QString newId)
@@ -153,9 +158,9 @@ void MilkyPackage::setUri(QString newUri)
     uri = newUri;
     emit uriChanged(uri);
 }
-void MilkyPackage::setmd5(QString newMd5)
+void MilkyPackage::setMD5(QString newMD5)
 {
-    md5 = newMd5;
+    md5 = newMD5;
     emit md5Changed(md5);
 }
 void MilkyPackage::setVendor(QString newVendor)
@@ -267,4 +272,10 @@ void MilkyPackage::setInstallPath(QString newInstallPath)
 {
     installPath = newInstallPath;
     emit installPathChanged(installPath);
+}
+
+void MilkyPackage::setCategories(QString newCategories)
+{
+    categories = newCategories;
+    emit categoriesChanged(categories);
 }

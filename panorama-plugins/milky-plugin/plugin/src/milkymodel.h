@@ -4,14 +4,15 @@
 #include "panoramainternal.h"
 #include "milkylistener.h"
 
-#include <QObject>
+#include <QAbstractListModel>
 #include <QtDeclarative>
 
 class MilkyModelPrivate;
 
-class MilkyModel : public QObject
+class MilkyModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(QObject* categories    READ getCategories                  NOTIFY categoriesChanged)
     Q_PROPERTY(QString device        READ getDevice        WRITE setDevice        NOTIFY deviceChanged)
     Q_PROPERTY(QString targetDir     READ getTargetDir     WRITE setTargetDir     NOTIFY targetDirChanged)
     Q_PROPERTY(QString repositoryUrl READ getRepositoryUrl WRITE setRepositoryUrl NOTIFY repositoryUrlChanged)
@@ -23,6 +24,65 @@ class MilkyModel : public QObject
 public:
     explicit MilkyModel(QObject *parent = 0);
     virtual ~MilkyModel();
+
+    enum Roles
+    {
+        Id = Qt::UserRole,
+        Title,
+        Description,
+        Info,
+        Icon,
+        Uri,
+        MD5,
+        Vendor,
+        Group,
+        Modified,
+        Rating,
+        Size,
+        AuthorName,
+        AuthorSite,
+        AuthorEmail,
+        InstalledVersionMajor,
+        InstalledVersionMinor,
+        InstalledVersionRelease,
+        InstalledVersionBuild,
+        InstalledVersionType,
+        CurrentVersionMajor,
+        CurrentVersionMinor,
+        CurrentVersionRelease,
+        CurrentVersionBuild,
+        CurrentVersionType,
+        Installed,
+        HasUpdate,
+        InstallPath,
+        Categories
+    };
+
+    /** QML helper method that applies a filter to this model */
+    Q_INVOKABLE QVariant inCategory(const QString &category);
+
+    /** QML helper method that applies a filter to this model */
+    Q_INVOKABLE QVariant matching(const QString &role, const QString &value);
+
+    /** QML helper method that sorts this model */
+    Q_INVOKABLE QVariant sortedBy(const QString &role, bool ascending);
+
+    Q_INVOKABLE QVariant drop(int count);
+
+    Q_INVOKABLE QVariant take(int count);
+
+
+    /** Returns the number of items in this model */
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
+    /** Returns the data at the specified index. */
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+    /** Returns the header for each role */
+    QVariant headerData(int section, Qt::Orientation orientation,
+                        int role = Qt::DisplayRole) const;
+
+    Q_INVOKABLE QStringListModel* getCategories();
 
     QString getDevice();
     void setDevice(QString const newDevice);
@@ -42,6 +102,7 @@ public:
     MilkyListener* getListener();
 
 signals:
+    void categoriesChanged(QStringListModel* categories);
     void deviceChanged(QString device);
     void targetDirChanged(QString targetDir);
     void repositoryUrlChanged(QString databaseFile);

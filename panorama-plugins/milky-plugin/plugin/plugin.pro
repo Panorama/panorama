@@ -15,13 +15,17 @@ SOURCES += \
     src/milkyplugin.cpp \
     src/milkymodel.cpp \
     src/milkylistener.cpp \
-    src/milkypackage.cpp
+    src/milkypackage.cpp \
+    src/packagefiltermodel.cpp \
+    src/packagefiltermethods.cpp
 
 HEADERS += \
     src/milkyplugin.h \
     src/milkymodel.h \
     src/milkylistener.h \
-    src/milkypackage.h
+    src/milkypackage.h \
+    src/packagefiltermodel.h \
+    src/packagefiltermethods.h
 
 LIBS += -L../libmilky -lmilky
 LIBS += -L../libjansson -ljansson

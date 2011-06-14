@@ -55,7 +55,7 @@ MilkyModel::MilkyModel(QObject *parent) :
     setRoleNames(roles);
 
     milky_init();
-    milky_set_verbose(1);
+    milky_set_verbose(3);
 
     priv->listenerThread = new MilkyListenerThread(this);
     connect(priv->listenerThread, SIGNAL(ready()), this, SLOT(finishInitialization()));
@@ -255,6 +255,18 @@ QStringListModel* MilkyModel::getCategories() {
     return &(priv->categories);
 }
 
+int MilkyModel::getBytesDownloaded() const
+{
+    __m_dl_status* status = milky_get_dl_status();
+    return status ? status->now_downloaded : 0;
+}
+
+int MilkyModel::getBytesToDownload() const
+{
+    __m_dl_status* status = milky_get_dl_status();
+    return status ? status->total_to_download : 0;
+}
+
 QString MilkyModel::getDevice()
 {
     return QString(milky_get_dev());
@@ -328,6 +340,7 @@ void MilkyModel::applyConfiguration()
 void MilkyModel::updateDatabase()
 {
     milky_sync_database();
+    milky_crawl_pnd();
     emit notifyListener();
 }
 
@@ -429,5 +442,5 @@ void MilkyModel::finishInitialization()
     PANORAMA_PRIVATE(MilkyModel);
     connect(this, SIGNAL(notifyListener()), priv->listenerThread->listener, SLOT(listen()));
     connect(priv->listenerThread->listener, SIGNAL(syncDone()), this, SLOT(refreshModel()));
-    //updateDatabase();
+    connect(priv->listenerThread->listener, SIGNAL(installDone()), this, SLOT(refreshModel()));
 }

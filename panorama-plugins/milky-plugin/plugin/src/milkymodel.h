@@ -12,7 +12,9 @@ class MilkyModelPrivate;
 class MilkyModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QObject* categories    READ getCategories                  NOTIFY categoriesChanged)
+    Q_PROPERTY(QObject* categories   READ getCategories                  NOTIFY categoriesChanged)
+    Q_PROPERTY(int     bytesDownloaded READ getBytesDownloaded)
+    Q_PROPERTY(int     bytesToDownload READ getBytesToDownload)
     Q_PROPERTY(QString device        READ getDevice        WRITE setDevice        NOTIFY deviceChanged)
     Q_PROPERTY(QString targetDir     READ getTargetDir     WRITE setTargetDir     NOTIFY targetDirChanged)
     Q_PROPERTY(QString repositoryUrl READ getRepositoryUrl WRITE setRepositoryUrl NOTIFY repositoryUrlChanged)
@@ -82,7 +84,10 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation,
                         int role = Qt::DisplayRole) const;
 
-    Q_INVOKABLE QStringListModel* getCategories();
+    QStringListModel* getCategories();
+
+    int getBytesDownloaded() const;
+    int getBytesToDownload() const;
 
     QString getDevice();
     void setDevice(QString const newDevice);

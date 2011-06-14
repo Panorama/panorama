@@ -27,6 +27,14 @@ PanoramaUI {
         }
     }
 
+    function categoryHue(name) {
+        var sum = 0;
+        for(var i = 0; i < name.length; ++i) {
+            sum += name.charCodeAt(i);
+        }
+        return (sum % 256) / 256.0;
+    }
+
     state: "browse"
 
     states: [
@@ -34,17 +42,27 @@ PanoramaUI {
             name: "browse"
             PropertyChanges { target: syncOverlay; opacity: 0.0 }
             PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
+            PropertyChanges { target: installOverlay; opacity: 0.0 }
         },
         State {
             name: "sync"
             PropertyChanges { target: syncOverlay; opacity: 0.9 }
             PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
+            PropertyChanges { target: installOverlay; opacity: 0.0 }
         },
         State {
             name: "categories"
             PropertyChanges { target: syncOverlay; opacity: 0.0 }
             PropertyChanges { target: categoryListOverlay; opacity: 0.9 }
+            PropertyChanges { target: installOverlay; opacity: 0.0 }
+        },
+        State {
+            name: "install"
+            PropertyChanges { target: syncOverlay; opacity: 0.0 }
+            PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
+            PropertyChanges { target: installOverlay; opacity: 0.9 }
         }
+
     ]
 
     transitions: [
@@ -78,6 +96,9 @@ PanoramaUI {
             anchors.fill: parent
             z: 10
 
+            // Restrict mouse events to children
+            MouseArea { anchors.fill: parent; onPressed: mouse.accepted = true; }
+
             color: "#99c"
 
             Text {
@@ -86,6 +107,263 @@ PanoramaUI {
                 text: "Synchronizing database with repository..."
                 font.pixelSize: ui.width / 40
             }
+        }
+
+        Rectangle {
+            id: installOverlay
+            anchors.fill: parent
+            z: 10
+
+            // Restrict mouse events to children
+            MouseArea { anchors.fill: parent; onPressed: mouse.accepted = true; }
+
+            color: "#222"
+
+            Component.onCompleted: {
+                ui.milky.events.installCheck.connect(function() {
+                    ui.state = "install";
+                    installOverlay.state = "verify";
+                });
+                ui.milky.events.installStart.connect(function() {
+                    ui.state = "install";
+                    installOverlay.state = "download";
+                });
+                ui.milky.events.downloadFinished.connect(function() {
+                    ui.state = "install";
+                    installOverlay.state = "apply";
+                });
+                ui.milky.events.installDone.connect(function() {
+                    ui.state = "install";
+                    installOverlay.state = "done";
+                });
+
+            }
+
+            states: [
+                State {
+                    name: "verify"
+                    PropertyChanges { target: installVerify; opacity: 1.0 }
+                    PropertyChanges { target: installApply; opacity: 0.0 }
+                    PropertyChanges { target: installDownload; opacity: 0.0 }
+                    PropertyChanges { target: installDone; opacity: 0.0 }
+                },
+                State {
+                    name: "download"
+                    PropertyChanges { target: installVerify; opacity: 0.0 }
+                    PropertyChanges { target: installApply; opacity: 0.0 }
+                    PropertyChanges { target: installDownload; opacity: 1.0 }
+                    PropertyChanges { target: installDone; opacity: 0.0 }
+                },
+                State {
+                    name: "apply"
+                    PropertyChanges { target: installVerify; opacity: 0.0 }
+                    PropertyChanges { target: installDownload; opacity: 0.0 }
+                    PropertyChanges { target: installApply; opacity: 1.0 }
+                    PropertyChanges { target: installDone; opacity: 0.0 }
+                },
+                State {
+                    name: "done"
+                    PropertyChanges { target: installVerify; opacity: 0.0 }
+                    PropertyChanges { target: installDownload; opacity: 0.0 }
+                    PropertyChanges { target: installApply; opacity: 0.0 }
+                    PropertyChanges { target: installDone; opacity: 1.0 }
+                }
+            ]
+
+            state: "verify"
+
+            Item {
+                id: installVerify
+                anchors.centerIn: parent
+                height: childrenRect.height
+                property string installedPackage: ""
+
+                Text {
+                    id: installVerifyLabel
+                    anchors.top: parent.top
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Install PND " + parent.installedPackage + "?"
+                    font.pixelSize: 24
+                    color: "#eee"
+                }
+                Rectangle {
+                    id: installYesButton
+                    anchors.top: installVerifyLabel.bottom
+                    anchors.right: parent.horizontalCenter
+                    anchors.margins: 16
+                    width: 128
+                    height: 48
+                    gradient: Gradient {
+                        GradientStop { position: 0; color: "#cec" }
+                        GradientStop { position: 1; color: "#aca" }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Yes"
+                        font.pixelSize: 18
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            ui.milky.answer(true);
+                        }
+
+                    }
+                }
+                Rectangle {
+                    id: installNoButton
+                    anchors.top: installVerifyLabel.bottom
+                    anchors.left: parent.horizontalCenter
+                    anchors.margins: 16
+                    width: 128
+                    height: 48
+                    gradient: Gradient {
+                        GradientStop { position: 0; color: "#ecc" }
+                        GradientStop { position: 1; color: "#caa" }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "No"
+                        font.pixelSize: 18
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            ui.milky.answer(false);
+                            ui.state = "browse";
+                        }
+                    }
+                }
+
+            }
+
+            Item {
+                id: installDownload
+                property int progress: 0
+                anchors.centerIn: parent
+                height: childrenRect.height
+
+                Timer {
+                    running: ui.state == "install" && installOverlay.state == "download"
+                    interval: 100
+                    repeat: true
+                    onTriggered: {
+                        if(milky.bytesToDownload) {
+                            installDownload.progress = parseInt(100.0 * milky.bytesDownloaded / milky.bytesToDownload)
+                        }
+                    }
+
+                }
+
+                Text {
+                    id: installDownloadLabel
+                    anchors.top: parent.top
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Downloading..."
+                    font.pixelSize: 24
+                    color: "#eee"
+                }
+
+                Row {
+                    id: installPercentageIndicator
+                    anchors.top: installDownloadLabel.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.margins: 16
+                    spacing: 8
+                    Repeater {
+                        model: 10
+                        delegate: Rectangle {
+                            function calcValue() {
+                                if(installDownload.progress >= 10 * (index+1))
+                                    return 1.0
+                                else if(installDownload.progress < 10 * index)
+                                    return 0.0
+                                else
+                                    return (installDownload.progress % 10) / 10.0
+                            }
+
+                            property real value: calcValue()
+
+                            height: 32
+                            width: 16
+                            radius: 6
+                            smooth: true
+                            gradient: Gradient {
+                                GradientStop { position: 0; color: Qt.rgba(0.5+(1.0-value)*0.5, 0.5+value*0.5, 0.5, 1.0) }
+                                GradientStop { position: 1; color: Qt.rgba(0.5+(1.0-value)*0.8*0.5, 0.5+value*0.8*0.5, 0.5, 1.0) }
+                            }
+                        }
+                    }
+                }
+
+                Text {
+                    id: installPercentage
+
+                    anchors.top: installPercentageIndicator.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.margins: 16
+                    text: installDownload.progress + "%"
+                    font.pixelSize: 24
+                    color: "#eee"
+                }
+
+            }
+
+            Item {
+                id: installApply
+                anchors.centerIn: parent
+                height: childrenRect.height
+
+                Text {
+                    id: installProgressLabel
+                    anchors.top: parent.top
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Applying..."
+                    font.pixelSize: 24
+                    color: "#eee"
+                }
+            }
+
+            Item {
+                id: installDone
+                anchors.centerIn: parent
+                height: childrenRect.height
+
+                Text {
+                    id: installDoneLabel
+                    anchors.top: parent.top
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Install complete"
+                    font.pixelSize: 24
+                    color: "#eee"
+                }
+                Rectangle {
+                    id: installDoneButton
+                    anchors.top: installDoneLabel.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.margins: 16
+                    width: 128
+                    height: 48
+                    gradient: Gradient {
+                        GradientStop { position: 0; color: "#eee" }
+                        GradientStop { position: 1; color: "#ccc" }
+                    }
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Continue"
+                        font.pixelSize: 18
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            ui.state = "browse";
+                        }
+                    }
+                }
+            }
+
 
         }
 
@@ -109,8 +387,8 @@ PanoramaUI {
                 property variant filterOptions: ["notInstalled", "installed", "upgradable"]
                 property variant filterProperties: {
                     "notInstalled": { "label": "Not installed", "color": "#c77", "installed": "false", "hasUpdate": ".*" },
-                    "installed": { "label": "Installed", "color": "green", "installed": "true", "hasUpdate": ".*" },
-                    "upgradable": { "label": "Upgradable", "color": "blue", "installed": "true", "hasUpdate": "true" }
+                    "installed": { "label": "Installed", "color": "#5a5", "installed": "true", "hasUpdate": ".*" },
+                    "upgradable": { "label": "Upgradable", "color": "#77c", "installed": "true", "hasUpdate": "true" }
                 }
 
                 property string label: filterProperties[value].label
@@ -126,8 +404,8 @@ PanoramaUI {
 
 
                 gradient: Gradient {
-                    GradientStop { position: 0.0; color: Qt.lighter(statusFilter.baseColor, 1.8) }
-                    GradientStop { position: 0.8; color: Qt.lighter(statusFilter.baseColor, 1.6) }
+                    GradientStop { position: 0.0; color: Qt.lighter(statusFilter.baseColor, 1.6) }
+                    GradientStop { position: 0.8; color: Qt.lighter(statusFilter.baseColor, 1.4) }
                     GradientStop { position: 1.0; color: Qt.lighter(statusFilter.baseColor, 1.2) }
                 }
 
@@ -162,9 +440,9 @@ PanoramaUI {
                 width: 192
 
                 gradient: Gradient {
-                    GradientStop { position: 0.0; color: "#fff" }
-                    GradientStop { position: 0.8; color: "#ccc" }
-                    GradientStop { position: 1.0; color: "#aaa" }
+                    GradientStop { position: 0.0; color: Qt.hsla(ui.categoryHue(categoryFilter.value), 0.4, 0.9, 1.0) }
+                    GradientStop { position: 0.8; color: Qt.hsla(ui.categoryHue(categoryFilter.value), 0.4, 0.7, 1.0) }
+                    GradientStop { position: 1.0; color: Qt.hsla(ui.categoryHue(categoryFilter.value), 0.4, 0.5, 1.0) }
                 }
 
                 Text {
@@ -215,87 +493,10 @@ PanoramaUI {
             }
         }
 
-        Column {
-            id: buttons
-            width: 120
-            anchors.right: parent.right
-            anchors.bottom: statusContainer.top
-            anchors.top: filterContainer.bottom
-            Rectangle {
-                color: "lightgreen"
-                width: 100
-                height: 30
-
-                Text {
-                    text: "Yes"
-                    anchors.centerIn: parent
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            ui.milky.answer(true)
-                        }
-                    }
-                }
-            }
-            Rectangle {
-                color: "pink"
-                width: 100
-                height: 30
-
-                Text {
-                    text: "No"
-                    anchors.centerIn: parent
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            ui.milky.answer(false)
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                color: "yellow"
-                width: 100
-                height: 30
-
-                Text {
-                    text: "Fail install"
-                    anchors.centerIn: parent
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            ui.milky.install("non-existing package")
-                        }
-                    }
-                }
-            }
-            Rectangle {
-                color: "lightblue"
-                width: 100
-                height: 30
-
-                Text {
-                    text: "Install w:c"
-                    anchors.centerIn: parent
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            ui.milky.install("bzar-wars-commando")
-                        }
-                    }
-                }
-            }
-        }
-
         Rectangle {
             id: packages
             anchors.left: parent.left
-            anchors.right: buttons.left
+            anchors.right: parent.right
             anchors.top: toolbar.bottom
             anchors.bottom: statusContainer.top
             color: "#eee"
@@ -305,6 +506,10 @@ PanoramaUI {
                 anchors.fill: parent
                 color: "#111"
                 z: 10
+
+                // Restrict mouse events to children
+                MouseArea { anchors.fill: parent; onPressed: mouse.accepted = true; }
+
                 GridView {
                     id: categoryList
                     anchors.fill: parent
@@ -321,7 +526,7 @@ PanoramaUI {
                             width: 2
                         }
 
-                        color: "#00000000"
+                        color: Qt.hsla(ui.categoryHue(edit), 0.4, 0.7, 1.0);
                         radius: 4
 
                         Text {
@@ -362,12 +567,13 @@ PanoramaUI {
 
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    height: showDetails ? 128 : 32
+                    height: showDetails ? 196 : 32
                     Behavior on height { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
 
                     Rectangle {
                         id: packageTitle
                         height: 32
+                        z: 1
                         anchors.top: parent.top
                         anchors.left: parent.left
                         anchors.right: parent.right
@@ -389,6 +595,7 @@ PanoramaUI {
                         }
 
                         Text {
+                            id: titleLabel
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.left: iconImage.right
                             anchors.margins: 8
@@ -397,23 +604,18 @@ PanoramaUI {
                             color: "#222"
                         }
 
-                        Rectangle {
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: titleLabel.right
                             anchors.right: parent.right
-                            width: 64
+                            anchors.margins: 8
+                            text: description.split("\n")[0]
+                            elide: Text.ElideRight
+                            font.pixelSize: 14
+                            color: "#111"
 
-                            gradient: Gradient {
-                                GradientStop { position: 0; color: installed ? "#ecc" : "#cec" }
-                                GradientStop { position: 1; color: installed ? "#caa" : "#aca" }
-                            }
-
-                            Text {
-                                id: buttonText
-                                text: installed ? "Remove" : "Install"
-                                anchors.centerIn: parent
-                            }
                         }
+
                     }
 
                     Rectangle {
@@ -426,10 +628,14 @@ PanoramaUI {
                         anchors.bottom: parent.bottom
 
                         color: "white"
-                        height: 96
 
                         Flickable {
-                            anchors.fill: parent
+                            id: descriptionContainer
+                            anchors.top: parent.top
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.bottom: installButton.top
+
                             contentWidth: descriptionText.paintedWidth
                             contentHeight: descriptionText.paintedHeight
                             flickableDirection: Flickable.VerticalFlick
@@ -447,6 +653,78 @@ PanoramaUI {
                                 wrapMode: Text.WordWrap
                             }
                         }
+
+                        Rectangle {
+                            id: installButton
+                            anchors.bottom: parent.bottom
+                            anchors.left: parent.left
+                            height: 32
+                            width: parent.width / 3
+
+                            gradient: Gradient {
+                                GradientStop { position: 0; color: installed ? "#ccc" : "#cec" }
+                                GradientStop { position: 1; color: installed ? "#aaa" : "#aca" }
+                            }
+
+                            Text {
+                                text: "Install"
+                                anchors.centerIn: parent
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                enabled: !installed
+                                onClicked: ui.milky.install(identifier);
+                            }
+                        }
+                        Rectangle {
+                            id: upgradeButton
+                            anchors.bottom: parent.bottom
+                            anchors.left: installButton.right
+                            anchors.right: removeButton.left
+                            height: 32
+                            width: parent.width / 3
+
+                            gradient: Gradient {
+                                GradientStop { position: 0; color: hasUpdate ? "#cce" :  "#ccc" }
+                                GradientStop { position: 1; color: hasUpdate ? "#aac" :  "#aaa" }
+                            }
+
+                            Text {
+                                text: "Upgrade"
+                                anchors.centerIn: parent
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                enabled: hasUpdate
+                                onClicked: print("Not implemented");
+                            }
+                        }
+                        Rectangle {
+                            id: removeButton
+                            anchors.bottom: parent.bottom
+                            anchors.right: parent.right
+                            height: 32
+                            width: parent.width / 3
+
+                            gradient: Gradient {
+                                GradientStop { position: 0; color: installed ? "#ecc" :  "#ccc" }
+                                GradientStop { position: 1; color: installed ? "#caa" :  "#aaa" }
+                            }
+
+                            Text {
+                                text: "Remove"
+                                anchors.centerIn: parent
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                enabled: installed
+                                onClicked: print("Not implemented");
+                            }
+                        }
+
                     }
                 }
             }

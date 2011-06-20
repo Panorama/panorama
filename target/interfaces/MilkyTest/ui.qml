@@ -1,6 +1,7 @@
 import Qt 4.7
 import Panorama.UI 1.0
 import Panorama.Milky 1.0
+import Panorama.Settings 1.0
 
 PanoramaUI {
     id: ui
@@ -9,12 +10,31 @@ PanoramaUI {
     author: "B-ZaR"
     anchors.fill: parent
 
+    Setting {
+        id: installDevice
+        section: "Milky"
+        key: "installDevice"
+        defaultValue: "/dev/mmcblk1p1"
+    }
+
+    Setting {
+        id: installDirectory
+        section: "Milky"
+        key: "installDirectory"
+        defaultValue: "menu"
+    }
+
+    Setting {
+        id: repositoryUrl
+        section: "Milky"
+        key: "repositoryUrl"
+        defaultValue: "http://repo.openpandora.org/includes/get_data.php"
+    }
+
     property QtObject milky : Milky {
-        device: "/home/bzar/src/panorama/target"
-        repositoryUrl: "http://repo.openpandora.org/includes/get_data.php"
-        logFile: "milky.log"
-        targetDir: "apps"
-        configFile: "milky.config"
+        device: installDevice.value
+        repositoryUrl: repositoryUrl.value
+        targetDir: installDirectory.value
 
         Component.onCompleted: {
             events.syncStart.connect(function() {
@@ -157,6 +177,8 @@ PanoramaUI {
                     PropertyChanges { target: installApply; opacity: 0.0 }
                     PropertyChanges { target: installDownload; opacity: 0.0 }
                     PropertyChanges { target: installDone; opacity: 0.0 }
+                    PropertyChanges { target: installDownload; progress: 0 }
+
                 },
                 State {
                     name: "download"

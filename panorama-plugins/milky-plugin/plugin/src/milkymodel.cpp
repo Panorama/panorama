@@ -459,7 +459,7 @@ void MilkyModel::finishInitialization()
 {
     PANORAMA_PRIVATE(MilkyModel);
     connect(this, SIGNAL(notifyListener()), priv->listenerThread->listener, SLOT(listen()));
-    connect(priv->listenerThread->listener, SIGNAL(syncDone()), this, SLOT(refreshModel()));
+    connect(priv->listenerThread->listener, SIGNAL(crawlDone()), this, SLOT(refreshModel()));
     connect(priv->listenerThread->listener, SIGNAL(installDone()), this, SLOT(refreshModel()));
     connect(priv->listenerThread->listener, SIGNAL(removeDone()), this, SLOT(refreshModel()));
     connect(priv->listenerThread->listener, SIGNAL(upgradeDone()), this, SLOT(refreshModel()));

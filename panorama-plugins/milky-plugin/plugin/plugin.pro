@@ -29,5 +29,5 @@ HEADERS += \
 
 LIBS += -L../libmilky -lmilky
 LIBS += -L../libjansson -ljansson
-LIBS += -L ../../../pandora-libraries/pnd -lpnd
+LIBS += -L ../../../pandora-libraries -lpnd
 LIBS += -lm -lcurl -lssl -lstdc++

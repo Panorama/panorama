@@ -1,7 +1,7 @@
 [submodule "pandora-libraries"]
 	path = pandora-libraries
-	url = git://github.com/dflemstr/pandora-libraries.git
-        branch = clean
+	url = git://github.com/bzar/pandora-libraries.git
+        branch = master
 [submodule "panorama-plugins/milky-plugin/libmilky/src"]
 	path = panorama-plugins/milky-plugin/libmilky/src
 	url = git://github.com/Cloudef/milkyhelper.git

@@ -7,10 +7,10 @@ TARGET = $$qtLibraryTarget($$TARGET)
 DESTDIR = ../../target/plugins/Panorama/Applications
 
 INCLUDEPATH += ../../panorama/include
-INCLUDEPATH += ../../pandora-libraries/pnd/include
+INCLUDEPATH += ../../pandora-libraries/include
 
 LIBS += \
-    -L../../pandora-libraries/pnd \
+    -L../../pandora-libraries \
     -lpnd
 
 SOURCES += \

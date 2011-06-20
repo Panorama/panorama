@@ -347,7 +347,24 @@ void MilkyModel::updateDatabase()
 void MilkyModel::install(QString pndId)
 {
     milky_add_target(pndId.toLocal8Bit());
+    milky_check_config();
     milky_install();
+    emit notifyListener();
+}
+
+void MilkyModel::remove(QString pndId)
+{
+    milky_add_target(pndId.toLocal8Bit());
+    milky_check_config();
+    milky_remove();
+    emit notifyListener();
+}
+
+void MilkyModel::upgrade(QString pndId)
+{
+    milky_add_target(pndId.toLocal8Bit());
+    milky_check_config();
+    milky_upgrade();
     emit notifyListener();
 }
 
@@ -362,6 +379,8 @@ void MilkyModel::refreshModel()
     PANORAMA_PRIVATE(MilkyModel);
 
     beginResetModel();
+
+    milky_clear_targets();
 
     foreach(MilkyPackage* mp, priv->packages)
     {
@@ -433,7 +452,6 @@ void MilkyModel::refreshModel()
 
     categoryList.sort();
     priv->categories.setStringList(categoryList);
-
     endResetModel();
 }
 
@@ -443,4 +461,6 @@ void MilkyModel::finishInitialization()
     connect(this, SIGNAL(notifyListener()), priv->listenerThread->listener, SLOT(listen()));
     connect(priv->listenerThread->listener, SIGNAL(syncDone()), this, SLOT(refreshModel()));
     connect(priv->listenerThread->listener, SIGNAL(installDone()), this, SLOT(refreshModel()));
+    connect(priv->listenerThread->listener, SIGNAL(removeDone()), this, SLOT(refreshModel()));
+    connect(priv->listenerThread->listener, SIGNAL(upgradeDone()), this, SLOT(refreshModel()));
 }

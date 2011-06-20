@@ -43,24 +43,35 @@ PanoramaUI {
             PropertyChanges { target: syncOverlay; opacity: 0.0 }
             PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
             PropertyChanges { target: installOverlay; opacity: 0.0 }
+            PropertyChanges { target: removeOverlay; opacity: 0.0 }
         },
         State {
             name: "sync"
             PropertyChanges { target: syncOverlay; opacity: 0.9 }
             PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
             PropertyChanges { target: installOverlay; opacity: 0.0 }
+            PropertyChanges { target: removeOverlay; opacity: 0.0 }
         },
         State {
             name: "categories"
             PropertyChanges { target: syncOverlay; opacity: 0.0 }
             PropertyChanges { target: categoryListOverlay; opacity: 0.9 }
             PropertyChanges { target: installOverlay; opacity: 0.0 }
+            PropertyChanges { target: removeOverlay; opacity: 0.0 }
         },
         State {
             name: "install"
             PropertyChanges { target: syncOverlay; opacity: 0.0 }
             PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
             PropertyChanges { target: installOverlay; opacity: 0.9 }
+            PropertyChanges { target: removeOverlay; opacity: 0.0 }
+        },
+        State {
+            name: "remove"
+            PropertyChanges { target: syncOverlay; opacity: 0.0 }
+            PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
+            PropertyChanges { target: installOverlay; opacity: 0.0 }
+            PropertyChanges { target: removeOverlay; opacity: 0.9 }
         }
 
     ]
@@ -342,6 +353,178 @@ PanoramaUI {
                 Rectangle {
                     id: installDoneButton
                     anchors.top: installDoneLabel.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.margins: 16
+                    width: 128
+                    height: 48
+                    gradient: Gradient {
+                        GradientStop { position: 0; color: "#eee" }
+                        GradientStop { position: 1; color: "#ccc" }
+                    }
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Continue"
+                        font.pixelSize: 18
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            ui.state = "browse";
+                        }
+                    }
+                }
+            }
+
+
+        }
+
+        Rectangle {
+            id: removeOverlay
+            anchors.fill: parent
+            z: 10
+
+            // Restrict mouse events to children
+            MouseArea { anchors.fill: parent; onPressed: mouse.accepted = true; }
+
+            color: "#222"
+
+            Component.onCompleted: {
+                ui.milky.events.removeCheck.connect(function() {
+                    ui.state = "remove";
+                    removeOverlay.state = "verify";
+                });
+                ui.milky.events.removeStart.connect(function() {
+                    ui.state = "remove";
+                    removeOverlay.state = "apply";
+                });
+                ui.milky.events.removeDone.connect(function() {
+                    ui.state = "remove";
+                    removeOverlay.state = "done";
+                });
+
+            }
+
+            states: [
+                State {
+                    name: "verify"
+                    PropertyChanges { target: removeVerify; opacity: 1.0 }
+                    PropertyChanges { target: removeApply; opacity: 0.0 }
+                    PropertyChanges { target: removeDone; opacity: 0.0 }
+                },
+                State {
+                    name: "apply"
+                    PropertyChanges { target: removeVerify; opacity: 0.0 }
+                    PropertyChanges { target: removeApply; opacity: 1.0 }
+                    PropertyChanges { target: removeDone; opacity: 0.0 }
+                },
+                State {
+                    name: "done"
+                    PropertyChanges { target: removeVerify; opacity: 0.0 }
+                    PropertyChanges { target: removeApply; opacity: 0.0 }
+                    PropertyChanges { target: removeDone; opacity: 1.0 }
+                }
+            ]
+
+            state: "verify"
+
+            Item {
+                id: removeVerify
+                anchors.centerIn: parent
+                height: childrenRect.height
+                property string removedPackage: ""
+
+                Text {
+                    id: removeVerifyLabel
+                    anchors.top: parent.top
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Remove PND " + parent.removedPackage + "?"
+                    font.pixelSize: 24
+                    color: "#eee"
+                }
+                Rectangle {
+                    id: removeYesButton
+                    anchors.top: removeVerifyLabel.bottom
+                    anchors.right: parent.horizontalCenter
+                    anchors.margins: 16
+                    width: 128
+                    height: 48
+                    gradient: Gradient {
+                        GradientStop { position: 0; color: "#cec" }
+                        GradientStop { position: 1; color: "#aca" }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Yes"
+                        font.pixelSize: 18
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            ui.milky.answer(true);
+                        }
+
+                    }
+                }
+                Rectangle {
+                    id: removeNoButton
+                    anchors.top: removeVerifyLabel.bottom
+                    anchors.left: parent.horizontalCenter
+                    anchors.margins: 16
+                    width: 128
+                    height: 48
+                    gradient: Gradient {
+                        GradientStop { position: 0; color: "#ecc" }
+                        GradientStop { position: 1; color: "#caa" }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "No"
+                        font.pixelSize: 18
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            ui.milky.answer(false);
+                            ui.state = "browse";
+                        }
+                    }
+                }
+
+            }
+
+            Item {
+                id: removeApply
+                anchors.centerIn: parent
+                height: childrenRect.height
+
+                Text {
+                    id: removeProgressLabel
+                    anchors.top: parent.top
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Removing..."
+                    font.pixelSize: 24
+                    color: "#eee"
+                }
+            }
+
+            Item {
+                id: removeDone
+                anchors.centerIn: parent
+                height: childrenRect.height
+
+                Text {
+                    id: removeDoneLabel
+                    anchors.top: parent.top
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Remove complete"
+                    font.pixelSize: 24
+                    color: "#eee"
+                }
+                Rectangle {
+                    id: removeDoneButton
+                    anchors.top: removeDoneLabel.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.margins: 16
                     width: 128
@@ -721,7 +904,7 @@ PanoramaUI {
                             MouseArea {
                                 anchors.fill: parent
                                 enabled: installed
-                                onClicked: print("Not implemented");
+                                onClicked: ui.milky.remove(identifier)
                             }
                         }
 

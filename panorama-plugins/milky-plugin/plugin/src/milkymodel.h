@@ -122,6 +122,8 @@ public slots:
 
     void updateDatabase();
     void install(QString pndId);
+    void remove(QString pndId);
+    void upgrade(QString pndId);
     void answer(bool value);
 
 private slots:

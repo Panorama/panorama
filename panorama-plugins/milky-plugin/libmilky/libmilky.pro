@@ -36,12 +36,11 @@ HEADERS = \
     src/lib/merge.h \
     src/lib/milky.h \
     src/lib/parseconfig.h \
-    src/lib/pnd_container.h \
-    src/lib/pnd_discovery.h \
     src/lib/pnd.h \
     src/lib/remove.h \
     src/lib/sync.h \
     src/lib/upgrade.h
 
+INCLUDEPATH += ../../../pandora-libraries/include
 INCLUDEPATH += src/lib
 INCLUDEPATH += ../libjansson/src/src

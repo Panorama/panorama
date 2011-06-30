@@ -332,7 +332,6 @@ MilkyListener* MilkyModel::getListener()
 
 void MilkyModel::applyConfiguration()
 {
-    qDebug() << "Check config";
     milky_check_config();
     refreshModel();
 }

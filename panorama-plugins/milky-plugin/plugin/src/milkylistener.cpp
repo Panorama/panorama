@@ -197,13 +197,10 @@ void MilkyListener::listen()
     }
 
     priv->listening = false;
-    qDebug() << "MilkyListener: exiting";
 }
 
 void MilkyListener::handleMessage(__m_sig_message *msgSignal)
 {
-    qDebug() << "Message" << msgSignal->msg << "received";
-
     switch(msgSignal->msg)
     {
         case M_MSG_CONFIG:

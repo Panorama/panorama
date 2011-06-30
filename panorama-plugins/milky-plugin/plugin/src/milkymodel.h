@@ -57,7 +57,8 @@ public:
         Installed,
         HasUpdate,
         InstallPath,
-        Categories
+        Categories,
+        PreviewPics
     };
 
     /** QML helper method that applies a filter to this model */

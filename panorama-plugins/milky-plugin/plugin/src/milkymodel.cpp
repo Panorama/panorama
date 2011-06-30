@@ -52,6 +52,7 @@ MilkyModel::MilkyModel(QObject *parent) :
     roles[MilkyModel::HasUpdate] = QString("hasUpdate").toLocal8Bit();
     roles[MilkyModel::InstallPath] = QString("installPath").toLocal8Bit();
     roles[MilkyModel::Categories] = QString("categories").toLocal8Bit();
+    roles[MilkyModel::PreviewPics] = QString("previewPics").toLocal8Bit();
     setRoleNames(roles);
 
     milky_init();
@@ -175,6 +176,8 @@ QVariant MilkyModel::data(const QModelIndex &index, int role) const
             return value->getInstallPath();
         case Categories:
             return value->getCategories();
+        case PreviewPics:
+            return value->getPreviewPics();
         default:
             return QVariant();
         }
@@ -245,6 +248,8 @@ QVariant MilkyModel::headerData(int, Qt::Orientation, int role) const
         return QString("InstallPath");
     case Categories:
         return QString("Categories");
+    case PreviewPics:
+        return QString("PreviewPics");
     default:
         return QVariant();
     }
@@ -430,7 +435,6 @@ void MilkyModel::refreshModel()
             mp->setInstallPath(p->install_path);
 
             QStringList packageCategories;
-
             alpm_list_t* categoryNode = p->categories;
             do
             {
@@ -442,10 +446,20 @@ void MilkyModel::refreshModel()
                 }
             } while((categoryNode = categoryNode->next));
 
-            mp->setCategories(packageCategories.join(";"));
+
+            alpm_list_t* previewPicNode = p->previewpics;
+            if(previewPicNode)
+            {
+                QStringList previewPics;
+                do
+                {
+                    char* previewPic = static_cast<char*>(previewPicNode->data);
+                    previewPics << previewPic;
+                } while((previewPicNode = previewPicNode->next));
+                mp->setPreviewPics(previewPics);
+            }
+
             priv->packages << mp;
-
-
         } while((package = package->next));
     }
 

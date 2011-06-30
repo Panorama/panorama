@@ -128,6 +128,11 @@ QString MilkyPackage::getCategories() const
     return categories;
 }
 
+QStringList MilkyPackage::getPreviewPics() const
+{
+    return previewPics;
+}
+
 void MilkyPackage::setId(QString newId)
 {
     id = newId;
@@ -278,4 +283,10 @@ void MilkyPackage::setCategories(QString newCategories)
 {
     categories = newCategories;
     emit categoriesChanged(categories);
+}
+
+void MilkyPackage::setPreviewPics(QStringList newPreviewPics)
+{
+    previewPics = newPreviewPics;
+    emit previewPicsChanged(previewPics);
 }

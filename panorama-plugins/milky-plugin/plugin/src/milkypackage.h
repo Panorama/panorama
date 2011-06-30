@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDateTime>
+#include <QStringList>
 
 class MilkyPackage : public QObject
 {
@@ -41,6 +42,7 @@ class MilkyPackage : public QObject
     Q_PROPERTY(bool hasUpdate READ getHasUpdate WRITE setHasUpdate NOTIFY hasUpdateChanged);
     Q_PROPERTY(QString installPath READ getInstallPath WRITE setInstallPath NOTIFY installPathChanged);
     Q_PROPERTY(QString categories READ getCategories WRITE setCategories NOTIFY categoriesChanged);
+    Q_PROPERTY(QStringList previewPics READ getPreviewPics WRITE setPreviewPics NOTIFY previewPicsChanged);
 
 public:
     explicit MilkyPackage(QObject *parent = 0);
@@ -75,6 +77,7 @@ public slots:
     bool getHasUpdate() const;
     QString getInstallPath() const;
     QString getCategories() const;
+    QStringList getPreviewPics() const;
 
     void setId(QString newId);
     void setTitle(QString newTitle);
@@ -105,6 +108,7 @@ public slots:
     void setHasUpdate(bool newHasUpdate);
     void setInstallPath(QString newInstallPath);
     void setCategories(QString newCategory);
+    void setPreviewPics(QStringList newPreviewPics);
 
 signals:
     void idChanged(QString);
@@ -136,6 +140,7 @@ signals:
     void hasUpdateChanged(bool);
     void installPathChanged(QString);
     void categoriesChanged(QString);
+    void previewPicsChanged(QStringList);
 
 private:
     struct Author {
@@ -173,6 +178,7 @@ private:
     bool hasUpdate;
     QString installPath;
     QString categories;
+    QStringList previewPics;
 };
 
 #endif // MILKYPACKAGE_H

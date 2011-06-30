@@ -65,6 +65,7 @@ PanoramaUI {
             PropertyChanges { target: installOverlay; opacity: 0.0 }
             PropertyChanges { target: removeOverlay; opacity: 0.0 }
             PropertyChanges { target: upgradeOverlay; opacity: 0.0 }
+            PropertyChanges { target: previewOverlay; opacity: 0.0 }
         },
         State {
             name: "sync"
@@ -73,6 +74,7 @@ PanoramaUI {
             PropertyChanges { target: installOverlay; opacity: 0.0 }
             PropertyChanges { target: removeOverlay; opacity: 0.0 }
             PropertyChanges { target: upgradeOverlay; opacity: 0.0 }
+            PropertyChanges { target: previewOverlay; opacity: 0.0 }
         },
         State {
             name: "categories"
@@ -81,6 +83,7 @@ PanoramaUI {
             PropertyChanges { target: installOverlay; opacity: 0.0 }
             PropertyChanges { target: removeOverlay; opacity: 0.0 }
             PropertyChanges { target: upgradeOverlay; opacity: 0.0 }
+            PropertyChanges { target: previewOverlay; opacity: 0.0 }
         },
         State {
             name: "install"
@@ -89,6 +92,7 @@ PanoramaUI {
             PropertyChanges { target: installOverlay; opacity: 0.9 }
             PropertyChanges { target: removeOverlay; opacity: 0.0 }
             PropertyChanges { target: upgradeOverlay; opacity: 0.0 }
+            PropertyChanges { target: previewOverlay; opacity: 0.0 }
         },
         State {
             name: "remove"
@@ -97,6 +101,7 @@ PanoramaUI {
             PropertyChanges { target: installOverlay; opacity: 0.0 }
             PropertyChanges { target: removeOverlay; opacity: 0.9 }
             PropertyChanges { target: upgradeOverlay; opacity: 0.0 }
+            PropertyChanges { target: previewOverlay; opacity: 0.0 }
         },
         State {
             name: "upgrade"
@@ -105,29 +110,27 @@ PanoramaUI {
             PropertyChanges { target: installOverlay; opacity: 0.0 }
             PropertyChanges { target: removeOverlay; opacity: 0.0 }
             PropertyChanges { target: upgradeOverlay; opacity: 0.9 }
+            PropertyChanges { target: previewOverlay; opacity: 0.0 }
+        },
+        State {
+            name: "preview"
+            PropertyChanges { target: syncOverlay; opacity: 0.0 }
+            PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
+            PropertyChanges { target: installOverlay; opacity: 0.0 }
+            PropertyChanges { target: removeOverlay; opacity: 0.0 }
+            PropertyChanges { target: upgradeOverlay; opacity: 0.0 }
+            PropertyChanges { target: previewOverlay; opacity: 0.9 }
         }
 
     ]
 
     transitions: [
-        Transition {
-            from: "sync"
-            to: "browse"
-            reversible: true
-            NumberAnimation {
-                properties: "opacity"
-                easing.type: Easing.Linear
-            }
-        },
-        Transition {
-            from: "categories"
-            to: "browse"
-            reversible: true
-            NumberAnimation {
-                properties: "opacity"
-                easing.type: Easing.Linear
-            }
-        }
+        Transition { to: "browse"; NumberAnimation { properties: "opacity"; easing.type: Easing.Linear } },
+        Transition { to: "categories"; NumberAnimation { properties: "opacity"; easing.type: Easing.Linear } },
+        Transition { to: "install"; NumberAnimation { properties: "opacity"; easing.type: Easing.Linear } },
+        Transition { to: "remove"; NumberAnimation { properties: "opacity"; easing.type: Easing.Linear } },
+        Transition { to: "upgrade"; NumberAnimation { properties: "opacity"; easing.type: Easing.Linear } },
+        Transition { to: "preview"; NumberAnimation { properties: "opacity"; easing.type: Easing.Linear } }
     ]
 
 
@@ -150,6 +153,46 @@ PanoramaUI {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Synchronizing database with repository..."
                 font.pixelSize: ui.width / 40
+            }
+        }
+
+
+        Rectangle {
+            id: previewOverlay
+            anchors.fill: parent
+            z: 10
+
+            property variant model
+
+            // Restrict mouse events to children
+            MouseArea { anchors.fill: parent; onPressed: ui.state = "browse" }
+
+            color: "#222"
+
+            ListView {
+                id: previewList
+                //anchors.left: parent.left
+                //anchors.right: parent.right
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                height: 2*parent.height/3
+                width: 2*parent.width/3
+
+                orientation: ListView.Horizontal
+                //boundsBehavior: ListView.StopAtBounds
+                snapMode: ListView.SnapToItem
+
+                cacheBuffer: width*2
+                spacing: 32
+
+
+                model: parent.model
+
+                delegate: Image {
+                    source: modelData
+                    height: previewList.height
+                    fillMode: Image.PreserveAspectFit
+                }
             }
         }
 
@@ -1034,180 +1077,22 @@ PanoramaUI {
                   .matching("hasUpdate", statusFilter.hasUpdate)
                   .inCategory(categoryFilter.value ? categoryFilter.value : ".*")
 
-                delegate: Item {
-                    id: packageItem
-                    property bool showDetails: false
-
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    height: showDetails ? 196 : 32
-                    Behavior on height { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
-
-                    Rectangle {
-                        id: packageTitle
-                        height: 32
-                        z: 1
-                        anchors.top: parent.top
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        gradient: Gradient {
-                            GradientStop { position: 0; color: installed ? "#cec" : "#eee" }
-                            GradientStop { position: 1; color: installed ? "#aca" : "#ccc" }
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: packageItem.showDetails = !packageItem.showDetails;
-                        }
-                        Image {
-                            id: iconImage
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.left
-                            width: 24
-                            height: 24
-                            source: icon
-                        }
-
-                        Text {
-                            id: titleLabel
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: iconImage.right
-                            anchors.margins: 8
-                            text: title
-                            font.pixelSize: 24
-                            color: "#222"
-                        }
-
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: titleLabel.right
-                            anchors.right: parent.right
-                            anchors.margins: 8
-                            text: description.split("\n")[0]
-                            elide: Text.ElideRight
-                            font.pixelSize: 14
-                            color: "#111"
-
-                        }
-
+                delegate: PackageDelegate {
+                    onInstall: {
+                        installVerify.installedPackage = title;
+                        ui.milky.install(identifier);
                     }
-
-                    Rectangle {
-                        id: packageDetails
-                        opacity: packageItem.showDetails ? 1.0 : 0
-                        Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-                        anchors.top: packageTitle.bottom
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.bottom: parent.bottom
-
-                        color: "white"
-
-                        Flickable {
-                            id: descriptionContainer
-                            anchors.top: parent.top
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.bottom: installButton.top
-
-                            contentWidth: descriptionText.paintedWidth
-                            contentHeight: descriptionText.paintedHeight
-                            flickableDirection: Flickable.VerticalFlick
-                            boundsBehavior: Flickable.StopAtBounds
-                            clip: true
-
-                            Text {
-                                id: descriptionText
-                                anchors.top: parent.top
-                                width: packageDetails.width
-
-                                text: description
-                                color: "#222"
-                                font.pixelSize: 16
-                                wrapMode: Text.WordWrap
-                            }
-                        }
-
-                        Rectangle {
-                            id: installButton
-                            anchors.bottom: parent.bottom
-                            anchors.left: parent.left
-                            height: 32
-                            width: parent.width / 3
-
-                            gradient: Gradient {
-                                GradientStop { position: 0; color: installed ? "#ccc" : "#cec" }
-                                GradientStop { position: 1; color: installed ? "#aaa" : "#aca" }
-                            }
-
-                            Text {
-                                text: "Install"
-                                anchors.centerIn: parent
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                enabled: !installed
-                                onClicked: {
-                                    installVerify.installedPackage = title;
-                                    ui.milky.install(identifier);
-                                }
-
-                            }
-                        }
-                        Rectangle {
-                            id: upgradeButton
-                            anchors.bottom: parent.bottom
-                            anchors.left: installButton.right
-                            anchors.right: removeButton.left
-                            height: 32
-                            width: parent.width / 3
-
-                            gradient: Gradient {
-                                GradientStop { position: 0; color: hasUpdate ? "#cce" :  "#ccc" }
-                                GradientStop { position: 1; color: hasUpdate ? "#aac" :  "#aaa" }
-                            }
-
-                            Text {
-                                text: "Upgrade"
-                                anchors.centerIn: parent
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                enabled: hasUpdate
-                                onClicked: {
-                                    upgradeVerify.upgradedPackage = title;
-                                    ui.milky.upgrade(identifier);
-                                }
-                            }
-                        }
-                        Rectangle {
-                            id: removeButton
-                            anchors.bottom: parent.bottom
-                            anchors.right: parent.right
-                            height: 32
-                            width: parent.width / 3
-
-                            gradient: Gradient {
-                                GradientStop { position: 0; color: installed ? "#ecc" :  "#ccc" }
-                                GradientStop { position: 1; color: installed ? "#caa" :  "#aaa" }
-                            }
-
-                            Text {
-                                text: "Remove"
-                                anchors.centerIn: parent
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                enabled: installed
-                                onClicked: {
-                                    removeVerify.removedPackage = title;
-                                    ui.milky.remove(identifier);
-                                }
-                            }
-                        }
-
+                    onRemove: {
+                        removeVerify.removedPackage = title;
+                        ui.milky.remove(identifier);
+                    }
+                    onUpgrade: {
+                        upgradeVerify.upgradedPackage = title;
+                        ui.milky.upgrade(identifier);
+                    }
+                    onPreview: {
+                        previewOverlay.model = previewPics;
+                        ui.state = "preview";
                     }
                 }
             }

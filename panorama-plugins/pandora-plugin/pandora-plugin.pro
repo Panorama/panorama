@@ -10,7 +10,7 @@ INCLUDEPATH += ../../panorama/include
 INCLUDEPATH += ../../pandora-libraries/include
 
 LIBS += \
-    -L../../pandora-libraries \
+    -L../../target/lib \
     -lpnd
 
 SOURCES += \

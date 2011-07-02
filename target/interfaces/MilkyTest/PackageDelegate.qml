@@ -106,12 +106,30 @@ Item {
             anchors.bottom: installButton.top
             width: previewPics.length ? 192 : 0
 
+            Text {
+                anchors.centerIn: parent
+                opacity: image.status != Image.Ready && image.source != "" ? 1.0 : 0.0
+                text: parseInt(image.progress * 100) + "%"
+                font.pixelSize: 24
+                color: "#ddd"
+            }
+
             Image {
+                id: image
+                function selectImage() {
+                    if(!packageItem.showDetails) {
+                        return ""
+                    } else if(previewPics.length == 0) {
+                        return ""
+                    } else {
+                        return previewPics[0]
+                    }
+                }
+
                 height: previewContainer.height
                 width: previewContainer.width
-                asynchronous: true
                 fillMode: Image.PreserveAspectFit
-                source: previewPics.length ? previewPics[0] : ""
+                source:  selectImage()
 
                 MouseArea {
                     anchors.fill: parent

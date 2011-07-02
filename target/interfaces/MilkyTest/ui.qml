@@ -171,27 +171,45 @@ PanoramaUI {
 
             ListView {
                 id: previewList
-                //anchors.left: parent.left
-                //anchors.right: parent.right
-                anchors.horizontalCenter: parent.horizontalCenter
+                property int previewSize: 500
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.right: parent.right
                 height: 2*parent.height/3
-                width: 2*parent.width/3
 
                 orientation: ListView.Horizontal
-                //boundsBehavior: ListView.StopAtBounds
                 snapMode: ListView.SnapToItem
+                flickDeceleration: 2500
 
-                cacheBuffer: width*2
-                spacing: 32
+                preferredHighlightBegin: width/2 - previewSize/2
+                preferredHighlightEnd: width/2 + previewSize/2
+                highlightRangeMode: ListView.StrictlyEnforceRange
 
+                cacheBuffer: width*4
+                spacing: 16
+                boundsBehavior: ListView.DragOverBounds
 
                 model: parent.model
 
-                delegate: Image {
-                    source: modelData
-                    height: previewList.height
-                    fillMode: Image.PreserveAspectFit
+                delegate: Rectangle {
+                    color: image.status == Image.Ready ? "#00000000" : "#eee"
+                    height: image.status == Image.Ready ? image.height : previewList.height
+                    width: previewList.previewSize
+                    Behavior on height { NumberAnimation { duration: 500 } }
+
+                    Text {
+                        anchors.centerIn: parent
+                        visible: image.status != Image.Ready
+                        text: parseInt(image.progress * 100) + "%"
+                        font.pixelSize: 24
+                    }
+
+                    Image {
+                        id: image
+                        source: modelData
+                        width: previewList.previewSize
+                        fillMode: Image.PreserveAspectFit
+                    }
                 }
             }
         }
@@ -1076,6 +1094,8 @@ PanoramaUI {
                   .matching("installed", statusFilter.installed)
                   .matching("hasUpdate", statusFilter.hasUpdate)
                   .inCategory(categoryFilter.value ? categoryFilter.value : ".*")
+
+                cacheBuffer: height / 2
 
                 delegate: PackageDelegate {
                     onInstall: {

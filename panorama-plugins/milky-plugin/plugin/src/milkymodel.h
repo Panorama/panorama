@@ -6,6 +6,7 @@
 
 #include <QAbstractListModel>
 #include <QtDeclarative>
+#include <QStringList>
 
 class MilkyModelPrivate;
 
@@ -95,6 +96,7 @@ public:
 
     QString getDevice();
     void setDevice(QString const newDevice);
+    Q_INVOKABLE QStringList getDeviceList();
 
     QString getTargetDir();
     void setTargetDir(QString const newTargetDir);

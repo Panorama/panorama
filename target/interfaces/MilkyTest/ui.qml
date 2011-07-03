@@ -1098,7 +1098,7 @@ PanoramaUI {
                   .matching("installed", statusFilter.installed)
                   .matching("hasUpdate", statusFilter.hasUpdate)
                   .inCategory(categoryFilter.value ? categoryFilter.value : ".*")
-                  .matching("title", (search.text.length == 0) ? ".*" : ".*" + search.text + ".*")
+                  .matching("title", (search.text.length > 0 && search.text.length < 3) ? "^$" : ".*" + search.text + ".*")
 
                 cacheBuffer: height / 2
 
@@ -1136,6 +1136,14 @@ PanoramaUI {
                 PropertyAnimation { id: scrollAnimation; target: packageList; property: "contentY"; duration: 200; easing.type: Easing.OutQuad }
             }
 
+            Text {
+                visible: search.text.length > 0 && packageList.count == 0
+                text: search.text.length < 3 ? "At least three characters required to search" : "No packages found"
+                color: "#888"
+                font.pixelSize: 24
+                anchors.centerIn: parent
+            }
+
         }
 
         Rectangle {
@@ -1154,7 +1162,6 @@ PanoramaUI {
                 anchors.leftMargin: 4
                 font.pixelSize: 24
             }
-
         }
 
         Rectangle {

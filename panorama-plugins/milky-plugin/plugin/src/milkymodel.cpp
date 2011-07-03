@@ -298,6 +298,22 @@ void MilkyModel::setDevice(QString const newDevice)
     emit deviceChanged(newDevice);
 }
 
+QStringList MilkyModel::getDeviceList()
+{
+    QStringList list;
+    alpm_list_t* node = milky_list_devices();
+
+    while(node)
+    {
+        char* item = static_cast<char*>(node->data);
+        list << item;
+        node = node->next;
+    }
+
+    milky_free_device_list(node);
+    return list;
+}
+
 QString MilkyModel::getTargetDir()
 {
     return QString(milky_get_target_dir());

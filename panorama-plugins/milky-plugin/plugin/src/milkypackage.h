@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <QStringList>
+#include "milky/milky.h"
 
 class MilkyPackage : public QObject
 {
@@ -41,11 +42,13 @@ class MilkyPackage : public QObject
     Q_PROPERTY(bool installed READ getInstalled WRITE setInstalled NOTIFY installedChanged);
     Q_PROPERTY(bool hasUpdate READ getHasUpdate WRITE setHasUpdate NOTIFY hasUpdateChanged);
     Q_PROPERTY(QString installPath READ getInstallPath WRITE setInstallPath NOTIFY installPathChanged);
-    Q_PROPERTY(QString categories READ getCategories WRITE setCategories NOTIFY categoriesChanged);
+    Q_PROPERTY(QStringList categories READ getCategories WRITE setCategories NOTIFY categoriesChanged);
+    Q_PROPERTY(QString categoriesString READ getCategoriesString WRITE setCategoriesString NOTIFY categoriesStringChanged);
     Q_PROPERTY(QStringList previewPics READ getPreviewPics WRITE setPreviewPics NOTIFY previewPicsChanged);
 
 public:
     explicit MilkyPackage(QObject *parent = 0);
+    MilkyPackage(_pnd_package* p, QObject* parent = 0);
 
 public slots:
     QString getId() const;
@@ -76,7 +79,8 @@ public slots:
     bool getInstalled() const;
     bool getHasUpdate() const;
     QString getInstallPath() const;
-    QString getCategories() const;
+    QStringList getCategories() const;
+    QString getCategoriesString() const;
     QStringList getPreviewPics() const;
 
     void setId(QString newId);
@@ -107,7 +111,8 @@ public slots:
     void setInstalled(bool newInstalled);
     void setHasUpdate(bool newHasUpdate);
     void setInstallPath(QString newInstallPath);
-    void setCategories(QString newCategory);
+    void setCategories(QStringList newCategories);
+    void setCategoriesString(QString newCategoriesString);
     void setPreviewPics(QStringList newPreviewPics);
 
 signals:
@@ -139,7 +144,8 @@ signals:
     void installedChanged(bool);
     void hasUpdateChanged(bool);
     void installPathChanged(QString);
-    void categoriesChanged(QString);
+    void categoriesChanged(QStringList);
+    void categoriesStringChanged(QString);
     void previewPicsChanged(QStringList);
 
 private:
@@ -177,7 +183,7 @@ private:
     bool installed;
     bool hasUpdate;
     QString installPath;
-    QString categories;
+    QStringList categories;
     QStringList previewPics;
 };
 

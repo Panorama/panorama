@@ -8,7 +8,7 @@ QVariant PackageFilterMethods::inCategory(QAbstractItemModel *source,
     PackageFilterModel *result = new PackageFilterModel(source, source);
 
     result->setParent(source);
-    result->setFilterRole(MilkyModel::Categories);
+    result->setFilterRole(MilkyModel::CategoriesString);
     QString filter = QString("%1%2%3").arg("(^|;)").arg(category).arg("($|;)");
     result->setFilterRegExp(filter);
 

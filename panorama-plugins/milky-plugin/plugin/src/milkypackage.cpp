@@ -5,6 +5,63 @@ MilkyPackage::MilkyPackage(QObject *parent) :
 {
 }
 
+MilkyPackage::MilkyPackage(_pnd_package* p, QObject* parent) :
+    QObject(parent)
+{
+    setId(p->id);
+    setTitle(p->title);
+    setDescription(p->desc);
+    setInfo(p->info);
+    setIcon(p->icon);
+    setUri(p->uri);
+    setMD5(p->md5);
+    setVendor(p->vendor);
+    setGroup(p->group);
+    setModified(QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(p->modified_time) * 1000));
+    setRating(p->rating);
+    setSize(p->size);
+    setAuthorName(p->author->name);
+    setAuthorSite(p->author->website);
+    setAuthorEmail(p->author->email);
+    setInstalledVersionMajor(p->local_version->major);
+    setInstalledVersionMinor(p->local_version->minor);
+    setInstalledVersionRelease(p->local_version->release);
+    setInstalledVersionBuild(p->local_version->build);
+    setInstalledVersionType(p->local_version->type);
+    setCurrentVersionMajor(p->version->major);
+    setCurrentVersionMinor(p->version->minor);
+    setCurrentVersionRelease(p->version->release);
+    setCurrentVersionBuild(p->version->build);
+    setCurrentVersionType(p->version->type);
+    setInstalled(p->installed);
+    setHasUpdate(p->hasupdate);
+    setInstallPath(p->install_path);
+
+    QStringList packageCategories;
+    alpm_list_t* categoryNode = p->categories;
+    if(categoryNode)
+    {
+        do
+        {
+            char* category = static_cast<char*>(categoryNode->data);
+            packageCategories << category;
+        } while((categoryNode = categoryNode->next));
+        setCategories(packageCategories);
+    }
+
+    alpm_list_t* previewPicNode = p->previewpics;
+    if(previewPicNode)
+    {
+        QStringList previewPicList;
+        do
+        {
+            char* previewPic = static_cast<char*>(previewPicNode->data);
+            previewPicList << previewPic;
+        } while((previewPicNode = previewPicNode->next));
+        setPreviewPics(previewPicList);
+    }
+}
+
 QString MilkyPackage::getId() const
 {
     return id;
@@ -123,9 +180,14 @@ QString MilkyPackage::getInstallPath() const
     return installPath;
 }
 
-QString MilkyPackage::getCategories() const
+QStringList MilkyPackage::getCategories() const
 {
     return categories;
+}
+
+QString MilkyPackage::getCategoriesString() const
+{
+    return categories.join(";");
 }
 
 QStringList MilkyPackage::getPreviewPics() const
@@ -279,10 +341,18 @@ void MilkyPackage::setInstallPath(QString newInstallPath)
     emit installPathChanged(installPath);
 }
 
-void MilkyPackage::setCategories(QString newCategories)
+void MilkyPackage::setCategories(QStringList newCategories)
 {
     categories = newCategories;
     emit categoriesChanged(categories);
+    emit categoriesStringChanged(getCategoriesString());
+}
+
+void MilkyPackage::setCategoriesString(QString newCategoriesString)
+{
+    categories = newCategoriesString.split(";");
+    emit categoriesChanged(categories);
+    emit categoriesStringChanged(getCategoriesString());
 }
 
 void MilkyPackage::setPreviewPics(QStringList newPreviewPics)

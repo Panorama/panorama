@@ -52,6 +52,7 @@ MilkyModel::MilkyModel(QObject *parent) :
     roles[MilkyModel::HasUpdate] = QString("hasUpdate").toLocal8Bit();
     roles[MilkyModel::InstallPath] = QString("installPath").toLocal8Bit();
     roles[MilkyModel::Categories] = QString("categories").toLocal8Bit();
+    roles[MilkyModel::CategoriesString] = QString("categoriesString").toLocal8Bit();
     roles[MilkyModel::PreviewPics] = QString("previewPics").toLocal8Bit();
     setRoleNames(roles);
 
@@ -176,6 +177,8 @@ QVariant MilkyModel::data(const QModelIndex &index, int role) const
             return value->getInstallPath();
         case Categories:
             return value->getCategories();
+        case CategoriesString:
+            return value->getCategoriesString();
         case PreviewPics:
             return value->getPreviewPics();
         default:
@@ -248,6 +251,8 @@ QVariant MilkyModel::headerData(int, Qt::Orientation, int role) const
         return QString("InstallPath");
     case Categories:
         return QString("Categories");
+    case CategoriesString:
+        return QString("CategoriesString");
     case PreviewPics:
         return QString("PreviewPics");
     default:
@@ -392,6 +397,7 @@ void MilkyModel::refreshModel()
     }
 
     QStringList categoryList;
+    categoryList << ""; // "All" category
 
     priv->packages.clear();
 
@@ -403,60 +409,14 @@ void MilkyModel::refreshModel()
         do
         {
             _pnd_package* p = reinterpret_cast<_pnd_package*>(package->data);
-            MilkyPackage* mp = new MilkyPackage();
+            MilkyPackage* mp = new MilkyPackage(p);
 
-            mp->setId(p->id);
-            mp->setTitle(p->title);
-            mp->setDescription(p->desc);
-            mp->setInfo(p->info);
-            mp->setIcon(p->icon);
-            mp->setUri(p->uri);
-            mp->setMD5(p->md5);
-            mp->setVendor(p->vendor);
-            mp->setGroup(p->group);
-            mp->setModified(QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(p->modified_time) * 1000));
-            mp->setRating(p->rating);
-            mp->setSize(p->size);
-            mp->setAuthorName(p->author->name);
-            mp->setAuthorSite(p->author->website);
-            mp->setAuthorEmail(p->author->email);
-            mp->setInstalledVersionMajor(p->local_version->major);
-            mp->setInstalledVersionMinor(p->local_version->minor);
-            mp->setInstalledVersionRelease(p->local_version->release);
-            mp->setInstalledVersionBuild(p->local_version->build);
-            mp->setInstalledVersionType(p->local_version->type);
-            mp->setCurrentVersionMajor(p->version->major);
-            mp->setCurrentVersionMinor(p->version->minor);
-            mp->setCurrentVersionRelease(p->version->release);
-            mp->setCurrentVersionBuild(p->version->build);
-            mp->setCurrentVersionType(p->version->type);
-            mp->setInstalled(p->installed);
-            mp->setHasUpdate(p->hasupdate);
-            mp->setInstallPath(p->install_path);
-
-            QStringList packageCategories;
-            alpm_list_t* categoryNode = p->categories;
-            do
+            foreach(QString category, mp->getCategories())
             {
-                char* category = static_cast<char*>(categoryNode->data);
-                packageCategories << category;
                 if(!categoryList.contains(category))
                 {
                     categoryList.append(category);
                 }
-            } while((categoryNode = categoryNode->next));
-
-
-            alpm_list_t* previewPicNode = p->previewpics;
-            if(previewPicNode)
-            {
-                QStringList previewPics;
-                do
-                {
-                    char* previewPic = static_cast<char*>(previewPicNode->data);
-                    previewPics << previewPic;
-                } while((previewPicNode = previewPicNode->next));
-                mp->setPreviewPics(previewPics);
             }
 
             priv->packages << mp;

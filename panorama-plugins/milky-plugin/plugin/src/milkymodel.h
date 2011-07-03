@@ -58,6 +58,7 @@ public:
         HasUpdate,
         InstallPath,
         Categories,
+        CategoriesString,
         PreviewPics
     };
 

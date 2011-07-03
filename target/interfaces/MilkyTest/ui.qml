@@ -1088,9 +1088,8 @@ PanoramaUI {
                 }
             }
 
-
-            ListView
-            {
+            ListView {
+                id: packageList
                 anchors.fill: parent
                 clip: true
 
@@ -1120,7 +1119,21 @@ PanoramaUI {
                         previewOverlay.model = previewPics;
                         ui.state = "preview";
                     }
+                    onShowDetails: {
+                        packageList.gotoIndex(index);
+                    }
                 }
+
+                function gotoIndex(idx) {
+                    var from = packageList.contentY;
+                    packageList.positionViewAtIndex(idx, ListView.Contain);
+                    var to = packageList.contentY;
+                    scrollAnimation.from = from;
+                    scrollAnimation.to = to;
+                    scrollAnimation.running = true;
+                }
+
+                PropertyAnimation { id: scrollAnimation; target: packageList; property: "contentY"; duration: 200; easing.type: Easing.OutQuad }
             }
 
         }

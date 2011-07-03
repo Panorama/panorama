@@ -2,17 +2,24 @@ import Qt 4.7
 
 Item {
     id: packageItem
-    property bool showDetails: false
+    property bool detailsVisible: false
 
     signal install();
     signal remove();
     signal upgrade();
     signal preview();
+    signal showDetails();
 
     anchors.left: parent.left
     anchors.right: parent.right
-    height: showDetails ? 196 : 32
-    Behavior on height { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+    height: detailsVisible ? 196 : 32
+    Behavior on height {
+        SequentialAnimation {
+            NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+            ScriptAction { script: packageItem.showDetails() }
+        }
+    }
+
 
     Rectangle {
         id: packageTitle
@@ -27,7 +34,13 @@ Item {
         }
         MouseArea {
             anchors.fill: parent
-            onClicked: packageItem.showDetails = !packageItem.showDetails;
+            onClicked: {
+                packageItem.detailsVisible = !packageItem.detailsVisible;
+                if(packageItem.detailsVisible) {
+                    showDetails();
+                }
+            }
+
         }
         Image {
             id: iconImage
@@ -64,7 +77,7 @@ Item {
 
     Rectangle {
         id: packageDetails
-        opacity: packageItem.showDetails ? 1.0 : 0
+        opacity: packageItem.detailsVisible ? 1.0 : 0
         Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.InOutQuad } }
         anchors.top: packageTitle.bottom
         anchors.left: parent.left
@@ -117,7 +130,7 @@ Item {
             Image {
                 id: image
                 function selectImage() {
-                    if(!packageItem.showDetails) {
+                    if(!packageItem.detailsVisible) {
                         return ""
                     } else if(previewPics.length == 0) {
                         return ""

@@ -125,10 +125,20 @@ public slots:
     void applyConfiguration();
 
     void updateDatabase();
+
+    void addTarget(QString pndId);
+    void removeTarget(QString pndId);
+    void clearTargets();
+
+    void install();
+    void remove();
+    void upgrade();
+
     void install(QString pndId);
     void remove(QString pndId);
     void upgrade(QString pndId);
     void answer(bool value);
+
 
 private slots:
     void refreshModel();

@@ -363,28 +363,62 @@ void MilkyModel::updateDatabase()
     emit notifyListener();
 }
 
-void MilkyModel::install(QString pndId)
+
+void MilkyModel::addTarget(QString pndId)
 {
     milky_add_target(pndId.toLocal8Bit());
+}
+
+void MilkyModel::removeTarget(QString pndId)
+{
+    milky_remove_target(pndId.toLocal8Bit());
+}
+
+void MilkyModel::clearTargets()
+{
+    milky_clear_targets();
+}
+
+void MilkyModel::install()
+{
     milky_check_config();
     milky_install();
     emit notifyListener();
 }
 
-void MilkyModel::remove(QString pndId)
+void MilkyModel::remove()
 {
-    milky_add_target(pndId.toLocal8Bit());
     milky_check_config();
     milky_remove();
     emit notifyListener();
 }
 
-void MilkyModel::upgrade(QString pndId)
+void MilkyModel::upgrade()
 {
-    milky_add_target(pndId.toLocal8Bit());
     milky_check_config();
     milky_upgrade();
     emit notifyListener();
+}
+
+void MilkyModel::install(QString pndId)
+{
+    clearTargets();
+    addTarget(pndId);
+    install();
+}
+
+void MilkyModel::remove(QString pndId)
+{
+    clearTargets();
+    addTarget(pndId);
+    remove();
+}
+
+void MilkyModel::upgrade(QString pndId)
+{
+    clearTargets();
+    addTarget(pndId);
+    upgrade();
 }
 
 void MilkyModel::answer(bool value)

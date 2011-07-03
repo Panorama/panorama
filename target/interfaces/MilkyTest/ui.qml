@@ -47,6 +47,11 @@ PanoramaUI {
         }
     }
 
+    Item {
+        focus: true
+        Keys.forwardTo: [search]
+    }
+
     function categoryHue(name) {
         var sum = 0;
         for(var i = 0; i < name.length; ++i) {
@@ -1032,7 +1037,7 @@ PanoramaUI {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: toolbar.bottom
-            anchors.bottom: statusContainer.top
+            anchors.bottom: searchBox.top
             color: "#eee"
 
             Rectangle {
@@ -1094,6 +1099,7 @@ PanoramaUI {
                   .matching("installed", statusFilter.installed)
                   .matching("hasUpdate", statusFilter.hasUpdate)
                   .inCategory(categoryFilter.value ? categoryFilter.value : ".*")
+                  .matching("title", (search.text.length == 0) ? ".*" : ".*" + search.text + ".*")
 
                 cacheBuffer: height / 2
 
@@ -1118,6 +1124,26 @@ PanoramaUI {
             }
 
         }
+
+        Rectangle {
+            id: searchBox
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: statusContainer.top
+            height: search.text != "" ? 32 : 0
+            color: "#fff"
+            border.width: 2
+            border.color: "#111"
+
+            TextInput {
+                id: search
+                anchors.fill: parent
+                anchors.leftMargin: 4
+                font.pixelSize: 24
+            }
+
+        }
+
         Rectangle {
             id: statusContainer
 

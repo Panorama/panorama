@@ -54,6 +54,8 @@ MilkyModel::MilkyModel(QObject *parent) :
     roles[MilkyModel::Categories] = QString("categories").toLocal8Bit();
     roles[MilkyModel::CategoriesString] = QString("categoriesString").toLocal8Bit();
     roles[MilkyModel::PreviewPics] = QString("previewPics").toLocal8Bit();
+    roles[MilkyModel::Licenses] = QString("licenses").toLocal8Bit();
+    roles[MilkyModel::SourceLinks] = QString("sourceLinks").toLocal8Bit();
     setRoleNames(roles);
 
     milky_init();
@@ -181,6 +183,10 @@ QVariant MilkyModel::data(const QModelIndex &index, int role) const
             return value->getCategoriesString();
         case PreviewPics:
             return value->getPreviewPics();
+        case Licenses:
+            return value->getLicenses();
+        case SourceLinks:
+            return value->getSourceLinks();
         default:
             return QVariant();
         }
@@ -255,6 +261,10 @@ QVariant MilkyModel::headerData(int, Qt::Orientation, int role) const
         return QString("CategoriesString");
     case PreviewPics:
         return QString("PreviewPics");
+    case Licenses:
+        return QString("Licenses");
+    case SourceLinks:
+        return QString("SourceLinks");
     default:
         return QVariant();
     }

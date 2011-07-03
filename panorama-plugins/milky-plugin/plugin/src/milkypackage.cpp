@@ -36,30 +36,10 @@ MilkyPackage::MilkyPackage(_pnd_package* p, QObject* parent) :
     setInstalled(p->installed);
     setHasUpdate(p->hasupdate);
     setInstallPath(p->install_path);
-
-    QStringList packageCategories;
-    alpm_list_t* categoryNode = p->categories;
-    if(categoryNode)
-    {
-        do
-        {
-            char* category = static_cast<char*>(categoryNode->data);
-            packageCategories << category;
-        } while((categoryNode = categoryNode->next));
-        setCategories(packageCategories);
-    }
-
-    alpm_list_t* previewPicNode = p->previewpics;
-    if(previewPicNode)
-    {
-        QStringList previewPicList;
-        do
-        {
-            char* previewPic = static_cast<char*>(previewPicNode->data);
-            previewPicList << previewPic;
-        } while((previewPicNode = previewPicNode->next));
-        setPreviewPics(previewPicList);
-    }
+    setCategories(alpmListToQStringList(p->categories));
+    setPreviewPics(alpmListToQStringList(p->previewpics));
+    setLicenses(alpmListToQStringList(p->licenses));
+    setSourceLinks(alpmListToQStringList(p->source));
 }
 
 QString MilkyPackage::getId() const
@@ -193,6 +173,16 @@ QString MilkyPackage::getCategoriesString() const
 QStringList MilkyPackage::getPreviewPics() const
 {
     return previewPics;
+}
+
+QStringList MilkyPackage::getLicenses() const
+{
+    return licenses;
+}
+
+QStringList MilkyPackage::getSourceLinks() const
+{
+    return sourceLinks;
 }
 
 void MilkyPackage::setId(QString newId)
@@ -359,4 +349,31 @@ void MilkyPackage::setPreviewPics(QStringList newPreviewPics)
 {
     previewPics = newPreviewPics;
     emit previewPicsChanged(previewPics);
+}
+
+void MilkyPackage::setLicenses(QStringList newLicenses)
+{
+    licenses = newLicenses;
+    emit licensesChanged(licenses);
+}
+
+void MilkyPackage::setSourceLinks(QStringList newSourceLinks)
+{
+    sourceLinks = newSourceLinks;
+    emit sourceLinksChanged(sourceLinks);
+}
+
+QStringList MilkyPackage::alpmListToQStringList(alpm_list_t* node)
+{
+    QStringList list;
+    if(node)
+    {
+        do
+        {
+            char* item = static_cast<char*>(node->data);
+            list << item;
+        } while((node = node->next));
+    }
+
+    return list;
 }

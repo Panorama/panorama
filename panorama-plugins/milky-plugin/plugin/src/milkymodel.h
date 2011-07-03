@@ -59,7 +59,9 @@ public:
         InstallPath,
         Categories,
         CategoriesString,
-        PreviewPics
+        PreviewPics,
+        Licenses,
+        SourceLinks
     };
 
     /** QML helper method that applies a filter to this model */

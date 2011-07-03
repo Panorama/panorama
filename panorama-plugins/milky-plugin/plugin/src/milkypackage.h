@@ -45,6 +45,8 @@ class MilkyPackage : public QObject
     Q_PROPERTY(QStringList categories READ getCategories WRITE setCategories NOTIFY categoriesChanged);
     Q_PROPERTY(QString categoriesString READ getCategoriesString WRITE setCategoriesString NOTIFY categoriesStringChanged);
     Q_PROPERTY(QStringList previewPics READ getPreviewPics WRITE setPreviewPics NOTIFY previewPicsChanged);
+    Q_PROPERTY(QStringList licenses READ getLicenses WRITE setLicenses NOTIFY licensesChanged);
+    Q_PROPERTY(QStringList sourceLinks READ getSourceLinks WRITE setSourceLinks NOTIFY sourceLinksChanged);
 
 public:
     explicit MilkyPackage(QObject *parent = 0);
@@ -82,6 +84,8 @@ public slots:
     QStringList getCategories() const;
     QString getCategoriesString() const;
     QStringList getPreviewPics() const;
+    QStringList getLicenses() const;
+    QStringList getSourceLinks() const;
 
     void setId(QString newId);
     void setTitle(QString newTitle);
@@ -114,6 +118,8 @@ public slots:
     void setCategories(QStringList newCategories);
     void setCategoriesString(QString newCategoriesString);
     void setPreviewPics(QStringList newPreviewPics);
+    void setLicenses(QStringList newLicenses);
+    void setSourceLinks(QStringList newSourceLinks);
 
 signals:
     void idChanged(QString);
@@ -147,8 +153,12 @@ signals:
     void categoriesChanged(QStringList);
     void categoriesStringChanged(QString);
     void previewPicsChanged(QStringList);
+    void licensesChanged(QStringList);
+    void sourceLinksChanged(QStringList);
 
 private:
+    static QStringList alpmListToQStringList(alpm_list_t* list);
+
     struct Author {
         QString name;
         QString site;
@@ -185,6 +195,8 @@ private:
     QString installPath;
     QStringList categories;
     QStringList previewPics;
+    QStringList licenses;
+    QStringList sourceLinks;
 };
 
 #endif // MILKYPACKAGE_H

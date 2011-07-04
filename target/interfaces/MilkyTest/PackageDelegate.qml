@@ -29,8 +29,10 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         gradient: Gradient {
-            GradientStop { position: 0; color: installed ? "#cec" : "#eee" }
-            GradientStop { position: 1; color: installed ? "#aca" : "#ccc" }
+            GradientStop { position: 0; color: hasUpdate ? "#eef" : "#eee" }
+            GradientStop { position: 0.2; color: hasUpdate ? "#ccd" : "#ddd" }
+            GradientStop { position: 0.8; color: hasUpdate ? "#bbc" : "#ccc" }
+            GradientStop { position: 1; color: hasUpdate ? "#99a" : "#aaa" }
         }
         MouseArea {
             anchors.fill: parent
@@ -153,77 +155,45 @@ Item {
 
         }
 
-        Rectangle {
+        Button {
             id: installButton
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             height: 32
-            width: parent.width / 3
-
-            gradient: Gradient {
-                GradientStop { position: 0; color: installed ? "#ccc" : "#cec" }
-                GradientStop { position: 1; color: installed ? "#aaa" : "#aca" }
-            }
-
-            Text {
-                text: "Install"
-                anchors.centerIn: parent
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: !installed
-                onClicked: packageItem.install()
-
-            }
+            width: visible ? parent.width : 0
+            visible: !installed
+            color: installed ? "#ccc" : "#cec"
+            label: "Install"
+            enabled: !installed
+            onClicked: packageItem.install()
         }
-        Rectangle {
+
+        Button {
             id: upgradeButton
             anchors.bottom: parent.bottom
             anchors.left: installButton.right
             anchors.right: removeButton.left
             height: 32
-            width: parent.width / 3
-
-            gradient: Gradient {
-                GradientStop { position: 0; color: hasUpdate ? "#cce" :  "#ccc" }
-                GradientStop { position: 1; color: hasUpdate ? "#aac" :  "#aaa" }
-            }
-
-            Text {
-                text: "Upgrade"
-                anchors.centerIn: parent
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: hasUpdate
-                onClicked: packageItem.upgrade()
-            }
+            width: visible ? parent.width / 2 : 0
+            visible: installed
+            color: hasUpdate ? "#cce" :  "#ccc"
+            label: "Upgrade"
+            enabled: hasUpdate
+            onClicked: packageItem.upgrade()
         }
-        Rectangle {
+
+        Button {
             id: removeButton
             anchors.bottom: parent.bottom
             anchors.right: parent.right
             height: 32
-            width: parent.width / 3
+            width: visible ? parent.width / 2 : 0
+            visible: installed
 
-            gradient: Gradient {
-                GradientStop { position: 0; color: installed ? "#ecc" :  "#ccc" }
-                GradientStop { position: 1; color: installed ? "#caa" :  "#aaa" }
-            }
-
-            Text {
-                text: "Remove"
-                anchors.centerIn: parent
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: installed
-                onClicked: packageItem.remove()
-            }
+            color: installed ? "#ecc" :  "#ccc"
+            label: "Remove"
+            enabled: installed
+            onClicked: packageItem.remove()
         }
-
     }
 }

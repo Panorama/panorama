@@ -5,6 +5,64 @@ MilkyPackage::MilkyPackage(QObject *parent) :
 {
 }
 
+MilkyPackage::MilkyPackage(MilkyPackage const& other) :
+    QObject()
+{
+    id = other.id;
+    title = other.title;
+    description = other.description;
+    info = other.info;
+    icon = other.icon;
+    uri = other.uri;
+    md5 = other.md5;
+    vendor = other.vendor;
+    group = other.group;
+    modified = other.modified;
+    rating = other.rating;
+    size = other.size;
+    author = other.author;
+    installedVersion = other.installedVersion;
+    currentVersion = other.currentVersion;
+    installed = other.installed;
+    hasUpdate = other.hasUpdate;
+    installPath = other.installPath;
+    categories = other.categories;
+    previewPics = other.previewPics;
+    licenses = other.licenses;
+    sourceLinks = other.sourceLinks;
+}
+
+MilkyPackage const& MilkyPackage::operator=(MilkyPackage const& other)
+{
+    if(&other != this)
+    {
+        id = other.id;
+        title = other.title;
+        description = other.description;
+        info = other.info;
+        icon = other.icon;
+        uri = other.uri;
+        md5 = other.md5;
+        vendor = other.vendor;
+        group = other.group;
+        modified = other.modified;
+        rating = other.rating;
+        size = other.size;
+        author = other.author;
+        installedVersion = other.installedVersion;
+        currentVersion = other.currentVersion;
+        installed = other.installed;
+        hasUpdate = other.hasUpdate;
+        installPath = other.installPath;
+        categories = other.categories;
+        previewPics = other.previewPics;
+        licenses = other.licenses;
+        sourceLinks = other.sourceLinks;
+    }
+
+    return *this;
+}
+
 MilkyPackage::MilkyPackage(_pnd_package* p, QObject* parent) :
     QObject(parent)
 {

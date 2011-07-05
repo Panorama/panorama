@@ -21,7 +21,8 @@ class MilkyModel : public QAbstractListModel
     Q_PROPERTY(QString repositoryUrl READ getRepositoryUrl WRITE setRepositoryUrl NOTIFY repositoryUrlChanged)
     Q_PROPERTY(QString configFile    READ getConfigFile    WRITE setConfigFile    NOTIFY configFileChanged)
     Q_PROPERTY(QString logFile       READ getLogFile       WRITE setLogFile       NOTIFY logFileChanged)
-    Q_PROPERTY(MilkyListener* events       READ getListener                             NOTIFY listenerChanged)
+    Q_PROPERTY(bool    hasUpgrades   READ getHasUpgrades   WRITE setHasUpgrades   NOTIFY hasUpgradesChanged)
+    Q_PROPERTY(MilkyListener* events READ getListener                             NOTIFY listenerChanged)
 
     PANORAMA_DECLARE_PRIVATE(MilkyModel)
 public:
@@ -100,6 +101,7 @@ public:
 
     QString getTargetDir();
     void setTargetDir(QString const newTargetDir);
+    Q_INVOKABLE QList<QObject*> getTargetPackages();
 
     QString getRepositoryUrl();
     void setRepositoryUrl(QString const newRepositoryUrl);
@@ -109,6 +111,9 @@ public:
 
     QString getLogFile();
     void setLogFile(QString const newLogFile);
+
+    bool getHasUpgrades();
+    void setHasUpgrades(bool const newLogFile);
 
     MilkyListener* getListener();
 
@@ -120,6 +125,7 @@ signals:
     void configFileChanged(QString configFile);
     void logFileChanged(QString logFile);
     void listenerChanged(MilkyListener* listener);
+    void hasUpgradesChanged(bool newHasUpgrades);
 
     void notifyListener();
 
@@ -135,6 +141,7 @@ public slots:
     void install();
     void remove();
     void upgrade();
+    void upgradeAll();
 
     void install(QString pndId);
     void remove(QString pndId);
@@ -148,4 +155,5 @@ private slots:
 };
 
 QML_DECLARE_TYPE(MilkyModel)
+
 #endif // MILKYMODEL_H

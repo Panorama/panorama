@@ -15,12 +15,15 @@ public:
     MilkyListenerThread* listenerThread;
     QList<MilkyPackage*> packages;
     QStringListModel categories;
+    bool hasUpgrades;
 };
 
 MilkyModel::MilkyModel(QObject *parent) :
     QAbstractListModel(parent)
 {
     PANORAMA_INITIALIZE(MilkyModel);
+
+    priv->hasUpgrades = false;
 
     QHash<int, QByteArray> roles;
     roles[MilkyModel::Id] = QString("identifier").toLocal8Bit();
@@ -325,6 +328,27 @@ void MilkyModel::setTargetDir(QString const newTargetDir)
     emit targetDirChanged(newTargetDir);
 }
 
+QList<QObject*> MilkyModel::getTargetPackages()
+{
+    PANORAMA_PRIVATE(MilkyModel);
+    QList<QObject*> packages;
+    alpm_list_t* node = milky_get_target_pnd();
+    while(node)
+    {
+        _pnd_package* package = static_cast<_pnd_package*>(node->data);
+        foreach(MilkyPackage* p, priv->packages)
+        {
+            if(p->getId() == package->id)
+            {
+                packages << p;
+                break;
+            }
+        }
+        node = node->next;
+    }
+    return packages;
+}
+
 QString MilkyModel::getRepositoryUrl()
 {
     return QString(milky_get_db());
@@ -358,6 +382,22 @@ void MilkyModel::setLogFile(QString const newLogFile)
 {
     milky_set_log_file(newLogFile.toLocal8Bit());
     emit logFileChanged(newLogFile);
+}
+
+bool MilkyModel::getHasUpgrades()
+{
+    PANORAMA_PRIVATE(MilkyModel);
+    return priv->hasUpgrades;
+}
+
+void MilkyModel::setHasUpgrades(bool const newHasUpgrades)
+{
+    PANORAMA_PRIVATE(MilkyModel);
+    if(newHasUpgrades != priv->hasUpgrades)
+    {
+        priv->hasUpgrades = newHasUpgrades;
+        emit hasUpgradesChanged(newHasUpgrades);
+    }
 }
 
 MilkyListener* MilkyModel::getListener()
@@ -416,6 +456,19 @@ void MilkyModel::upgrade()
     emit notifyListener();
 }
 
+void MilkyModel::upgradeAll()
+{
+    PANORAMA_PRIVATE(MilkyModel);
+    foreach(MilkyPackage* p, priv->packages)
+    {
+        if(p->getHasUpdate()) {
+            addTarget(p->getId());
+        }
+    }
+
+    upgrade();
+}
+
 void MilkyModel::install(QString pndId)
 {
     clearTargets();
@@ -464,6 +517,8 @@ void MilkyModel::refreshModel()
     alpm_list_t* packageList = milky_get_package_list();
     alpm_list_t* package = packageList;
 
+    setHasUpgrades(false);
+
     if(package)
     {
         do
@@ -477,6 +532,11 @@ void MilkyModel::refreshModel()
                 {
                     categoryList.append(category);
                 }
+            }
+
+            if(mp->getHasUpdate())
+            {
+                setHasUpgrades(true);
             }
 
             priv->packages << mp;

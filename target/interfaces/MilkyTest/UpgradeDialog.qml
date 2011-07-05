@@ -7,8 +7,7 @@ Rectangle {
     signal activate()
     signal deactivate()
 
-    function upgrade(pndId, title) {
-        upgradeVerify.upgradedPackage = title;
+    function upgrade(pndId) {
         milky.upgrade(pndId);
     }
 
@@ -20,8 +19,16 @@ Rectangle {
 
     Component.onCompleted: {
         milky.events.upgradeCheck.connect(function() {
-            activate();
-            state = "verify";
+            var targets = milky.getTargetPackages();
+            if(targets.length > 0) {
+                upgradeVerify.upgradedPackages = targets;
+                activate();
+                state = "verify";
+            } else {
+                milky.answer(false);
+                milky.clearTargets();
+            }
+
         });
         milky.events.upgradeStart.connect(function() {
             activate();
@@ -77,15 +84,25 @@ Rectangle {
         id: upgradeVerify
         anchors.centerIn: parent
         height: childrenRect.height
-        property string upgradedPackage: ""
+        property variant upgradedPackages: []
 
         Text {
             id: upgradeVerifyLabel
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "Upgrade PND " + parent.upgradedPackage + "?"
+            text: genText()
             font.pixelSize: 24
             color: "#eee"
+
+            function genText() {
+                if(upgradeVerify.upgradedPackages.length == 0) {
+                    return "No upgrades"
+                } else if(upgradeVerify.upgradedPackages.length == 1) {
+                    return "Upgrade PND " + upgradeVerify.upgradedPackages[0].title + "?"
+                } else {
+                    return "Upgrade " + upgradeVerify.upgradedPackages.length + " PNDs?"
+                }
+            }
         }
         Button {
             id: upgradeYesButton
@@ -111,10 +128,27 @@ Rectangle {
             label: "No"
             onClicked: {
                 dialog.milky.answer(false);
-                dialog.deactivate()
+                dialog.deactivate();
+                milky.clearTargets();
             }
         }
+    }
 
+    ListView {
+        anchors.top: upgradeVerify.bottom
+        anchors.bottom: parent.bottom
+        anchors.left:parent.left
+        anchors.right: parent.right
+        anchors.margins: 16
+        clip: true
+        visible: upgradeVerify.opacity > 0 && upgradeVerify.upgradedPackages.length > 1
+        model: upgradeVerify.upgradedPackages
+        delegate: Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: modelData.title
+            color: "#eee"
+            font.pixelSize: 14
+        }
     }
 
     Item {

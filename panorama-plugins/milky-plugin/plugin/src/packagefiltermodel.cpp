@@ -75,6 +75,11 @@ QVariant PackageFilterModel::sortedBy(const QString &role, bool ascending)
     return PackageFilterMethods::sortedBy(this, role, ascending);
 }
 
+int PackageFilterModel::numResults()
+{
+    return rowCount();
+}
+
 QVariant PackageFilterModel::drop(int count)
 {
     return PackageFilterMethods::drop(this, count);

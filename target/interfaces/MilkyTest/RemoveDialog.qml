@@ -7,8 +7,7 @@ Rectangle {
     signal activate()
     signal deactivate()
 
-    function remove(pndId, title) {
-        removeVerify.removedPackage = title;
+    function remove(pndId) {
         milky.remove(pndId);
     }
 
@@ -19,8 +18,16 @@ Rectangle {
 
     Component.onCompleted: {
         milky.events.removeCheck.connect(function() {
-            activate();
-            state = "verify";
+            var targets = milky.getTargetPackages();
+            if(targets.length == 1) {
+                activate();
+                state = "verify";
+                removeVerify.removedPackage = targets[0].title;
+            } else {
+                milky.answer(false);
+                milky.clearTargets();
+            }
+
         });
         milky.events.removeStart.connect(function() {
             activate();
@@ -94,7 +101,8 @@ Rectangle {
             label: "No"
             onClicked: {
                 dialog.milky.answer(false);
-                dialog.deactivate()
+                dialog.deactivate();
+                milky.clearTargets();
             }
         }
 

@@ -47,6 +47,8 @@ public:
     /** QML helper method that sorts this model */
     Q_INVOKABLE QVariant sortedBy(const QString &role, bool ascending);
 
+    Q_INVOKABLE int numResults();
+
     Q_INVOKABLE QVariant drop(int count);
 
     Q_INVOKABLE QVariant take(int count);

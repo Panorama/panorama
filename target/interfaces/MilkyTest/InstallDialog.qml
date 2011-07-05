@@ -7,8 +7,7 @@ Rectangle {
     signal activate()
     signal deactivate()
 
-    function install(pndId, title) {
-        installVerify.installedPackage = title;
+    function install(pndId) {
         milky.install(pndId);
     }
 
@@ -19,12 +18,20 @@ Rectangle {
 
     Component.onCompleted: {
         milky.events.installCheck.connect(function() {
-            activate();
-            state = "verify";
+            var targets = milky.getTargetPackages();
+            if(targets.length == 1) {
+                activate();
+                state = "verify";
+                installVerify.installedPackage = targets[0].title;
+            } else {
+                milky.answer(false);
+                milky.clearTargets();
+            }
         });
         milky.events.installStart.connect(function() {
             activate();
             state = "download";
+            installDownload.progress = 0;
         });
         milky.events.downloadFinished.connect(function() {
             activate();
@@ -109,7 +116,8 @@ Rectangle {
             label: "No"
             onClicked: {
                 milky.answer(false);
-                dialog.deactivate()
+                milky.clearTargets();
+                dialog.deactivate();
             }
         }
 

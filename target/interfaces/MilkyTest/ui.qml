@@ -279,9 +279,9 @@ PanoramaUI {
             anchors.top: parent.top
 
             gradient: Gradient {
-                GradientStop { position: 0.0; color: "#eee" }
-                GradientStop { position: 0.8; color: "#bbb" }
-                GradientStop { position: 1.0; color: "#999" }
+                GradientStop { position: 0.0; color: "#ddd" }
+                GradientStop { position: 0.8; color: "#aaa" }
+                GradientStop { position: 1.0; color: "#888" }
             }
 
             Row {
@@ -322,9 +322,10 @@ PanoramaUI {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.left: statusFilter.right
-                width: 192
+                anchors.right: upgradeAllButton.left
+
                 color:  Qt.hsla(ui.categoryHue(categoryFilter.value), 0.5, 0.7, 1.0)
-                label: categoryFilter.value ? categoryFilter.value : "All"
+                label: "Category: " + (categoryFilter.value ? categoryFilter.value : "All")
                 onClicked: {
                     if(ui.state != "categories") {
                         ui.state = "categories";
@@ -332,6 +333,18 @@ PanoramaUI {
                         ui.state = "browse";
                     }
                 }
+            }
+
+            Button {
+                id: upgradeAllButton
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.right: syncButton.left
+                width: 128
+                color: milky.hasUpgrades ? "#ddf" : "#888"
+                enabled: milky.hasUpgrades
+                label: milky.hasUpgrades ? "Upgrade all" : "No upgrades"
+                onClicked: milky.upgradeAll();
             }
 
             Button {

@@ -9,6 +9,7 @@ Rectangle {
 
     function remove(pndId) {
         milky.remove(pndId);
+        activate();
     }
 
     // Restrict mouse events to children
@@ -20,7 +21,6 @@ Rectangle {
         milky.events.removeCheck.connect(function() {
             var targets = milky.getTargetPackages();
             if(targets.length == 1) {
-                activate();
                 state = "verify";
                 removeVerify.removedPackage = targets[0].title;
             } else {
@@ -30,11 +30,9 @@ Rectangle {
 
         });
         milky.events.removeStart.connect(function() {
-            activate();
             state = "apply";
         });
         milky.events.removeDone.connect(function() {
-            activate();
             state = "done";
         });
 

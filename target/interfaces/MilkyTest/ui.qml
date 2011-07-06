@@ -344,7 +344,7 @@ PanoramaUI {
                 color: milky.hasUpgrades ? "#ddf" : "#888"
                 enabled: milky.hasUpgrades
                 label: milky.hasUpgrades ? "Upgrade all" : "No upgrades"
-                onClicked: milky.upgradeAll();
+                onClicked: upgradeDialog.upgradeAll();
             }
 
             Button {
@@ -599,6 +599,7 @@ PanoramaUI {
             ui.milky.events.crawlDone.connect(createAddStatusMessageFunction("Crawl complete."));
             ui.milky.events.cleanStart.connect(createAddStatusMessageFunction("Cleaning..."));
             ui.milky.events.cleanDone.connect(createAddStatusMessageFunction("Clean complete."));
+            ui.milky.events.downloadStarted.connect(createAddStatusMessageFunction("Download started."));
             ui.milky.events.downloadFinished.connect(createAddStatusMessageFunction("Download finished."));
             ui.milky.events.checkingMD5.connect(createAddStatusMessageFunction("Checking MD5..."));
             ui.milky.events.parsingFilename.connect(createAddStatusMessageFunction("Parsing filename..."));

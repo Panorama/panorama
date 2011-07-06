@@ -9,6 +9,8 @@
 #include "milky/milky.h"
 #include "panoramainternal.h"
 
+#include "milkypackage.h"
+
 class MilkyListenerPrivate;
 
 // Wrapper class to make the events available in QML
@@ -57,6 +59,12 @@ signals:
     void crawlDone();
     void cleanStart();
     void cleanDone();
+
+    // Have to send only a title string instead of a MilkyPackage because of Qt bug
+    // http://bugreports.qt.nokia.com/browse/QTBUG-15712
+    // TODO: Should be fixed to send the new MilkyPackage after the bug is fixed.
+    void downloadStarted(QString pndId);
+
     void downloadFinished();
     void checkingMD5();
     void parsingFilename();

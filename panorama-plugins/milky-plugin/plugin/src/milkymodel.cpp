@@ -328,6 +328,10 @@ void MilkyModel::setTargetDir(QString const newTargetDir)
     emit targetDirChanged(newTargetDir);
 }
 
+// Have to return QObject*s instead of MilkyPackages because of Qt bug
+// http://bugreports.qt.nokia.com/browse/QTBUG-15712
+// TODO: Should be fixed to create new MilkyPackages instead of relying
+// on the model after the bug is fixed.
 QList<QObject*> MilkyModel::getTargetPackages()
 {
     PANORAMA_PRIVATE(MilkyModel);
@@ -414,6 +418,7 @@ void MilkyModel::applyConfiguration()
 
 void MilkyModel::updateDatabase()
 {
+    milky_check_config();
     milky_sync_database();
     milky_crawl_pnd();
     emit notifyListener();

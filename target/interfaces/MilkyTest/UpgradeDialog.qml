@@ -9,8 +9,13 @@ Rectangle {
 
     function upgrade(pndId) {
         milky.upgrade(pndId);
+        activate();
     }
 
+    function upgradeAll() {
+        milky.upgradeAll();
+        activate();
+    }
 
     // Restrict mouse events to children
     MouseArea { anchors.fill: parent; onPressed: mouse.accepted = true; }
@@ -22,7 +27,6 @@ Rectangle {
             var targets = milky.getTargetPackages();
             if(targets.length > 0) {
                 upgradeVerify.upgradedPackages = targets;
-                activate();
                 state = "verify";
             } else {
                 milky.answer(false);
@@ -30,16 +34,14 @@ Rectangle {
             }
 
         });
-        milky.events.upgradeStart.connect(function() {
-            activate();
+        milky.events.downloadStarted.connect(function(pnd) {
+            upgradeDownload.pnd = pnd;
             state = "download";
         });
         milky.events.downloadFinished.connect(function() {
-            activate();
             state = "apply";
         });
         milky.events.upgradeDone.connect(function() {
-            activate();
             state = "done";
         });
 
@@ -153,6 +155,7 @@ Rectangle {
 
     Item {
         id: upgradeDownload
+        property string pnd: "" // Contains only PND title because of Qt bug http://bugreports.qt.nokia.com/browse/QTBUG-15712
         property int progress: 0
         anchors.centerIn: parent
         height: childrenRect.height
@@ -173,7 +176,7 @@ Rectangle {
             id: upgradeDownloadLabel
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "Downloading..."
+            text: "Downloading " + upgradeDownload.pnd +"..."
             font.pixelSize: 24
             color: "#eee"
         }
@@ -232,7 +235,7 @@ Rectangle {
             id: upgradeProgressLabel
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "Applying..."
+            text: "Upgrading..."
             font.pixelSize: 24
             color: "#eee"
         }

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <QStringList>
+#include <QMetaType>
 #include "milky/milky.h"
 
 class MilkyPackage : public QObject
@@ -200,5 +201,7 @@ private:
     QStringList licenses;
     QStringList sourceLinks;
 };
+
+Q_DECLARE_METATYPE(MilkyPackage)
 
 #endif // MILKYPACKAGE_H

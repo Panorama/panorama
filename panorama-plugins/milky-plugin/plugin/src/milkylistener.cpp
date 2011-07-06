@@ -165,6 +165,13 @@ void MilkyListener::listen()
                 emit cleanDone();
                 break;
             }
+            case M_SIG_DL_STARTED:
+            {
+                _pnd_package* pnd = static_cast<_pnd_package*>(signal->data);
+                MilkyPackage package(pnd);
+                emit downloadStarted(package.getTitle());
+                break;
+            }
             case M_SIG_DL_FINISHED:
             {
                 emit downloadFinished();

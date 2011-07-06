@@ -9,6 +9,7 @@ Rectangle {
 
     function install(pndId) {
         milky.install(pndId);
+        activate();
     }
 
     // Restrict mouse events to children
@@ -20,7 +21,6 @@ Rectangle {
         milky.events.installCheck.connect(function() {
             var targets = milky.getTargetPackages();
             if(targets.length == 1) {
-                activate();
                 state = "verify";
                 installVerify.installedPackage = targets[0].title;
             } else {
@@ -28,17 +28,15 @@ Rectangle {
                 milky.clearTargets();
             }
         });
-        milky.events.installStart.connect(function() {
-            activate();
+        milky.events.downloadStarted.connect(function(pnd) {
             state = "download";
             installDownload.progress = 0;
+            installDownload.pnd = pnd; // Contains only title because of Qt bug http://bugreports.qt.nokia.com/browse/QTBUG-15712
         });
         milky.events.downloadFinished.connect(function() {
-            activate();
             state = "apply";
         });
         milky.events.installDone.connect(function() {
-            activate();
             state = "done";
         });
 
@@ -125,6 +123,7 @@ Rectangle {
 
     Item {
         id: installDownload
+        property string pnd: ""  // Contains only PND title because of Qt bug http://bugreports.qt.nokia.com/browse/QTBUG-15712
         property int progress: 0
         anchors.centerIn: parent
         height: childrenRect.height
@@ -145,7 +144,7 @@ Rectangle {
             id: installDownloadLabel
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "Downloading..."
+            text: installDownload.pnd ? "Downloading " + installDownload.pnd +"..." : ""
             font.pixelSize: 24
             color: "#eee"
         }
@@ -204,7 +203,7 @@ Rectangle {
             id: installProgressLabel
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "Applying..."
+            text: "Installing..."
             font.pixelSize: 24
             color: "#eee"
         }

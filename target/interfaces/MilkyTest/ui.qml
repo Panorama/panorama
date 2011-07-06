@@ -387,35 +387,23 @@ PanoramaUI {
                     clip: true
                     cellWidth: width / 4
                     cellHeight: 48
-                    delegate: Rectangle {
-                        width: parent.width / 4 - 4
+                    delegate: Button {
+                        width: categoryList.width / 4 - 4
                         height: 44
-
                         border {
                             color: "#ccc"
                             width: 2
                         }
-
+                        textColor: "#eee"
+                        font.pixelSize: 18
                         color: Qt.hsla(ui.categoryHue(edit), 0.5, 0.7, 1.0);
                         radius: 4
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: edit ? edit : "All"
-                            font.pixelSize: 18
-                            color: "#eee"
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                categoryFilter.value = edit;
-                                ui.state = "browse"
-                            }
-
+                        label: edit ? edit : "All"
+                        onClicked: {
+                            categoryFilter.value = edit;
+                            ui.state = "browse"
                         }
                     }
-
                 }
             }
 

@@ -7,7 +7,10 @@ Item {
     property bool toggleButton: false
     property bool pressed: false
     property alias font: labelText.font
+    property alias textColor: labelText.color
     property alias enabled: mouseArea.enabled
+    property alias radius: rectangle.radius
+    property alias border: rectangle.border
 
     function isDown() {
         return button.pressed || mouseArea.pressed;
@@ -19,6 +22,7 @@ Item {
     height: 32
 
     Rectangle {
+        id: rectangle
         anchors.fill: parent
 
         gradient: Gradient {

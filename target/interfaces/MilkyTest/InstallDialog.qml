@@ -12,6 +12,20 @@ Rectangle {
         activate();
     }
 
+    function yes() {
+        if(state == "verify") {
+            installYesButton.clicked(false);
+        } else if(state == "done") {
+            installDoneButton.clicked(false);
+        }
+    }
+
+    function no() {
+        if(state == "verify") {
+            installNoButton.clicked(false);
+        }
+    }
+
     // Restrict mouse events to children
     MouseArea { anchors.fill: parent; onPressed: mouse.accepted = true; }
 
@@ -91,31 +105,33 @@ Rectangle {
             color: "#eee"
         }
         Button {
-            id: installYesButton
+            id: installNoButton
             anchors.top: installVerifyLabel.bottom
             anchors.right: parent.horizontalCenter
             anchors.margins: 16
             width: 128
             height: 48
-            color: "#cec"
-            label: "Yes"
+            color: "#ecc"
+            label: "No"
+            controlHint: "A"
             onClicked: {
-                milky.answer(true);
+                milky.answer(false);
+                milky.clearTargets();
+                dialog.deactivate();
             }
         }
         Button {
-            id: installNoButton
+            id: installYesButton
             anchors.top: installVerifyLabel.bottom
             anchors.left: parent.horizontalCenter
             anchors.margins: 16
             width: 128
             height: 48
-            color: "#ecc"
-            label: "No"
+            color: "#cec"
+            label: "Yes"
+            controlHint: "B"
             onClicked: {
-                milky.answer(false);
-                milky.clearTargets();
-                dialog.deactivate();
+                milky.answer(true);
             }
         }
 
@@ -231,6 +247,7 @@ Rectangle {
             height: 48
             color: "#eee"
             label: "Continue"
+            controlHint: "B"
             onClicked: {
                 dialog.deactivate()
             }

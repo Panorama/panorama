@@ -11,6 +11,7 @@ Item {
     property alias enabled: mouseArea.enabled
     property alias radius: rectangle.radius
     property alias border: rectangle.border
+    property alias controlHint: controlHintText.text
 
     function isDown() {
         return button.pressed || mouseArea.pressed;
@@ -31,12 +32,39 @@ Item {
             GradientStop { position: 1.0; color: Qt.darker(button.color, button.isDown() ? 1.2 : 1.4) }
         }
 
-        Text {
-            id: labelText
+        Row {
             anchors.centerIn: parent
-            font.pixelSize: 18
-            text: button.label
+            width: childrenRect.width
+            height: parent.height
+            spacing: 4
+            Rectangle {
+                anchors.verticalCenter: parent.verticalCenter
+                height: 16
+                width: height
+                radius: height/2
+                color: "transparent"
+                visible: controlHintText.text != ""
+                border {
+                    width: 1
+                    color: controlHintText.color
+                }
 
+                Text {
+                    id: controlHintText
+                    anchors.centerIn: parent
+                    anchors.horizontalCenterOffset: 1
+                    text: ""
+                    font.pixelSize: 12
+                    color: "#333"
+                }
+            }
+
+            Text {
+                id: labelText
+                font.pixelSize: 18
+                text: button.label
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
 
         MouseArea {

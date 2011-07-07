@@ -3,7 +3,8 @@ import Qt 4.7
 Item {
     id: packageItem
     property bool detailsVisible: false
-
+    property bool isInstalled: installed
+    property bool hasUpgrade: hasUpdate
     signal install();
     signal remove();
     signal upgrade();
@@ -72,13 +73,13 @@ Item {
             elide: Text.ElideRight
             font.pixelSize: 14
             color: "#111"
-
         }
 
     }
 
     Rectangle {
         id: packageDetails
+        visible: packageItem.detailsVisible
         opacity: packageItem.detailsVisible ? 1.0 : 0
         Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.InOutQuad } }
         anchors.top: packageTitle.bottom
@@ -164,6 +165,7 @@ Item {
             visible: !installed
             color: installed ? "#ccc" : "#cec"
             label: "Install"
+            controlHint: "X"
             enabled: !installed
             onClicked: packageItem.install()
         }
@@ -178,6 +180,7 @@ Item {
             visible: installed
             color: hasUpdate ? "#cce" :  "#ccc"
             label: "Upgrade"
+            controlHint: "Y"
             enabled: hasUpdate
             onClicked: packageItem.upgrade()
         }
@@ -192,6 +195,7 @@ Item {
 
             color: installed ? "#ecc" :  "#ccc"
             label: "Remove"
+            controlHint: "A"
             enabled: installed
             onClicked: packageItem.remove()
         }

@@ -12,6 +12,20 @@ Rectangle {
         activate();
     }
 
+    function yes() {
+        if(state == "verify") {
+            removeYesButton.clicked(false);
+        } else if(state == "done") {
+            removeDoneButton.clicked(false);
+        }
+    }
+
+    function no() {
+        if(state == "verify") {
+            removeNoButton.clicked(false);
+        }
+    }
+
     // Restrict mouse events to children
     MouseArea { anchors.fill: parent; onPressed: mouse.accepted = true; }
 
@@ -76,31 +90,33 @@ Rectangle {
             color: "#eee"
         }
         Button {
-            id: removeYesButton
+            id: removeNoButton
             anchors.top: removeVerifyLabel.bottom
             anchors.right: parent.horizontalCenter
             anchors.margins: 16
             width: 128
             height: 48
-            color: "#cec"
-            label: "Yes"
+            color: "#ecc"
+            label: "No"
+            controlHint: "A"
             onClicked: {
-                dialog.milky.answer(true);
+                dialog.milky.answer(false);
+                dialog.deactivate();
+                milky.clearTargets();
             }
         }
         Button {
-            id: removeNoButton
+            id: removeYesButton
             anchors.top: removeVerifyLabel.bottom
             anchors.left: parent.horizontalCenter
             anchors.margins: 16
             width: 128
             height: 48
-            color: "#ecc"
-            label: "No"
+            color: "#cec"
+            label: "Yes"
+            controlHint: "B"
             onClicked: {
-                dialog.milky.answer(false);
-                dialog.deactivate();
-                milky.clearTargets();
+                dialog.milky.answer(true);
             }
         }
 
@@ -143,6 +159,7 @@ Rectangle {
             height: 48
             color: "#eee"
             label: "Continue"
+            controlHint: "B"
             onClicked: {
                 dialog.deactivate()
             }

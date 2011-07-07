@@ -17,6 +17,20 @@ Rectangle {
         activate();
     }
 
+    function yes() {
+        if(state == "verify") {
+            upgradeYesButton.clicked(false);
+        } else if(state == "done") {
+            upgradeDoneButton.clicked(false);
+        }
+    }
+
+    function no() {
+        if(state == "verify") {
+            upgradeNoButton.clicked(false);
+        }
+    }
+
     // Restrict mouse events to children
     MouseArea { anchors.fill: parent; onPressed: mouse.accepted = true; }
 
@@ -107,31 +121,33 @@ Rectangle {
             }
         }
         Button {
-            id: upgradeYesButton
+            id: upgradeNoButton
             anchors.top: upgradeVerifyLabel.bottom
             anchors.right: parent.horizontalCenter
             anchors.margins: 16
             width: 128
             height: 48
-            color: "#cec"
-            label: "Yes"
+            color: "#ecc"
+            label: "No"
+            controlHint: "A"
             onClicked: {
-                dialog.milky.answer(true);
+                dialog.milky.answer(false);
+                dialog.deactivate();
+                milky.clearTargets();
             }
         }
         Button {
-            id: upgradeNoButton
+            id: upgradeYesButton
             anchors.top: upgradeVerifyLabel.bottom
             anchors.left: parent.horizontalCenter
             anchors.margins: 16
             width: 128
             height: 48
-            color: "#ecc"
-            label: "No"
+            color: "#cec"
+            label: "Yes"
+            controlHint: "B"
             onClicked: {
-                dialog.milky.answer(false);
-                dialog.deactivate();
-                milky.clearTargets();
+                dialog.milky.answer(true);
             }
         }
     }
@@ -263,6 +279,7 @@ Rectangle {
             height: 48
             color: "#eee"
             label: "Continue"
+            controlHint: "B"
             onClicked: {
                 dialog.deactivate()
             }

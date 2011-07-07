@@ -2,6 +2,7 @@ import Qt 4.7
 import Panorama.UI 1.0
 import Panorama.Milky 1.0
 import Panorama.Settings 1.0
+import Panorama.Pandora 1.0
 
 PanoramaUI {
     id: ui
@@ -35,6 +36,155 @@ PanoramaUI {
         defaultValue: "http://repo.openpandora.org/includes/get_data.php"
     }
 
+    Item {
+        focus: true
+        Keys.forwardTo: [hotKeyHandler, search]
+    }
+
+    // ***************************************
+    //                CONTROLS
+    // ***************************************
+
+    Item {
+        id: hotKeyHandler
+        Keys.onPressed: {
+            var accept = true;
+            if(ui.state == "browse") {
+                var item = packageList.currentItem;
+                switch(event.key) {
+                    case Qt.Key_Return:
+                        item.preview();
+                        break;
+                    default:
+                        accept = false;
+                }
+            } else if(ui.state == "preview") {
+                var item = packageList.currentItem;
+                switch(event.key) {
+                    case Qt.Key_Return:
+                        ui.state = "browse"
+                        break;
+                    default:
+                        accept = false;
+                }
+            }
+
+            event.accepted = accept;
+        }
+    }
+
+    Pandora.onPressed: {
+        var accept = true;
+        if(ui.state == "browse") {
+            var item = packageList.currentItem;
+            switch(event.key) {
+                case Pandora.DPadUp:
+                    packageList.decrementCurrentIndex();
+                    packageList.positionViewAtIndex(packageList.currentIndex, ListView.Contain);
+                    break;
+                case Pandora.DPadDown:
+                    packageList.incrementCurrentIndex();
+                    packageList.positionViewAtIndex(packageList.currentIndex, ListView.Contain);
+                    break;
+                case Pandora.ButtonB:
+                    item.detailsVisible = !item.detailsVisible;
+                    break;
+                case Pandora.ButtonX:
+                    if(!item.isInstalled) item.install();
+                    break;
+                case Pandora.ButtonA:
+                    if(item.isInstalled) item.remove();
+                    break;
+                case Pandora.ButtonX:
+                    if(item.hasUpdate) item.upgrade();
+                    break;
+                case Pandora.TriggerL:
+                    statusFilter.selected = (statusFilter.selected + 1) % statusFilter.filterOptions.length
+                    break;
+                case Pandora.TriggerR:
+                    ui.state = "categories";
+                    break;
+                case Pandora.ButtonStart:
+                    syncButton.clicked(false);
+                    break;
+                case Pandora.ButtonSelect:
+                    if(upgradeAllButton.enabled)
+                        upgradeAllButton.clicked(false);
+                    break;
+                default:
+                    accept = false;
+            }
+        } else if(ui.state == "categories") {
+            switch(event.key) {
+                case Pandora.DPadUp:
+                    categoryList.moveCurrentIndexUp();
+                    break;
+                case Pandora.DPadDown:
+                    categoryList.moveCurrentIndexDown();
+                    break;
+                case Pandora.DPadLeft:
+                    categoryList.moveCurrentIndexLeft();
+                    break;
+                case Pandora.DPadRight:
+                    categoryList.moveCurrentIndexRight();
+                    break;
+                case Pandora.ButtonB:
+                    categoryList.currentItem.clicked(false);
+                    break;
+                case Pandora.TriggerR:
+                    ui.state = "browse";
+                    break;
+                default:
+                    accept = false;
+            }
+        } else if(ui.state == "install") {
+            switch(event.key) {
+                case Pandora.ButtonB:
+                    installDialog.yes();
+                    break;
+                case Pandora.ButtonA:
+                    installDialog.no()
+                    break;
+                default:
+                    accept = false;
+            }
+        } else if(ui.state == "remove") {
+            switch(event.key) {
+                case Pandora.ButtonB:
+                    removeDialog.yes();
+                    break;
+                case Pandora.ButtonA:
+                    removeDialog.no()
+                    break;
+                default:
+                    accept = false;
+            }
+        } else if(ui.state == "upgrade") {
+            switch(event.key) {
+                case Pandora.ButtonB:
+                    upgradeDialog.yes();
+                    break;
+                case Pandora.ButtonA:
+                    upgradeDialog.no()
+                    break;
+                default:
+                    accept = false;
+            }
+        } else if(ui.state == "preview") {
+            switch(event.key) {
+                case Pandora.DPadLeft:
+                    previewList.decrementCurrentIndex();
+                    break;
+                case Pandora.DPadRight:
+                    previewList.incrementCurrentIndex();
+                    break;
+                default:
+                    accept = false;
+            }
+        }
+        event.accepted = accept;
+    }
+
     // ***************************************
     //                  MILKY
     // ***************************************
@@ -55,11 +205,6 @@ PanoramaUI {
         }
     }
 
-    Item {
-        focus: true
-        Keys.forwardTo: [search]
-    }
-
     function categoryHue(name) {
         var sum = 0;
         for(var i = 0; i < name.length; ++i) {
@@ -77,83 +222,69 @@ PanoramaUI {
     states: [
         State {
             name: "browse"
-            PropertyChanges { target: syncOverlay; opacity: 0.0 }
-            PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
-            PropertyChanges { target: installDialog; opacity: 0.0 }
-            PropertyChanges { target: removeDialog; opacity: 0.0 }
-            PropertyChanges { target: upgradeDialog; opacity: 0.0 }
-            PropertyChanges { target: previewOverlay; opacity: 0.0 }
+            PropertyChanges { target: syncOverlay; visible: false }
+            PropertyChanges { target: categoryListOverlay; visible: false }
+            PropertyChanges { target: installDialog; visible: false }
+            PropertyChanges { target: removeDialog; visible: false }
+            PropertyChanges { target: upgradeDialog; visible: false }
+            PropertyChanges { target: previewOverlay; visible: false }
         },
         State {
             name: "sync"
-            PropertyChanges { target: syncOverlay; opacity: 0.9 }
-            PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
-            PropertyChanges { target: installDialog; opacity: 0.0 }
-            PropertyChanges { target: removeDialog; opacity: 0.0 }
-            PropertyChanges { target: upgradeDialog; opacity: 0.0 }
-            PropertyChanges { target: previewOverlay; opacity: 0.0 }
+            PropertyChanges { target: syncOverlay; visible: true }
+            PropertyChanges { target: categoryListOverlay; visible: false }
+            PropertyChanges { target: installDialog; visible: false }
+            PropertyChanges { target: removeDialog; visible: false }
+            PropertyChanges { target: upgradeDialog; visible: false }
+            PropertyChanges { target: previewOverlay; visible: false }
         },
         State {
             name: "categories"
-            PropertyChanges { target: syncOverlay; opacity: 0.0 }
-            PropertyChanges { target: categoryListOverlay; opacity: 0.9 }
-            PropertyChanges { target: installDialog; opacity: 0.0 }
-            PropertyChanges { target: removeDialog; opacity: 0.0 }
-            PropertyChanges { target: upgradeDialog; opacity: 0.0 }
-            PropertyChanges { target: previewOverlay; opacity: 0.0 }
+            PropertyChanges { target: syncOverlay; visible: false }
+            PropertyChanges { target: categoryListOverlay; visible: true }
+            PropertyChanges { target: installDialog; visible: false }
+            PropertyChanges { target: removeDialog; visible: false }
+            PropertyChanges { target: upgradeDialog; visible: false }
+            PropertyChanges { target: previewOverlay; visible: false }
         },
         State {
             name: "install"
-            PropertyChanges { target: syncOverlay; opacity: 0.0 }
-            PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
-            PropertyChanges { target: installDialog; opacity: 0.9 }
-            PropertyChanges { target: removeDialog; opacity: 0.0 }
-            PropertyChanges { target: upgradeDialog; opacity: 0.0 }
-            PropertyChanges { target: previewOverlay; opacity: 0.0 }
+            PropertyChanges { target: syncOverlay; visible: false }
+            PropertyChanges { target: categoryListOverlay; visible: false }
+            PropertyChanges { target: installDialog; visible: true }
+            PropertyChanges { target: removeDialog; visible: false }
+            PropertyChanges { target: upgradeDialog; visible: false }
+            PropertyChanges { target: previewOverlay; visible: false }
         },
         State {
             name: "remove"
-            PropertyChanges { target: syncOverlay; opacity: 0.0 }
-            PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
-            PropertyChanges { target: installDialog; opacity: 0.0 }
-            PropertyChanges { target: removeDialog; opacity: 0.9 }
-            PropertyChanges { target: upgradeDialog; opacity: 0.0 }
-            PropertyChanges { target: previewOverlay; opacity: 0.0 }
+            PropertyChanges { target: syncOverlay; visible: false }
+            PropertyChanges { target: categoryListOverlay; visible: false }
+            PropertyChanges { target: installDialog; visible: false }
+            PropertyChanges { target: removeDialog; visible: true }
+            PropertyChanges { target: upgradeDialog; visible: false }
+            PropertyChanges { target: previewOverlay; visible: false }
         },
         State {
             name: "upgrade"
-            PropertyChanges { target: syncOverlay; opacity: 0.0 }
-            PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
-            PropertyChanges { target: installDialog; opacity: 0.0 }
-            PropertyChanges { target: removeDialog; opacity: 0.0 }
-            PropertyChanges { target: upgradeDialog; opacity: 0.9 }
-            PropertyChanges { target: previewOverlay; opacity: 0.0 }
+            PropertyChanges { target: syncOverlay; visible: false }
+            PropertyChanges { target: categoryListOverlay; visible: false }
+            PropertyChanges { target: installDialog; visible: false }
+            PropertyChanges { target: removeDialog; visible: false }
+            PropertyChanges { target: upgradeDialog; visible: true }
+            PropertyChanges { target: previewOverlay; visible: false }
         },
         State {
             name: "preview"
-            PropertyChanges { target: syncOverlay; opacity: 0.0 }
-            PropertyChanges { target: categoryListOverlay; opacity: 0.0 }
-            PropertyChanges { target: installDialog; opacity: 0.0 }
-            PropertyChanges { target: removeDialog; opacity: 0.0 }
-            PropertyChanges { target: upgradeDialog; opacity: 0.0 }
-            PropertyChanges { target: previewOverlay; opacity: 0.9 }
+            PropertyChanges { target: syncOverlay; visible: false }
+            PropertyChanges { target: categoryListOverlay; visible: false }
+            PropertyChanges { target: installDialog; visible: false }
+            PropertyChanges { target: removeDialog; visible: false }
+            PropertyChanges { target: upgradeDialog; visible: false }
+            PropertyChanges { target: previewOverlay; visible: true }
         }
 
     ]
-
-    // ***************************************
-    //                TRANSITIONS
-    // ***************************************
-
-    transitions: [
-        Transition { to: "browse"; NumberAnimation { properties: "opacity"; easing.type: Easing.Linear } },
-        Transition { to: "categories"; NumberAnimation { properties: "opacity"; easing.type: Easing.Linear } },
-        Transition { to: "install"; NumberAnimation { properties: "opacity"; easing.type: Easing.Linear } },
-        Transition { to: "remove"; NumberAnimation { properties: "opacity"; easing.type: Easing.Linear } },
-        Transition { to: "upgrade"; NumberAnimation { properties: "opacity"; easing.type: Easing.Linear } },
-        Transition { to: "preview"; NumberAnimation { properties: "opacity"; easing.type: Easing.Linear } }
-    ]
-
 
     Rectangle {
         anchors.fill: parent
@@ -304,11 +435,12 @@ PanoramaUI {
                 Repeater {
                     model: statusFilter.filterOptions
                     delegate: Button {
-                        width: 96
+                        width: 110
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
                         color: modelData.baseColor
                         label: modelData.label
+                        controlHint: "L"
                         onClicked: statusFilter.selected = index;
                         pressed: statusFilter.selected == index
                     }
@@ -326,6 +458,7 @@ PanoramaUI {
 
                 color:  Qt.hsla(ui.categoryHue(categoryFilter.value), 0.5, 0.7, 1.0)
                 label: "Category: " + (categoryFilter.value ? categoryFilter.value : "All")
+                controlHint: "R"
                 onClicked: {
                     if(ui.state != "categories") {
                         ui.state = "categories";
@@ -340,10 +473,11 @@ PanoramaUI {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.right: syncButton.left
-                width: 128
+                width: 160
                 color: milky.hasUpgrades ? "#ddf" : "#888"
                 enabled: milky.hasUpgrades
                 label: milky.hasUpgrades ? "Upgrade all" : "No upgrades"
+                controlHint: "Sl"
                 onClicked: upgradeDialog.upgradeAll();
             }
 
@@ -352,9 +486,10 @@ PanoramaUI {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
-                width: 128
+                width: 160
                 color: "#bbf"
                 label: "Synchronize"
+                controlHint: "St"
                 onClicked: ui.milky.updateDatabase();
             }
         }
@@ -387,6 +522,24 @@ PanoramaUI {
                     clip: true
                     cellWidth: width / 4
                     cellHeight: 48
+                    cacheBuffer: height / 2
+                    currentIndex: 0
+
+                    highlightFollowsCurrentItem: false
+                    highlight: Rectangle {
+                        color: "transparent"
+                        z: 100
+                        x: categoryList.currentItem.x
+                        y: categoryList.currentItem.y
+                        height: categoryList.currentItem.height
+                        width: categoryList.currentItem.width
+                        border {
+                            color: "#aaf"
+                            width: 4
+                        }
+                        radius: 4
+                    }
+
                     delegate: Button {
                         width: categoryList.width / 4 - 4
                         height: 44
@@ -411,16 +564,40 @@ PanoramaUI {
                 id: packageList
                 anchors.fill: parent
                 clip: true
+                currentIndex: 0
+                function filteredModel() {
+                    if(search.text.length > 0 && search.text.length < 3)
+                        return []
 
-                model: ui.milky
-                  .sortedBy("title", true)
-                  .sortedBy("hasUpdate", false)
-                  .matching("installed", statusFilter.installed)
-                  .matching("hasUpdate", statusFilter.hasUpdate)
-                  .inCategory(categoryFilter.value ? categoryFilter.value : ".*")
-                  .matching("title", (search.text.length > 0 && search.text.length < 3) ? "^$" : ".*" + search.text + ".*")
+                    var result = ui.milky;
 
-                cacheBuffer: height / 2
+                    result = result.matching("installed", statusFilter.installed)
+
+                    if(categoryFilter.value)
+                        result = result.inCategory(categoryFilter.value)
+
+                    if(search.text)
+                        result = result.matching("title", ".*" + search.text + ".*")
+
+                    return result.sortedBy("title", true).sortedBy("hasUpdate", false);
+                }
+
+                model: filteredModel()
+
+                cacheBuffer: height
+
+                highlightFollowsCurrentItem: false
+                highlight: Rectangle {
+                    z: 100
+                    y: packageList.currentItem.y
+                    height: 32
+                    width: packageList.currentItem.width
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: Qt.rgba(0.7,0.7,1,0.7) }
+                        GradientStop { position: 0.5; color: Qt.rgba(0.7,0.7,1,0.2) }
+                        GradientStop { position: 1.0; color: Qt.rgba(0.7,0.7,1,0.7) }
+                    }
+                }
 
                 delegate: PackageDelegate {
                     onInstall: {
@@ -445,6 +622,7 @@ PanoramaUI {
                     var from = packageList.contentY;
                     packageList.positionViewAtIndex(idx, ListView.Contain);
                     var to = packageList.contentY;
+                    currentIndex = idx;
                     scrollAnimation.from = from;
                     scrollAnimation.to = to;
                     scrollAnimation.running = true;
@@ -476,6 +654,7 @@ PanoramaUI {
             color: "#fff"
             border.width: 2
             border.color: "#111"
+            enabled: ui.state == "browse"
 
             TextInput {
                 id: search

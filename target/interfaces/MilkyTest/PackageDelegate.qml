@@ -51,6 +51,12 @@ Item {
             anchors.left: parent.left
             width: 24
             height: 24
+            smooth: true
+            sourceSize {
+                width: 24
+                height: 24
+            }
+
             source: icon
         }
 

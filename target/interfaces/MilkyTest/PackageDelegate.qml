@@ -76,7 +76,6 @@ Item {
             anchors.right: parent.right
             anchors.margins: 8
             text: description.split("\n")[0]
-            elide: Text.ElideRight
             font.pixelSize: 14
             color: "#111"
         }
@@ -85,9 +84,7 @@ Item {
 
     Rectangle {
         id: packageDetails
-        visible: packageItem.detailsVisible
-        opacity: packageItem.detailsVisible ? 1.0 : 0
-        Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.InOutQuad } }
+        visible: packageItem.height > 32
         anchors.top: packageTitle.bottom
         anchors.left: parent.left
         anchors.right: parent.right

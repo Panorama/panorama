@@ -584,7 +584,7 @@ PanoramaUI {
 
                 model: filteredModel()
 
-                cacheBuffer: height
+                cacheBuffer: 2 * height
 
                 highlightFollowsCurrentItem: false
                 highlight: Rectangle {

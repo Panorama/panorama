@@ -302,7 +302,7 @@ PanoramaUI {
             // Restrict mouse events to children
             MouseArea { anchors.fill: parent; onPressed: mouse.accepted = true; }
 
-            color: "#99c"
+            color: Qt.rgba(0.4,0.4,0.7,0.9)
 
             Text {
                 anchors.verticalCenter: parent.verticalCenter
@@ -323,7 +323,7 @@ PanoramaUI {
             // Restrict mouse events to children
             MouseArea { anchors.fill: parent; onPressed: ui.state = "browse" }
 
-            color: "#222"
+            color: Qt.rgba(0.1,0.1,0.1,0.8)
 
             ListView {
                 id: previewList
@@ -494,6 +494,19 @@ PanoramaUI {
             }
         }
 
+        Rectangle {
+            id: separator
+            height: 4
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: toolbar.bottom
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#888" }
+                GradientStop { position: 1.0; color: "#666" }
+            }
+
+        }
+
         // ***************************************
         //                PACKAGES
         // ***************************************
@@ -502,14 +515,14 @@ PanoramaUI {
             id: packages
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.top: toolbar.bottom
+            anchors.top: separator.bottom
             anchors.bottom: searchBox.top
             color: "#eee"
 
             Rectangle {
                 id: categoryListOverlay
                 anchors.fill: parent
-                color: "#111"
+                color: Qt.rgba(0.1,0.1,0.1,0.8)
                 z: 10
 
                 // Restrict mouse events to children

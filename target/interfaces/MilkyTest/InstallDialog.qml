@@ -29,7 +29,7 @@ Rectangle {
     // Restrict mouse events to children
     MouseArea { anchors.fill: parent; onPressed: mouse.accepted = true; }
 
-    color: "#222"
+    color: Qt.rgba(0.1,0.1,0.1,0.8)
 
     Component.onCompleted: {
         milky.events.installCheck.connect(function() {

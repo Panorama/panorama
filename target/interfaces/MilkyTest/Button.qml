@@ -32,12 +32,15 @@ Item {
             GradientStop { position: 1.0; color: Qt.darker(button.color, button.isDown() ? 1.2 : 1.4) }
         }
 
+        clip: true
+
         Row {
             anchors.centerIn: parent
             width: childrenRect.width
             height: parent.height
             spacing: 4
             Rectangle {
+                id: controlHintCircle
                 anchors.verticalCenter: parent.verticalCenter
                 height: 16
                 width: height

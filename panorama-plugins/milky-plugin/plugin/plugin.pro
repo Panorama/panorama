@@ -17,7 +17,8 @@ SOURCES += \
     src/milkylistener.cpp \
     src/milkypackage.cpp \
     src/packagefiltermodel.cpp \
-    src/packagefiltermethods.cpp
+    src/packagefiltermethods.cpp \
+    src/milkydevice.cpp
 
 HEADERS += \
     src/milkyplugin.h \
@@ -25,7 +26,8 @@ HEADERS += \
     src/milkylistener.h \
     src/milkypackage.h \
     src/packagefiltermodel.h \
-    src/packagefiltermethods.h
+    src/packagefiltermethods.h \
+    src/milkydevice.h
 
 LIBS += -L../libmilky -lmilky
 LIBS += -L../libjansson -ljansson

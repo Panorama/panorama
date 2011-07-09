@@ -131,8 +131,18 @@ PanoramaUI {
                 case Pandora.ButtonB:
                     categoryList.currentItem.clicked(false);
                     break;
+                case Pandora.TriggerL:
+                    statusFilter.selected = (statusFilter.selected + 1) % statusFilter.filterOptions.length
+                    break;
                 case Pandora.TriggerR:
                     ui.state = "browse";
+                    break;
+                case Pandora.ButtonStart:
+                    syncButton.clicked(false);
+                    break;
+                case Pandora.ButtonSelect:
+                    if(upgradeAllButton.enabled)
+                        upgradeAllButton.clicked(false);
                     break;
                 default:
                     accept = false;
@@ -495,7 +505,7 @@ PanoramaUI {
         }
 
         Rectangle {
-            id: separator
+            id: topSeparator
             height: 4
             anchors.left: parent.left
             anchors.right: parent.right
@@ -515,7 +525,7 @@ PanoramaUI {
             id: packages
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.top: separator.bottom
+            anchors.top: topSeparator.bottom
             anchors.bottom: searchBox.top
             color: "#eee"
 
@@ -662,7 +672,7 @@ PanoramaUI {
             id: searchBox
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.bottom: statusContainer.top
+            anchors.bottom: bottomSeparator.top
             height: search.text != "" ? 32 : 0
             color: "#fff"
             border.width: 2
@@ -682,6 +692,19 @@ PanoramaUI {
         // ***************************************
 
         Rectangle {
+            id: bottomSeparator
+            height: 4
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: statusContainer.top
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#eee" }
+                GradientStop { position: 1.0; color: "#ddd" }
+            }
+
+        }
+
+        Rectangle {
             id: statusContainer
 
             height: 48
@@ -690,7 +713,7 @@ PanoramaUI {
             anchors.bottom: parent.bottom
 
             gradient: Gradient {
-                GradientStop { position: 0.0; color: "#fff" }
+                GradientStop { position: 0.0; color: "#ddd" }
                 GradientStop { position: 0.8; color: "#ccc" }
                 GradientStop { position: 1.0; color: "#aaa" }
             }
@@ -698,7 +721,10 @@ PanoramaUI {
             ListView {
                 id: status
                 clip: true
-                anchors.fill: parent
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.right: deviceButton.left
                 anchors.margins: 4
                 highlightFollowsCurrentItem: true
 
@@ -715,7 +741,50 @@ PanoramaUI {
                 }
             }
 
+            Button {
+                id: deviceButton
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                width: 256
+
+                label: "Device: " + installDevice.value
+                color: "#ddd"
+                toggleButton: true
+
+                Rectangle {
+                    id: deviceSelection
+                    anchors.bottom: parent.top
+                    visible: height > 0
+                    height: parent.pressed ? childrenRect.height : 0
+                    width: parent.width
+                    color: "gray"
+
+                    Text {
+                        id: noDevicesFound
+                        text: "No devices found"
+                        font.pixelSize: 14
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: deviceListRepeater.count == 0
+                    }
+
+                    Repeater {
+                        id: deviceListRepeater
+                        model: ui.milky.getDeviceList()
+                        delegate: Button {
+                            height: 32
+                            width: deviceSelection.width
+                            label: modelData.mountPoint
+                            onClicked: {
+                                installDevice.value = modelData.mountPoint;
+                                deviceButton.pressed = false;
+                            }
+                        }
+                    }
+                }
+            }
         }
+
 
         function handleMessage(messageType, messageData) {
             var messages = {}

@@ -3,7 +3,7 @@
 
 #include "panoramainternal.h"
 #include "milkylistener.h"
-
+#include "milkydevice.h"
 #include <QAbstractListModel>
 #include <QtDeclarative>
 #include <QStringList>
@@ -97,7 +97,7 @@ public:
 
     QString getDevice();
     void setDevice(QString const newDevice);
-    Q_INVOKABLE QStringList getDeviceList();
+    Q_INVOKABLE QList<MilkyDevice> getDeviceList();
 
     QString getTargetDir();
     void setTargetDir(QString const newTargetDir);

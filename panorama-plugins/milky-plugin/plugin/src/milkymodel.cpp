@@ -301,19 +301,19 @@ void MilkyModel::setDevice(QString const newDevice)
     emit deviceChanged(newDevice);
 }
 
-QStringList MilkyModel::getDeviceList()
+QList<MilkyDevice> MilkyModel::getDeviceList()
 {
-    QStringList list;
-    alpm_list_t* node = milky_list_devices();
-
+    QList<MilkyDevice> list;
+    alpm_list_t* deviceList = milky_list_devices();
+    alpm_list_t* node = deviceList;
     while(node)
     {
-        char* item = static_cast<char*>(node->data);
-        list << item;
+        _m_dev_struct* item = static_cast<_m_dev_struct*>(node->data);
+        list << MilkyDevice(item);
         node = node->next;
     }
 
-    milky_free_device_list(node);
+    milky_free_device_list(deviceList);
     return list;
 }
 

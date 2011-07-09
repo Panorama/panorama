@@ -14,6 +14,7 @@ class MilkyModelPrivate
 public:
     MilkyListenerThread* listenerThread;
     QList<MilkyPackage*> packages;
+    QList<QObject*> devices;
     QStringListModel categories;
     bool hasUpgrades;
 };
@@ -301,20 +302,26 @@ void MilkyModel::setDevice(QString const newDevice)
     emit deviceChanged(newDevice);
 }
 
-QList<MilkyDevice> MilkyModel::getDeviceList()
+QList<QObject*> MilkyModel::getDeviceList()
 {
-    QList<MilkyDevice> list;
+    PANORAMA_PRIVATE(MilkyModel);
+    foreach(QObject* device, priv->devices)
+    {
+        delete device;
+    }
+    priv->devices.clear();
+
     alpm_list_t* deviceList = milky_list_devices();
     alpm_list_t* node = deviceList;
     while(node)
     {
         _m_dev_struct* item = static_cast<_m_dev_struct*>(node->data);
-        list << MilkyDevice(item);
+        priv->devices << new MilkyDevice(item);
         node = node->next;
     }
 
     milky_free_device_list(deviceList);
-    return list;
+    return priv->devices;
 }
 
 QString MilkyModel::getTargetDir()

@@ -97,7 +97,7 @@ public:
 
     QString getDevice();
     void setDevice(QString const newDevice);
-    Q_INVOKABLE QList<MilkyDevice> getDeviceList();
+    Q_INVOKABLE QList<QObject*> getDeviceList();
 
     QString getTargetDir();
     void setTargetDir(QString const newTargetDir);

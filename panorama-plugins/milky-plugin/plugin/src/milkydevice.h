@@ -48,6 +48,6 @@ private:
     int freeForSuperuser;
 };
 
-//Q_DECLARE_METATYPE(MilkyDevice)
+Q_DECLARE_METATYPE(MilkyDevice)
 
 #endif // MILKYDEVICE_H

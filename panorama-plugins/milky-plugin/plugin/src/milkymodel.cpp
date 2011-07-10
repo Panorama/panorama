@@ -304,24 +304,19 @@ void MilkyModel::setDevice(QString const newDevice)
 
 QList<QObject*> MilkyModel::getDeviceList()
 {
-    PANORAMA_PRIVATE(MilkyModel);
-    foreach(QObject* device, priv->devices)
-    {
-        delete device;
-    }
-    priv->devices.clear();
+    QList<QObject*> devices;
 
     alpm_list_t* deviceList = milky_list_devices();
     alpm_list_t* node = deviceList;
     while(node)
     {
-        _m_dev_struct* item = static_cast<_m_dev_struct*>(node->data);
-        priv->devices << new MilkyDevice(item);
+        _m_dev_struct* device = static_cast<_m_dev_struct*>(node->data);
+        devices.append(new MilkyDevice(device));
         node = node->next;
     }
 
     milky_free_device_list(deviceList);
-    return priv->devices;
+    return devices;
 }
 
 QString MilkyModel::getTargetDir()
@@ -335,28 +330,18 @@ void MilkyModel::setTargetDir(QString const newTargetDir)
     emit targetDirChanged(newTargetDir);
 }
 
-// Have to return QObject*s instead of MilkyPackages because of Qt bug
-// http://bugreports.qt.nokia.com/browse/QTBUG-15712
-// TODO: Should be fixed to create new MilkyPackages instead of relying
-// on the model after the bug is fixed.
 QList<QObject*> MilkyModel::getTargetPackages()
 {
-    PANORAMA_PRIVATE(MilkyModel);
     QList<QObject*> packages;
+
     alpm_list_t* node = milky_get_target_pnd();
     while(node)
     {
         _pnd_package* package = static_cast<_pnd_package*>(node->data);
-        foreach(MilkyPackage* p, priv->packages)
-        {
-            if(p->getId() == package->id)
-            {
-                packages << p;
-                break;
-            }
-        }
+        packages.append(new MilkyPackage(package));
         node = node->next;
     }
+
     return packages;
 }
 

@@ -754,6 +754,7 @@ PanoramaUI {
 
                 Rectangle {
                     id: deviceSelection
+                    property variant deviceOptions: ui.milky.getDeviceList()
                     anchors.bottom: parent.top
                     visible: height > 0
                     height: parent.pressed ? childrenRect.height : 0
@@ -767,17 +768,22 @@ PanoramaUI {
                         anchors.horizontalCenter: parent.horizontalCenter
                         visible: deviceListRepeater.count == 0
                     }
-
-                    Repeater {
-                        id: deviceListRepeater
-                        model: ui.milky.getDeviceList()
-                        delegate: Button {
-                            height: 32
-                            width: deviceSelection.width
-                            label: modelData.mountPoint
-                            onClicked: {
-                                installDevice.value = modelData.mountPoint;
-                                deviceButton.pressed = false;
+                    Column {
+                        width: childrenRect.width
+                        height: childrenRect.height
+                        Repeater {
+                            id: deviceListRepeater
+                            model: deviceSelection.deviceOptions
+                            delegate: Button {
+                                property string mountPoint: modelData.mountPoint
+                                height: 32
+                                width: deviceSelection.width
+                                color: "#ccc"
+                                label: mountPoint
+                                onClicked: {
+                                    installDevice.value = mountPoint;
+                                    deviceButton.pressed = false;
+                                }
                             }
                         }
                     }

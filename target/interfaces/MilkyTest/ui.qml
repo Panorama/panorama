@@ -95,7 +95,7 @@ PanoramaUI {
                 case Pandora.ButtonA:
                     if(item.isInstalled) item.remove();
                     break;
-                case Pandora.ButtonX:
+                case Pandora.ButtonY:
                     if(item.hasUpdate) item.upgrade();
                     break;
                 case Pandora.TriggerL:

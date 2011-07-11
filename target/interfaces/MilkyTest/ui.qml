@@ -96,7 +96,7 @@ PanoramaUI {
                     if(item.isInstalled) item.remove();
                     break;
                 case Pandora.ButtonY:
-                    if(item.hasUpdate) item.upgrade();
+                    if(item.hasUpgrade) item.upgrade();
                     break;
                 case Pandora.TriggerL:
                     statusFilter.selected = (statusFilter.selected + 1) % statusFilter.filterOptions.length

@@ -299,6 +299,7 @@ QString MilkyModel::getDevice()
 void MilkyModel::setDevice(QString const newDevice)
 {
     milky_set_dev(newDevice.toLocal8Bit());
+    milky_check_config();
     emit deviceChanged(newDevice);
 }
 
@@ -327,6 +328,7 @@ QString MilkyModel::getTargetDir()
 void MilkyModel::setTargetDir(QString const newTargetDir)
 {
     milky_set_target_dir(newTargetDir.toLocal8Bit());
+    milky_check_config();
     emit targetDirChanged(newTargetDir);
 }
 
@@ -365,6 +367,7 @@ QString MilkyModel::getConfigFile()
 void MilkyModel::setConfigFile(QString const newConfigFile)
 {
     milky_set_config_file(newConfigFile.toLocal8Bit());
+    milky_check_config();
     emit configFileChanged(newConfigFile);
 }
 
@@ -377,6 +380,7 @@ QString MilkyModel::getLogFile()
 void MilkyModel::setLogFile(QString const newLogFile)
 {
     milky_set_log_file(newLogFile.toLocal8Bit());
+    milky_check_config();
     emit logFileChanged(newLogFile);
 }
 
@@ -549,6 +553,7 @@ void MilkyModel::finishInitialization()
 {
     PANORAMA_PRIVATE(MilkyModel);
     connect(this, SIGNAL(notifyListener()), priv->listenerThread->listener, SLOT(listen()));
+    connect(priv->listenerThread->listener, SIGNAL(syncDone()), this, SLOT(refreshModel()));
     connect(priv->listenerThread->listener, SIGNAL(crawlDone()), this, SLOT(refreshModel()));
     connect(priv->listenerThread->listener, SIGNAL(installDone()), this, SLOT(refreshModel()));
     connect(priv->listenerThread->listener, SIGNAL(removeDone()), this, SLOT(refreshModel()));

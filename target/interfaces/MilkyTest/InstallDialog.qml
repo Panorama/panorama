@@ -3,6 +3,7 @@ import Qt 4.7
 Rectangle {
     id: dialog
     property QtObject milky
+    property QtObject installDirectorySetting
 
     signal activate()
     signal deactivate()
@@ -132,6 +133,24 @@ Rectangle {
             controlHint: "B"
             onClicked: {
                 milky.answer(true);
+            }
+        }
+
+        Row {
+            id: installDirectoryButtons
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: installYesButton.bottom
+            anchors.margins: 16
+            height: childrenRect.height
+            spacing: 8
+            Repeater {
+                model: ["apps", "desktop", "menu"]
+                delegate: Button {
+                    width: 96
+                    label: modelData
+                    pressed: installDirectorySetting.value == label
+                    onClicked: installDirectorySetting.value = label
+                }
             }
         }
 

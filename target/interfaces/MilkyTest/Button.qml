@@ -2,7 +2,7 @@ import Qt 4.7
 
 Item {
     id: button
-    property color color: "grey"
+    property color color: "lightgrey"
     property string label: "Button!"
     property bool toggleButton: false
     property bool pressed: false

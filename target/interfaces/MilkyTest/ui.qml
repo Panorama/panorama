@@ -385,6 +385,7 @@ PanoramaUI {
             anchors.fill: parent
             z: 10
             milky: ui.milky
+            installDirectorySetting: installDirectory
             onActivate: ui.state = "install";
             onDeactivate: ui.state = "browse";
         }
@@ -772,8 +773,18 @@ PanoramaUI {
                         width: childrenRect.width
                         height: childrenRect.height
                         Repeater {
+                            function getDevice() {
+                                var list = [{mountPoint:"/home/bzar/src/panorama/target"}];
+                                for(var i = 0; i < deviceSelection.deviceOptions.length; ++i) {
+                                    list.push(deviceSelection.deviceOptions[i])
+                                }
+                                return list;
+                            }
+
                             id: deviceListRepeater
-                            model: deviceSelection.deviceOptions
+                            model: getDevice()
+
+
                             delegate: Button {
                                 property string mountPoint: modelData.mountPoint
                                 height: 32
@@ -782,6 +793,7 @@ PanoramaUI {
                                 label: mountPoint
                                 onClicked: {
                                     installDevice.value = mountPoint;
+                                    ui.milky.applyConfiguration();
                                     deviceButton.pressed = false;
                                 }
                             }

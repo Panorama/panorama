@@ -36,6 +36,13 @@ PanoramaUI {
         defaultValue: "http://repo.openpandora.org/includes/get_data.php"
     }
 
+    Setting {
+        id: customDevices
+        section: "Milky"
+        key: "customDevices"
+        defaultValue: ""
+    }
+
     Item {
         focus: true
         Keys.forwardTo: [hotKeyHandler, search]
@@ -612,14 +619,14 @@ PanoramaUI {
 
                 highlightFollowsCurrentItem: false
                 highlight: Rectangle {
-                    z: 100
+                    z: 10
                     y: packageList.currentItem.y
                     height: 32
                     width: packageList.currentItem.width
                     gradient: Gradient {
-                        GradientStop { position: 0.0; color: Qt.rgba(0.7,0.7,1,0.7) }
-                        GradientStop { position: 0.5; color: Qt.rgba(0.7,0.7,1,0.2) }
-                        GradientStop { position: 1.0; color: Qt.rgba(0.7,0.7,1,0.7) }
+                        GradientStop { position: 0.0; color: Qt.rgba(0.8,0.6,0.8,0.1) }
+                        GradientStop { position: 0.7; color: Qt.rgba(0.8,0.6,0.8,0.3) }
+                        GradientStop { position: 1.0; color: Qt.rgba(0.8,0.6,0.8,0.8) }
                     }
                 }
 
@@ -699,7 +706,7 @@ PanoramaUI {
             anchors.right: parent.right
             anchors.bottom: statusContainer.top
             gradient: Gradient {
-                GradientStop { position: 0.0; color: "#eee" }
+                GradientStop { position: 0.0; color: "#fff" }
                 GradientStop { position: 1.0; color: "#ddd" }
             }
 
@@ -747,7 +754,7 @@ PanoramaUI {
                 anchors.right: parent.right
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                width: 256
+                width: 288
 
                 label: "Device: " + installDevice.value
                 color: "#ddd"
@@ -774,7 +781,15 @@ PanoramaUI {
                         height: childrenRect.height
                         Repeater {
                             function getDevice() {
-                                var list = [{mountPoint:"/home/bzar/src/panorama/target"}];
+                                var list = []
+                                if(typeof(customDevices.value) == "string" && customDevices.value.length != 0) {
+                                    list.push({mountPoint: customDevices.value});
+                                } else {
+                                    for(var i = 0; i < customDevices.value.length; ++i) {
+                                        list.push({mountPoint: customDevices.value[i]});
+                                    }
+                                }
+
                                 for(var i = 0; i < deviceSelection.deviceOptions.length; ++i) {
                                     list.push(deviceSelection.deviceOptions[i])
                                 }

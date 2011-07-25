@@ -328,7 +328,6 @@ QString MilkyModel::getTargetDir()
 void MilkyModel::setTargetDir(QString const newTargetDir)
 {
     milky_set_target_dir(newTargetDir.toLocal8Bit());
-    milky_check_config();
     emit targetDirChanged(newTargetDir);
 }
 

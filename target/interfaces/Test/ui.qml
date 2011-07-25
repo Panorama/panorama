@@ -102,7 +102,7 @@ PanoramaUI {
                     .sortedBy("name", true)
                 onSelected: {
                     print(identifier);
-                    ui.execute(identifier);
+                    Applications.execute(identifier);
                     lastExecuted.value = identifier;
                 }
             }

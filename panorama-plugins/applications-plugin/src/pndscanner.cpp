@@ -55,8 +55,9 @@ void PndScanner::scanPnds()
 
             if(discovery->preview_pic1)
                 translated.preview = discovery->preview_pic1;
+            /* Returns potentially invalid pointer. Disabled until fixed in libpnd.
             else if(discovery->preview_pic2)
-                translated.preview = discovery->preview_pic2;
+                translated.preview = discovery->preview_pic2;*/
             else
                 translated.preview = QString();
 

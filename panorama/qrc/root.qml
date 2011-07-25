@@ -20,21 +20,26 @@ Item {
         id: fullscreen
         section: "panorama"
         key: "fullscreen"
-        defaultValue: false
-        onValueChanged: runtime.setFullscreen(value)
+        defaultValue: "false"
+        onValueChanged: runtime.setFullscreen(value == "true")
     }
     Setting {
         id: dataDirectory
         section: "panorama"
         key: "dataDirectory"
     }
-    Component.onCompleted: runtime.setFullscreen(fullscreen.value)
+    Component.onCompleted: runtime.setFullscreen(fullscreen.value == "true")
 
     Keys.onPressed: {
-        if(event.key == Qt.Key_F && event.modifiers & Qt.ControlModifier) {
+        if((event.key == Qt.Key_F && event.modifiers & Qt.ControlModifier) || event.key == Qt.Key_F11) {
             event.accepted = true;
-            fullscreen.value = !fullscreen.value;
-        } else if(event.key == Qt.Key_Q && event.modifiers & Qt.ControlModifier) {
+            if(fullscreen.value == "true") {
+                fullscreen.value = "false";
+            }
+            else {
+                fullscreen.value = "true";
+            }
+        } else if((event.key == Qt.Key_Q && event.modifiers & Qt.ControlModifier) || event.key == Qt.Key_F12) {
             event.accepted = true;
             Qt.quit();
         }

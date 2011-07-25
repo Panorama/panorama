@@ -97,19 +97,6 @@ PanoramaUI {
         if(ui.state == "browse") {
             var item = packageList.currentItem;
             switch(event.key) {
-                case Pandora.DPadUp:
-                    packageList.up();
-                    break;
-                case Pandora.DPadDown:
-                    packageList.down();
-                    break;
-                case Pandora.DPadLeft:
-                    packageList.pageUp();
-                    break;
-                case Pandora.DPadRight:
-                    packageList.pageDown();
-                    break;
-
                 case Pandora.ButtonB:
                     item.detailsVisible = !item.detailsVisible;
                     break;
@@ -623,14 +610,12 @@ PanoramaUI {
                     positionViewAtIndex(currentIndex, ListView.Contain);
                 }
                 function pageUp() {
-                    currentIndex = currentIndex < 10 ? 0 : currentIndex - 10;
-                    positionViewAtIndex(currentIndex, ListView.Beginning);
+                    gotoIndex(currentIndex < 10 ? 0 : currentIndex - 10, ListView.Beginning);
                 }
                 function pageDown() {
                     if(model.numResults === undefined)
                         return;
-                    currentIndex = currentIndex + 10 < model.numResults() ? currentIndex + 10 : model.numResults() - 1;
-                    positionViewAtIndex(currentIndex, ListView.Beginning);
+                    gotoIndex(currentIndex + 10 < model.numResults() ? currentIndex + 10 : model.numResults() - 1, ListView.Beginning);
                 }
 
                 function filteredModel() {
@@ -682,13 +667,13 @@ PanoramaUI {
                         ui.state = "preview";
                     }
                     onShowDetails: {
-                        packageList.gotoIndex(index);
+                        packageList.gotoIndex(index, ListView.Contain);
                     }
                 }
 
-                function gotoIndex(idx) {
+                function gotoIndex(idx, mode) {
                     var from = packageList.contentY;
-                    packageList.positionViewAtIndex(idx, ListView.Contain);
+                    packageList.positionViewAtIndex(idx, mode);
                     var to = packageList.contentY;
                     currentIndex = idx;
                     scrollAnimation.from = from;

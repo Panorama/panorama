@@ -62,6 +62,18 @@ PanoramaUI {
                     case Qt.Key_Return:
                         item.preview();
                         break;
+                    case Qt.Key_Up:
+                        packageList.up();
+                        break;
+                    case Qt.Key_Down:
+                        packageList.down();
+                        break;
+                    case Qt.Key_Left:
+                        packageList.pageUp();
+                        break;
+                    case Qt.Key_Right:
+                        packageList.pageDown();
+                        break;
                     default:
                         accept = false;
                 }
@@ -86,13 +98,18 @@ PanoramaUI {
             var item = packageList.currentItem;
             switch(event.key) {
                 case Pandora.DPadUp:
-                    packageList.decrementCurrentIndex();
-                    packageList.positionViewAtIndex(packageList.currentIndex, ListView.Contain);
+                    packageList.up();
                     break;
                 case Pandora.DPadDown:
-                    packageList.incrementCurrentIndex();
-                    packageList.positionViewAtIndex(packageList.currentIndex, ListView.Contain);
+                    packageList.down();
                     break;
+                case Pandora.DPadLeft:
+                    packageList.pageUp();
+                    break;
+                case Pandora.DPadRight:
+                    packageList.pageDown();
+                    break;
+
                 case Pandora.ButtonB:
                     item.detailsVisible = !item.detailsVisible;
                     break;
@@ -596,6 +613,26 @@ PanoramaUI {
                 anchors.fill: parent
                 clip: true
                 currentIndex: 0
+
+                function up() {
+                    decrementCurrentIndex();
+                    positionViewAtIndex(currentIndex, ListView.Contain);
+                }
+                function down() {
+                    incrementCurrentIndex();
+                    positionViewAtIndex(currentIndex, ListView.Contain);
+                }
+                function pageUp() {
+                    currentIndex = currentIndex < 10 ? 0 : currentIndex - 10;
+                    positionViewAtIndex(currentIndex, ListView.Beginning);
+                }
+                function pageDown() {
+                    if(model.numResults === undefined)
+                        return;
+                    currentIndex = currentIndex + 10 < model.numResults() ? currentIndex + 10 : model.numResults() - 1;
+                    positionViewAtIndex(currentIndex, ListView.Beginning);
+                }
+
                 function filteredModel() {
                     if(search.text.length > 0 && search.text.length < 3)
                         return []

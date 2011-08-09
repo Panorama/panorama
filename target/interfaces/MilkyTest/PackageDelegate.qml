@@ -5,6 +5,7 @@ Item {
     property bool detailsVisible: false
     property bool isInstalled: installed
     property bool hasUpgrade: hasUpdate
+
     signal install();
     signal remove();
     signal upgrade();
@@ -25,7 +26,7 @@ Item {
     Rectangle {
         id: packageTitle
         height: 32
-        z: 1
+        z: 10
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
@@ -84,7 +85,7 @@ Item {
 
     Rectangle {
         id: packageDetails
-        visible: packageItem.height > 32
+        visible: packageItem.height > packageTitle.height
         anchors.top: packageTitle.bottom
         anchors.left: parent.left
         anchors.right: parent.right
@@ -97,7 +98,7 @@ Item {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: previewContainer.left
-            anchors.bottom: installButton.top
+            anchors.bottom: sizeAndVersion.top
 
             contentWidth: descriptionText.paintedWidth
             contentHeight: descriptionText.paintedHeight
@@ -116,7 +117,36 @@ Item {
                 wrapMode: Text.WordWrap
             }
         }
-
+        Rectangle {
+            id: sizeAndVersion
+            anchors.left: parent.left
+            anchors.right: previewContainer.left
+            anchors.bottom: installButton.top
+            color: "#eee"
+            height: 16
+            visible: packageItem.height > packageTitle.height + height
+            Row {
+                anchors.fill: parent
+                spacing: 16
+                Text {
+                    id: sizeText
+                    text: "Size: " + sizeString
+                }
+                Text {
+                    id: versionText
+                    text: "Current version: " + [currentVersionMajor, currentVersionMinor, currentVersionRelease, currentVersionBuild].join(".");
+                }
+                Text {
+                    id: installedVersionText
+                    text: "Installed version: " + [installedVersionMajor, installedVersionMinor, installedVersionRelease, installedVersionBuild].join(".");
+                    visible: installed
+                }
+                Text {
+                    id: lastUpdatedText
+                    text: "Last updated: " + lastUpdatedString
+                }
+            }
+        }
         Rectangle {
             id: previewContainer
             color: "#444"

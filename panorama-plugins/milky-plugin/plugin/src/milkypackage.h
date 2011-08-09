@@ -20,9 +20,11 @@ class MilkyPackage : public QObject
     Q_PROPERTY(QString vendor READ getVendor WRITE setVendor NOTIFY vendorChanged);
     Q_PROPERTY(QString group READ getGroup WRITE setGroup NOTIFY groupChanged);
     Q_PROPERTY(QDateTime modified READ getModified WRITE setModified NOTIFY modifiedChanged);
+    Q_PROPERTY(QString lastUpdatedString READ getLastUpdatedString NOTIFY modifiedChanged);
 
     Q_PROPERTY(int rating READ getRating WRITE setRating NOTIFY ratingChanged);
     Q_PROPERTY(int size READ getSize WRITE setSize NOTIFY sizeChanged);
+    Q_PROPERTY(QString sizeString READ getSizeString NOTIFY sizeChanged);
 
     Q_PROPERTY(QString authorName READ getAuthorName WRITE setAuthorName NOTIFY authorNameChanged);
     Q_PROPERTY(QString authorSite READ getAuthorSite WRITE setAuthorSite NOTIFY authorSiteChanged);
@@ -66,8 +68,10 @@ public slots:
     QString getVendor() const;
     QString getGroup() const;
     QDateTime getModified() const;
+    QString getLastUpdatedString() const;
     int getRating() const;
     int getSize() const;
+    QString getSizeString() const;
     QString getAuthorName() const;
     QString getAuthorSite() const;
     QString getAuthorEmail() const;

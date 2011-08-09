@@ -141,6 +141,37 @@ QDateTime MilkyPackage::getModified() const
     return modified;
 }
 
+QString MilkyPackage::getLastUpdatedString() const
+{
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    qint64 days = (now - modified.toMSecsSinceEpoch()) / (1000 * 60*60*24);
+
+    if(days == 0)
+    {
+        return "today";
+    }
+    else if(days == 1)
+    {
+        return "yesterday";
+    }
+    else if(days < 2*7)
+    {
+        return QString("%1 %2").arg(days).arg("days ago");
+    }
+    else if(days < 2*30)
+    {
+        return QString("%1 %2").arg(days/7).arg("weeks ago");
+    }
+    else if(days < 2*365)
+    {
+        return QString("%1 %2").arg(days/30).arg("months ago");
+    }
+    else
+    {
+        return QString("%1 %2").arg(days/365).arg("years ago");
+    }
+}
+
 int MilkyPackage::getRating() const
 {
     return rating;
@@ -149,7 +180,33 @@ int MilkyPackage::getSize() const
 {
     return size;
 }
-
+QString MilkyPackage::getSizeString() const
+{
+    quint64 s = size;
+    QString suffix = "B";
+    quint64 kilo = 1024;
+    if(s > kilo*kilo*kilo*kilo)
+    {
+        suffix = "TiB";
+        s /= kilo*kilo*kilo*kilo;
+    }
+    else if(s > kilo*kilo*kilo)
+    {
+        suffix = "GiB";
+        s /= kilo*kilo*kilo;
+    }
+    if(s > kilo*kilo)
+    {
+        suffix = "MiB";
+        s /= kilo*kilo;
+    }
+    if(s > kilo)
+    {
+        suffix = "KiB";
+        s /= kilo;
+    }
+    return QString("%1 %2").arg(s).arg(suffix);
+}
 QString MilkyPackage::getAuthorName() const
 {
     return author.name;

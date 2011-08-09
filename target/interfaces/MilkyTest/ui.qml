@@ -43,14 +43,34 @@ PanoramaUI {
         defaultValue: ""
     }
 
-    Item {
-        focus: true
-        Keys.forwardTo: [hotKeyHandler, search]
+    // Run stuff when the entire UI is loaded
+    Timer {
+        interval: 1
+        running: true
+        repeat: false
+        onTriggered: {
+            ui.milky.crawlDevice();
+        }
+    }
+
+    Timer {
+        interval: 300000
+        running: true
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: {
+            syncButton.updateEnabled();
+        }
     }
 
     // ***************************************
     //                CONTROLS
     // ***************************************
+
+    Item {
+        focus: true
+        Keys.forwardTo: [hotKeyHandler, search]
+    }
 
     Item {
         id: hotKeyHandler
@@ -155,6 +175,9 @@ PanoramaUI {
                     if(upgradeAllButton.enabled)
                         upgradeAllButton.clicked(false);
                     break;
+                case Pandora.ButtonY:
+                    categoryFilter.nextOrder();
+                    break;
                 default:
                     accept = false;
             }
@@ -221,8 +244,8 @@ PanoramaUI {
             });
             events.syncDone.connect(function() {
                 ui.state = "browse";
+                syncButton.updateEnabled();
             });
-
         }
     }
 
@@ -463,7 +486,7 @@ PanoramaUI {
                         color: modelData.baseColor
                         label: modelData.label
                         controlHint: "L"
-                        onClicked: statusFilter.selected = index;
+                        onClicked: {statusFilter.selected = index; packageList.model = packageList.filteredModel();}
                         pressed: statusFilter.selected == index
                     }
                 }
@@ -473,19 +496,36 @@ PanoramaUI {
                 id: categoryFilter
                 property string value: ""
 
+                property int selectedOrder: 0
+                property variant orderOptions: [
+                    {title:"Alphabetical", value:"title", ascending: true, sectionProperty: "", sectionCriteria: -1},
+                    {title:"Newest", value:"modified", ascending: false, sectionProperty: "lastUpdatedString", sectionCriteria: ViewSection.FullString}
+                ]
+
+                property string orderTitle: orderOptions[selectedOrder].title
+                property string orderProperty: orderOptions[selectedOrder].value
+                property bool orderAscending: orderOptions[selectedOrder].ascending
+                property string sectionProperty: orderOptions[selectedOrder].sectionProperty
+                property int sectionCriteria: orderOptions[selectedOrder].sectionCriteria
+
+                function nextOrder() {
+                    selectedOrder = (selectedOrder + 1) % orderOptions.length;
+                }
+
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.left: statusFilter.right
                 anchors.right: upgradeAllButton.left
 
                 color:  Qt.hsla(ui.categoryHue(categoryFilter.value), 0.5, 0.7, 1.0)
-                label: "Category: " + (categoryFilter.value ? categoryFilter.value : "All")
+                label: (categoryFilter.value ? categoryFilter.value : "All") + ", " + orderTitle
                 controlHint: "R"
                 onClicked: {
                     if(ui.state != "categories") {
                         ui.state = "categories";
                     } else {
                         ui.state = "browse";
+                        packageList.model = packageList.filteredModel();
                     }
                 }
             }
@@ -496,10 +536,10 @@ PanoramaUI {
                 anchors.bottom: parent.bottom
                 anchors.right: syncButton.left
                 width: 160
-                color: milky.hasUpgrades ? "#ddf" : "#888"
+                color: enabled ? "#ddf" : "#888"
                 enabled: milky.hasUpgrades
-                label: milky.hasUpgrades ? "Upgrade all" : "No upgrades"
-                controlHint: "Sl"
+                label: enabled ? "Upgrade all" : "No upgrades"
+                controlHint: enabled ? "Sl" : ""
                 onClicked: upgradeDialog.upgradeAll();
             }
 
@@ -509,10 +549,17 @@ PanoramaUI {
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 width: 160
-                color: "#bbf"
-                label: "Synchronize"
-                controlHint: "St"
-                onClicked: ui.milky.updateDatabase();
+                color: enabled ? "#bbf" : "#888"
+                label: enabled ? "Synchronize" : "Up to date"
+                controlHint: enabled ? "St" : ""
+                onClicked: ui.milky.syncWithRepository();
+
+                function updateEnabled() {
+                    var updated = ui.milky.repositoryUpdated();
+                    var lastSynced = new Date(ui.milky.repositoryLastSynced()).getTime();
+                    var neverSynced = lastSynced == 0;
+                    enabled = updated || neverSynced;
+                }
             }
         }
 
@@ -550,9 +597,39 @@ PanoramaUI {
                 // Restrict mouse events to children
                 MouseArea { anchors.fill: parent; onPressed: mouse.accepted = true; }
 
+                Row {
+                    id: orderByButtons
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+
+                    Repeater {
+                        id: orderByButtonsRepeater
+                        model: categoryFilter.orderOptions
+                        delegate: Button {
+                            property int ident: index
+                            label: modelData.title
+                            color: "#ddd"
+                            width: orderByButtons.width/(orderByButtonsRepeater.model.length)
+                            pressed:  categoryFilter.selectedOrder == ident
+                            controlHint: "Y"
+                            border {
+                                color: "#444"
+                                width: 1
+                            }
+                            onClicked: {
+                                categoryFilter.selectedOrder = ident;
+                            }
+                        }
+                    }
+                }
+
                 GridView {
                     id: categoryList
-                    anchors.fill: parent
+                    anchors.top: orderByButtons.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
                     model: ui.milky.categories
                     clip: true
                     cellWidth: width / 4
@@ -587,9 +664,9 @@ PanoramaUI {
                         color: Qt.hsla(ui.categoryHue(edit), 0.5, 0.7, 1.0);
                         radius: 4
                         label: edit ? edit : "All"
+                        pressed: categoryFilter.value == edit
                         onClicked: {
                             categoryFilter.value = edit;
-                            ui.state = "browse"
                         }
                     }
                 }
@@ -632,7 +709,7 @@ PanoramaUI {
                     if(search.text)
                         result = result.matching("title", ".*" + search.text + ".*")
 
-                    return result.sortedBy("title", true).sortedBy("hasUpdate", false);
+                    return result.sortedBy(categoryFilter.orderProperty, categoryFilter.orderAscending).sortedBy("hasUpdate", false);
                 }
 
                 model: filteredModel()
@@ -668,6 +745,24 @@ PanoramaUI {
                     }
                     onShowDetails: {
                         packageList.gotoIndex(index, ListView.Contain);
+                    }
+                }
+
+
+                section.property: categoryFilter.sectionProperty
+                section.criteria: categoryFilter.sectionCriteria
+                section.delegate: Rectangle {
+                    height: 32
+                    width: packageList.width
+                    z: 10
+                    color: "#555"
+
+                    Text {
+                        anchors.leftMargin: 16
+                        anchors.fill: parent
+                        text: section
+                        font.pixelSize: 24
+                        color: "#eee"
                     }
                 }
 
@@ -802,7 +897,7 @@ PanoramaUI {
                         width: childrenRect.width
                         height: childrenRect.height
                         Repeater {
-                            function getDevice() {
+                            function getDevices() {
                                 var list = []
                                 if(typeof(customDevices.value) == "string" && customDevices.value.length != 0) {
                                     list.push({mountPoint: customDevices.value});
@@ -813,13 +908,14 @@ PanoramaUI {
                                 }
 
                                 for(var i = 0; i < deviceSelection.deviceOptions.length; ++i) {
-                                    list.push(deviceSelection.deviceOptions[i])
+                                    if(!/\/mnt\/utmp\/.*/.test(deviceSelection.deviceOptions[i].mountPoint))
+                                        list.push(deviceSelection.deviceOptions[i])
                                 }
                                 return list;
                             }
 
                             id: deviceListRepeater
-                            model: getDevice()
+                            model: getDevices()
 
 
                             delegate: Button {
@@ -832,6 +928,8 @@ PanoramaUI {
                                     installDevice.value = mountPoint;
                                     ui.milky.applyConfiguration();
                                     deviceButton.pressed = false;
+                                    ui.milky.crawlDevice();
+                                    syncButton.updateEnabled();
                                 }
                             }
                         }

@@ -37,8 +37,10 @@ MilkyModel::MilkyModel(QObject *parent) :
     roles[MilkyModel::Vendor] = QString("vendor").toLocal8Bit();
     roles[MilkyModel::Group] = QString("group").toLocal8Bit();
     roles[MilkyModel::Modified] = QString("modified").toLocal8Bit();
+    roles[MilkyModel::LastUpdatedString] = QString("lastUpdatedString").toLocal8Bit();
     roles[MilkyModel::Rating] = QString("rating").toLocal8Bit();
     roles[MilkyModel::Size] = QString("size").toLocal8Bit();
+    roles[MilkyModel::SizeString] = QString("sizeString").toLocal8Bit();
     roles[MilkyModel::AuthorName] = QString("authorName").toLocal8Bit();
     roles[MilkyModel::AuthorSite] = QString("authorSite").toLocal8Bit();
     roles[MilkyModel::AuthorEmail] = QString("authorEmail").toLocal8Bit();
@@ -145,10 +147,14 @@ QVariant MilkyModel::data(const QModelIndex &index, int role) const
             return value->getGroup();
         case Modified:
             return value->getModified();
+        case LastUpdatedString:
+            return value->getLastUpdatedString();
         case Rating:
             return value->getRating();
         case Size:
             return value->getSize();
+        case SizeString:
+            return value->getSizeString();
         case AuthorName:
             return value->getAuthorName();
         case AuthorSite:
@@ -223,10 +229,14 @@ QVariant MilkyModel::headerData(int, Qt::Orientation, int role) const
         return QString("Group");
     case Modified:
         return QString("Modified");
+    case LastUpdatedString:
+        return QString("LastUpdatedString");
     case Rating:
         return QString("Rating");
     case Size:
         return QString("Size");
+    case SizeString:
+        return QString("SizeString");
     case AuthorName:
         return QString("AuthorName");
     case AuthorSite:
@@ -366,7 +376,6 @@ QString MilkyModel::getConfigFile()
 void MilkyModel::setConfigFile(QString const newConfigFile)
 {
     milky_set_config_file(newConfigFile.toLocal8Bit());
-    milky_check_config();
     emit configFileChanged(newConfigFile);
 }
 
@@ -379,7 +388,6 @@ QString MilkyModel::getLogFile()
 void MilkyModel::setLogFile(QString const newLogFile)
 {
     milky_set_log_file(newLogFile.toLocal8Bit());
-    milky_check_config();
     emit logFileChanged(newLogFile);
 }
 
@@ -399,6 +407,17 @@ void MilkyModel::setHasUpgrades(bool const newHasUpgrades)
     }
 }
 
+bool MilkyModel::repositoryUpdated()
+{
+    return milky_get_changes_since(0) != 0;
+}
+
+QDateTime MilkyModel::repositoryLastSynced()
+{
+    time_t time = milky_get_last_sync();
+    return QDateTime::fromMSecsSinceEpoch(static_cast<quint64>(time) * 1000);
+}
+
 MilkyListener* MilkyModel::getListener()
 {
     PANORAMA_PRIVATE(MilkyModel);
@@ -411,11 +430,17 @@ void MilkyModel::applyConfiguration()
     refreshModel();
 }
 
-void MilkyModel::updateDatabase()
+void MilkyModel::crawlDevice()
+{
+    milky_check_config();
+    milky_crawl_pnd();
+    emit notifyListener();
+}
+
+void MilkyModel::syncWithRepository()
 {
     milky_check_config();
     milky_sync_database();
-    milky_crawl_pnd();
     emit notifyListener();
 }
 

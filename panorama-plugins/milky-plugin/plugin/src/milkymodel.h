@@ -41,8 +41,10 @@ public:
         Vendor,
         Group,
         Modified,
+        LastUpdatedString,
         Rating,
         Size,
+        SizeString,
         AuthorName,
         AuthorSite,
         AuthorEmail,
@@ -113,7 +115,10 @@ public:
     void setLogFile(QString const newLogFile);
 
     bool getHasUpgrades();
-    void setHasUpgrades(bool const newLogFile);
+    void setHasUpgrades(bool const newHasUpgrades);
+
+    Q_INVOKABLE bool repositoryUpdated();
+    Q_INVOKABLE QDateTime repositoryLastSynced();
 
     MilkyListener* getListener();
 
@@ -132,7 +137,8 @@ signals:
 public slots:
     void applyConfiguration();
 
-    void updateDatabase();
+    void crawlDevice();
+    void syncWithRepository();
 
     void addTarget(QString pndId);
     void removeTarget(QString pndId);

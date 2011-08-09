@@ -908,7 +908,7 @@ PanoramaUI {
                                 }
 
                                 for(var i = 0; i < deviceSelection.deviceOptions.length; ++i) {
-                                    if(!/\/mnt\/utmp\/.*/.test(deviceSelection.deviceOptions[i].mountPoint))
+                                    if(!/\/mnt\/(utmp|pnd)\/.*/.test(deviceSelection.deviceOptions[i].mountPoint))
                                         list.push(deviceSelection.deviceOptions[i])
                                 }
                                 return list;

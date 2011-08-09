@@ -143,6 +143,10 @@ QDateTime MilkyPackage::getModified() const
 
 QString MilkyPackage::getLastUpdatedString() const
 {
+    if(modified.toMSecsSinceEpoch() == 0) {
+        return "unknown";
+    }
+
     qint64 now = QDateTime::currentMSecsSinceEpoch();
     qint64 days = (now - modified.toMSecsSinceEpoch()) / (1000 * 60*60*24);
 

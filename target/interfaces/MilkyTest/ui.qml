@@ -486,7 +486,7 @@ PanoramaUI {
                         color: modelData.baseColor
                         label: modelData.label
                         controlHint: "L"
-                        onClicked: {statusFilter.selected = index; packageList.model = packageList.filteredModel();}
+                        onClicked: {statusFilter.selected = index; packageList.updateModel();}
                         pressed: statusFilter.selected == index
                     }
                 }
@@ -525,7 +525,7 @@ PanoramaUI {
                         ui.state = "categories";
                     } else {
                         ui.state = "browse";
-                        packageList.model = packageList.filteredModel();
+                        packageList.updateModel();
                     }
                 }
             }
@@ -693,6 +693,10 @@ PanoramaUI {
                     if(model.numResults === undefined)
                         return;
                     gotoIndex(currentIndex + 10 < model.numResults() ? currentIndex + 10 : model.numResults() - 1, ListView.Beginning);
+                }
+
+                function updateModel() {
+                    model = filteredModel();
                 }
 
                 function filteredModel() {

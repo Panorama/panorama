@@ -1,2 +1,2 @@
 #!/bin/bash
-LD_LIBRARY_PATH=lib ./panorama
+LC_NUMERIC=en_US.utf8 LD_LIBRARY_PATH=lib ./panorama

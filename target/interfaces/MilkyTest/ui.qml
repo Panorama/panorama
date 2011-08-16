@@ -131,6 +131,7 @@ PanoramaUI {
                     break;
                 case Pandora.TriggerL:
                     statusFilter.selected = (statusFilter.selected + 1) % statusFilter.filterOptions.length
+                    packageList.updateModel();
                     break;
                 case Pandora.TriggerR:
                     ui.state = "categories";
@@ -167,6 +168,7 @@ PanoramaUI {
                     break;
                 case Pandora.TriggerR:
                     ui.state = "browse";
+                    packageList.updateModel();
                     break;
                 case Pandora.ButtonStart:
                     syncButton.clicked(false);

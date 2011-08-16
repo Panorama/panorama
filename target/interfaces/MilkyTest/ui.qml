@@ -716,7 +716,9 @@ PanoramaUI {
                     return result.sortedBy(categoryFilter.orderProperty, categoryFilter.orderAscending).sortedBy("hasUpdate", false);
                 }
 
-                model: filteredModel()
+                model: []
+
+                Component.onCompleted: updateModel();
 
                 cacheBuffer: 2 * height
 
@@ -813,6 +815,7 @@ PanoramaUI {
                 anchors.fill: parent
                 anchors.leftMargin: 4
                 font.pixelSize: 24
+                onTextChanged: packageList.updateModel()
             }
         }
 

@@ -20,10 +20,11 @@ class MilkyEvents : public QObject
     Q_ENUMS(MessageType)
 
 public:
-    enum MessageType { InvalidConfiguration, InvalidDevice, DeviceNotMounted, InvalidJSON, HTTPError, FileCreationError,
-                       FileCopyError, PNDNotFound, PNDNotInstalled, PNDAlreadyInstalled, PNDSkippingAlreadyInstalled,
-                       PNDReinstalling, PNDAlreadyUpdated, PNDRemoveFailed, PNDUpgradeFailed, PNDInstallFailed,
-                       PNDHasUpdate, PNDFound, NoTargets, NoDatabase, NoUpdates, MD5CheckFailed, MD5CheckFailedForce };
+    enum MessageType { Installing, Removing, Upgrading, InvalidConfiguration, InvalidDevice, DeviceNotMounted, InvalidJSON,
+                       HTTPError, FileCreationError, FileCopyError, PNDNotFound, PNDNotInstalled, PNDAlreadyInstalled,
+                       PNDSkippingAlreadyInstalled, PNDReinstalling, PNDAlreadyUpdated, PNDRemoveFailed, PNDUpgradeFailed,
+                       PNDInstallFailed, PNDHasUpdate, PNDRemoved, PNDFound, NoTargets, NoDatabase, NoUpdates, MD5CheckFailed,
+                       MD5CheckFailedForce };
 };
 
 class MilkyListener : public QObject

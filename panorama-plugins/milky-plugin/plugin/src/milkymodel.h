@@ -4,6 +4,7 @@
 #include "panoramainternal.h"
 #include "milkylistener.h"
 #include "milkydevice.h"
+#include "milkyrepository.h"
 #include <QAbstractListModel>
 #include <QtDeclarative>
 #include <QStringList>
@@ -18,7 +19,7 @@ class MilkyModel : public QAbstractListModel
     Q_PROPERTY(int     bytesToDownload READ getBytesToDownload)
     Q_PROPERTY(QString device        READ getDevice        WRITE setDevice        NOTIFY deviceChanged)
     Q_PROPERTY(QString targetDir     READ getTargetDir     WRITE setTargetDir     NOTIFY targetDirChanged)
-    Q_PROPERTY(QString repositoryUrl READ getRepositoryUrl WRITE setRepositoryUrl NOTIFY repositoryUrlChanged)
+    Q_PROPERTY(QList<QObject*> repositories READ getRepositories NOTIFY repositoriesChanged)
     Q_PROPERTY(QString configFile    READ getConfigFile    WRITE setConfigFile    NOTIFY configFileChanged)
     Q_PROPERTY(QString logFile       READ getLogFile       WRITE setLogFile       NOTIFY logFileChanged)
     Q_PROPERTY(bool    hasUpgrades   READ getHasUpgrades   WRITE setHasUpgrades   NOTIFY hasUpgradesChanged)
@@ -105,8 +106,10 @@ public:
     void setTargetDir(QString const newTargetDir);
     Q_INVOKABLE QList<QObject*> getTargetPackages();
 
-    QString getRepositoryUrl();
-    void setRepositoryUrl(QString const newRepositoryUrl);
+    QList<QObject*> getRepositories();
+    Q_INVOKABLE void addRepository(QString url);
+    Q_INVOKABLE void removeRepository(QString url);
+    Q_INVOKABLE void clearRepositories();
 
     QString getConfigFile();
     void setConfigFile(QString const newConfigFile);
@@ -118,7 +121,6 @@ public:
     void setHasUpgrades(bool const newHasUpgrades);
 
     Q_INVOKABLE bool repositoryUpdated();
-    Q_INVOKABLE QDateTime repositoryLastSynced();
 
     MilkyListener* getListener();
 
@@ -126,7 +128,7 @@ signals:
     void categoriesChanged(QStringListModel* categories);
     void deviceChanged(QString device);
     void targetDirChanged(QString targetDir);
-    void repositoryUrlChanged(QString databaseFile);
+    void repositoriesChanged(QList<MilkyRepository*> repositories);
     void configFileChanged(QString configFile);
     void logFileChanged(QString logFile);
     void listenerChanged(MilkyListener* listener);

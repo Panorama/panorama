@@ -17,7 +17,9 @@ SOURCES = \
     src/lib/install.c \
     src/lib/crawl.c \
     src/lib/remove.c \
-    src/lib/upgrade.c
+    src/lib/upgrade.c \
+    src/lib/logfile.c
+
 
 HEADERS = \
     src/lib/alpm_list.h \
@@ -38,8 +40,9 @@ HEADERS = \
     src/lib/pnd.h \
     src/lib/remove.h \
     src/lib/sync.h \
-    src/lib/upgrade.h
-
+    src/lib/upgrade.h \
+    src/lib/logfile.h \
+    src/lib/version.h
 INCLUDEPATH += ../../../pandora-libraries/include
 INCLUDEPATH += src/lib
 INCLUDEPATH += ../libjansson/src/src

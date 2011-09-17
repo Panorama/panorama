@@ -30,9 +30,9 @@ PanoramaUI {
     }
 
     Setting {
-        id: repositoryUrl
+        id: repositoryUrls
         section: "Milky"
-        key: "repositoryUrl"
+        key: "repositoryUrls"
         defaultValue: "http://repo.openpandora.org/includes/get_data.php"
     }
 
@@ -237,7 +237,6 @@ PanoramaUI {
 
     property QtObject milky : Milky {
         device: installDevice.value
-        repositoryUrl: repositoryUrl.value
         targetDir: installDirectory.value
 
         Component.onCompleted: {
@@ -248,6 +247,14 @@ PanoramaUI {
                 ui.state = "browse";
                 syncButton.updateEnabled();
             });
+
+            if(typeof(repositoryUrls.value) == "string" && repositoryUrls.value.length != 0) {
+               milky.addRepository(repositoryUrls.value);
+            } else {
+                for(var i = 0; i < repositoryUrls.value.length; ++i) {
+                    milky.addRepository(repositoryUrls.value[i]);
+                }
+            }
         }
     }
 
@@ -558,7 +565,13 @@ PanoramaUI {
 
                 function updateEnabled() {
                     var updated = ui.milky.repositoryUpdated();
-                    var lastSynced = new Date(ui.milky.repositoryLastSynced()).getTime();
+                    var lastSynced = 0;
+                    var repositories = ui.milky.repositories;
+                    for(var i = 0; i < repositories.length; ++i) {
+                        var timestamp = new Date(repositories[i].timestamp).getTime();
+                        lastSynced = lastSynced > timestamp ? lastSynced : timestamp;
+                    }
+
                     var neverSynced = lastSynced == 0;
                     enabled = updated || neverSynced;
                 }

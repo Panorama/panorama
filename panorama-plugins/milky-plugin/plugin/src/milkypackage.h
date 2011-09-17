@@ -53,7 +53,7 @@ class MilkyPackage : public QObject
 
 public:
     explicit MilkyPackage(QObject *parent = 0);
-    MilkyPackage(_pnd_package* p, QObject* parent = 0);
+    MilkyPackage(pnd_package* p, QObject* parent = 0);
     MilkyPackage(MilkyPackage const& other);
     MilkyPackage const& operator=(MilkyPackage const& other);
 

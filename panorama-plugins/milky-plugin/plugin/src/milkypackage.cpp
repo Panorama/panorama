@@ -63,7 +63,7 @@ MilkyPackage const& MilkyPackage::operator=(MilkyPackage const& other)
     return *this;
 }
 
-MilkyPackage::MilkyPackage(_pnd_package* p, QObject* parent) :
+MilkyPackage::MilkyPackage(pnd_package* p, QObject* parent) :
     QObject(parent)
 {
     setId(p->id);

@@ -291,13 +291,13 @@ QStringListModel* MilkyModel::getCategories() {
 
 int MilkyModel::getBytesDownloaded() const
 {
-    __m_dl_status* status = milky_get_dl_status();
+    _m_dl_status* status = milky_get_dl_status();
     return status ? status->now_downloaded : 0;
 }
 
 int MilkyModel::getBytesToDownload() const
 {
-    __m_dl_status* status = milky_get_dl_status();
+    _m_dl_status* status = milky_get_dl_status();
     return status ? status->total_to_download : 0;
 }
 
@@ -356,15 +356,34 @@ QList<QObject*> MilkyModel::getTargetPackages()
     return packages;
 }
 
-QString MilkyModel::getRepositoryUrl()
+QList<QObject*> MilkyModel::getRepositories()
 {
-    return QString(milky_get_db());
+    QList<QObject*> repositories;
+
+    alpm_list_t* node = milky_get_repositories();
+    while(node)
+    {
+        pnd_repo* repo = static_cast<pnd_repo*>(node->data);
+        repositories.append(new MilkyRepository(repo));
+        node = node->next;
+    }
+
+    return repositories;
 }
 
-void MilkyModel::setRepositoryUrl(QString const newRepositoryUrl)
+void MilkyModel::addRepository(QString url)
 {
-    milky_set_db(newRepositoryUrl.toLocal8Bit());
-    emit repositoryUrlChanged(newRepositoryUrl);
+    milky_add_repository(url.toLocal8Bit());
+}
+
+void MilkyModel::removeRepository(QString url)
+{
+    milky_remove_repository(url.toLocal8Bit());
+}
+
+void MilkyModel::clearRepositories()
+{
+    milky_clear_repositories();
 }
 
 
@@ -410,12 +429,6 @@ void MilkyModel::setHasUpgrades(bool const newHasUpgrades)
 bool MilkyModel::repositoryUpdated()
 {
     return milky_get_changes_since(0) != 0;
-}
-
-QDateTime MilkyModel::repositoryLastSynced()
-{
-    time_t time = milky_get_last_sync();
-    return QDateTime::fromMSecsSinceEpoch(static_cast<quint64>(time) * 1000);
 }
 
 MilkyListener* MilkyModel::getListener()

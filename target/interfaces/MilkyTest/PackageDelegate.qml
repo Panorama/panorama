@@ -60,7 +60,7 @@ Item {
 
             // Set source only once, when the list is moving slow enough. Binding loop evasion manouver.
             function setSource() {
-                if(Math.abs(ListView.view.verticalVelocity) < 500) {
+                if(Math.abs(packageItem.ListView.view.verticalVelocity) < 500) {
                     source = icon;
                 }
                 return true;

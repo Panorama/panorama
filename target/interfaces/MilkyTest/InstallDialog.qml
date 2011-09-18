@@ -43,10 +43,10 @@ Rectangle {
                 milky.clearTargets();
             }
         });
-        milky.events.downloadStarted.connect(function(pnd) {
+        milky.events.downloadStarted.connect(function(pndId) {
             state = "download";
             installDownload.progress = 0;
-            installDownload.pnd = pnd; // Contains only title because of Qt bug http://bugreports.qt.nokia.com/browse/QTBUG-15712
+            installDownload.pnd = milky.getPackage(pndId);
         });
         milky.events.downloadFinished.connect(function() {
             state = "apply";
@@ -158,7 +158,7 @@ Rectangle {
 
     Item {
         id: installDownload
-        property string pnd: ""  // Contains only PND title because of Qt bug http://bugreports.qt.nokia.com/browse/QTBUG-15712
+        property variant pnd: {}
         property int progress: 0
         anchors.centerIn: parent
         height: childrenRect.height
@@ -179,7 +179,7 @@ Rectangle {
             id: installDownloadLabel
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
-            text: installDownload.pnd ? "Downloading " + installDownload.pnd +"..." : ""
+            text: installDownload.pnd ? "Downloading " + installDownload.pnd.title +"..." : ""
             font.pixelSize: 24
             color: "#eee"
         }

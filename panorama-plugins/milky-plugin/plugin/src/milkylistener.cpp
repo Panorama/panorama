@@ -167,14 +167,14 @@ void MilkyListener::listen()
             }
             case M_SIG_DL_STARTED:
             {
-                _pnd_package* pnd = static_cast<_pnd_package*>(signal->data);
-                MilkyPackage package(pnd);
-                emit downloadStarted(package.getTitle());
+                MilkyPackage package(static_cast<pnd_package*>(signal->data));
+                emit downloadStarted(package.getId());
                 break;
             }
             case M_SIG_DL_FINISHED:
             {
-                emit downloadFinished();
+                MilkyPackage package(static_cast<pnd_package*>(signal->data));
+                emit downloadFinished(package.getId());
                 break;
             }
             case M_SIG_MD5_CHECK:

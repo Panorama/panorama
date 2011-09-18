@@ -66,7 +66,7 @@ signals:
     // TODO: Should be fixed to send the new MilkyPackage after the bug is fixed.
     void downloadStarted(QString pndId);
 
-    void downloadFinished();
+    void downloadFinished(QString pndId);
     void checkingMD5();
     void parsingFilename();
     void copyingFile();

@@ -48,8 +48,8 @@ Rectangle {
             }
 
         });
-        milky.events.downloadStarted.connect(function(pnd) {
-            upgradeDownload.pnd = pnd;
+        milky.events.downloadStarted.connect(function(pndId) {
+            upgradeDownload.pnd = milky.getPackage(pndId);
             state = "download";
         });
         milky.events.downloadFinished.connect(function() {
@@ -171,7 +171,7 @@ Rectangle {
 
     Item {
         id: upgradeDownload
-        property string pnd: "" // Contains only PND title because of Qt bug http://bugreports.qt.nokia.com/browse/QTBUG-15712
+        property variant pnd: {}
         property int progress: 0
         anchors.centerIn: parent
         height: childrenRect.height
@@ -192,7 +192,7 @@ Rectangle {
             id: upgradeDownloadLabel
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "Downloading " + upgradeDownload.pnd +"..."
+            text: "Downloading " + upgradeDownload.pnd.title +"..."
             font.pixelSize: 24
             color: "#eee"
         }

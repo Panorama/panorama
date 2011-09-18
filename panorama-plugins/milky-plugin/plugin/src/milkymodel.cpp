@@ -387,6 +387,20 @@ void MilkyModel::clearRepositories()
 }
 
 
+MilkyPackage* MilkyModel::getPackage(QString pndId)
+{
+    PANORAMA_PRIVATE(MilkyModel);
+    for(int i = 0; i < priv->packages.length(); ++i)
+    {
+        if(priv->packages.at(i)->getId() == pndId)
+        {
+            return priv->packages.at(i);
+        }
+    }
+
+    return new MilkyPackage();
+}
+
 QString MilkyModel::getConfigFile()
 {
     return QString(milky_get_config_file());

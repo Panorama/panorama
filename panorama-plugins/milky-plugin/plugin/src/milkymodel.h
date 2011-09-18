@@ -111,6 +111,8 @@ public:
     Q_INVOKABLE void removeRepository(QString url);
     Q_INVOKABLE void clearRepositories();
 
+    Q_INVOKABLE MilkyPackage* getPackage(QString pndId);
+
     QString getConfigFile();
     void setConfigFile(QString const newConfigFile);
 

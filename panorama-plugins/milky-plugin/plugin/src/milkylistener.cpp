@@ -35,9 +35,9 @@ void MilkyListenerThread::run()
     exec();
 }
 
-void MilkyListenerThread::sleepu(unsigned long usecs = 100)
+void MilkyListenerThread::sleepm(unsigned long msecs = 10)
 {
-    usleep(usecs);
+    msleep(msecs);
 }
 
 void MilkyListener::answer(bool value)
@@ -200,7 +200,7 @@ void MilkyListener::listen()
                 break;
             }
             case M_SIG_WAIT: {
-                thread->sleepu(10000);
+                thread->sleepm(1000);
                 break;
             }
             default:
@@ -209,7 +209,7 @@ void MilkyListener::listen()
             }
         }
 
-        thread->sleepu();
+        thread->sleepm(10);
         milky_free_signal(signal);
     }
 

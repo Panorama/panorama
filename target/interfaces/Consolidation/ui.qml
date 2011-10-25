@@ -3,6 +3,7 @@ import Panorama.UI 1.0
 import Panorama.Milky 1.0
 import Panorama.Settings 1.0
 import Panorama.Pandora 1.0
+import Panorama.Applications 1.0
 
 PanoramaUI {
     id: ui
@@ -586,6 +587,7 @@ PanoramaUI {
         // ***************************************
         //                PACKAGES
         // ***************************************
+
 
         Rectangle {
             id: packages

@@ -92,7 +92,7 @@ public:
     MilkyListener* listener;
 
 public slots:
-    void sleepu(unsigned long usecs);
+    void sleepm(unsigned long msecs);
 
 signals:
     void ready();

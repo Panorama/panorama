@@ -15,6 +15,7 @@ MilkyListener::MilkyListener(QObject *parent) :
     PANORAMA_INITIALIZE(MilkyListener);
 
     priv->listening = false;
+    connect(this, SIGNAL(wait()), QThread::currentThread(), SLOT(sleepu));
 }
 
 MilkyListenerThread::MilkyListenerThread(QObject *parent) :
@@ -33,6 +34,11 @@ void MilkyListenerThread::run()
     listener = new MilkyListener();
     emit ready();
     exec();
+}
+
+void MilkyListenerThread::sleepu(unsigned long usecs = 10000)
+{
+    usleep(usecs);
 }
 
 void MilkyListener::answer(bool value)
@@ -192,10 +198,12 @@ void MilkyListener::listen()
                 emit copyingFile();
                 break;
             }
-            case M_SIG_WAIT:
+            case M_SIG_WAIT: {
+                break;
+            }
             default:
             {
-
+                emit wait();
                 break;
             }
         }

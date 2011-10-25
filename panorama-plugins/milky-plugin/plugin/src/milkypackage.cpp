@@ -25,7 +25,10 @@ MilkyPackage::MilkyPackage(MilkyPackage const& other) :
     currentVersion = other.currentVersion;
     installed = other.installed;
     hasUpdate = other.hasUpdate;
+    foreign = other.foreign;
     installPath = other.installPath;
+    deviceMount = other.deviceMount;
+    device = other.device;
     categories = other.categories;
     previewPics = other.previewPics;
     licenses = other.licenses;
@@ -53,7 +56,10 @@ MilkyPackage const& MilkyPackage::operator=(MilkyPackage const& other)
         currentVersion = other.currentVersion;
         installed = other.installed;
         hasUpdate = other.hasUpdate;
+        foreign = other.foreign;
         installPath = other.installPath;
+        deviceMount = other.deviceMount;
+        device = other.device;
         categories = other.categories;
         previewPics = other.previewPics;
         licenses = other.licenses;
@@ -93,7 +99,10 @@ MilkyPackage::MilkyPackage(pnd_package* p, QObject* parent) :
     setCurrentVersionType(p->version->type);
     setInstalled(p->installed);
     setHasUpdate(p->hasupdate);
+    setForeign(p->foreign);
     setInstallPath(p->install_path);
+    setDeviceMount(p->mount);
+    setDevice(p->device);
     setCategories(alpmListToQStringList(p->categories));
     setPreviewPics(alpmListToQStringList(p->previewpics));
     setLicenses(alpmListToQStringList(p->licenses));
@@ -274,9 +283,22 @@ bool MilkyPackage::getHasUpdate() const
 {
     return hasUpdate;
 }
+bool MilkyPackage::getForeign() const
+{
+    return foreign;
+}
+
 QString MilkyPackage::getInstallPath() const
 {
     return installPath;
+}
+QString MilkyPackage::getDeviceMount() const
+{
+    return deviceMount;
+}
+QString MilkyPackage::getDevice() const
+{
+    return device;
 }
 
 QStringList MilkyPackage::getCategories() const
@@ -444,10 +466,25 @@ void MilkyPackage::setHasUpdate(bool newHasUpdate)
     hasUpdate = newHasUpdate;
     emit hasUpdateChanged(hasUpdate);
 }
+void MilkyPackage::setForeign(bool newForeign)
+{
+    foreign = newForeign;
+    emit foreignChanged(foreign);
+}
 void MilkyPackage::setInstallPath(QString newInstallPath)
 {
     installPath = newInstallPath;
     emit installPathChanged(installPath);
+}
+void MilkyPackage::setDeviceMount(QString newDeviceMount)
+{
+    deviceMount = newDeviceMount;
+    emit deviceMountChanged(deviceMount);
+}
+void MilkyPackage::setDevice(QString newDevice)
+{
+    device = newDevice;
+    emit deviceChanged(device);
 }
 
 void MilkyPackage::setCategories(QStringList newCategories)

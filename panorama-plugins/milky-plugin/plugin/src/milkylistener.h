@@ -71,6 +71,8 @@ signals:
     void parsingFilename();
     void copyingFile();
 
+    void wait();
+
 public slots:
     void listen();
     void answer(bool value);
@@ -88,6 +90,9 @@ public:
 
     void run();
     MilkyListener* listener;
+
+public slots:
+    void sleepu(unsigned long usecs);
 
 signals:
     void ready();

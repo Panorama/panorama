@@ -46,3 +46,4 @@ HEADERS = \
 INCLUDEPATH += ../../../pandora-libraries/include
 INCLUDEPATH += src/lib
 INCLUDEPATH += ../libjansson/src/src
+DEFINES += DEBUG_INTERNAL_EVENT

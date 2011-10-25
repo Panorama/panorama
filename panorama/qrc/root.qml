@@ -31,10 +31,10 @@ Item {
     Component.onCompleted: runtime.setFullscreen(fullscreen.value)
 
     Keys.onPressed: {
-        if(event.key == Qt.Key_F && event.modifiers & Qt.ControlModifier) {
+        if((event.key == Qt.Key_F && event.modifiers & Qt.ControlModifier) || event.key == Qt.Key_F11) {
             event.accepted = true;
             fullscreen.value = !fullscreen.value;
-        } else if(event.key == Qt.Key_Q && event.modifiers & Qt.ControlModifier) {
+        } else if((event.key == Qt.Key_Q && event.modifiers & Qt.ControlModifier) || event.key == Qt.Key_F12) {
             event.accepted = true;
             Qt.quit();
         }

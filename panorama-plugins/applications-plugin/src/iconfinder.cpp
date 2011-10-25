@@ -9,12 +9,12 @@
 #include <QtCore/QTextStream>
 
 #ifdef Q_WS_X11
-class QIconTheme
+class IconTheme
 {
 public:
-    QIconTheme(QHash<int, QString> dirList, QStringList parents)
+    IconTheme(QHash<int, QString> dirList, QStringList parents)
         : _dirList(dirList), _parents(parents), _valid(true) {}
-    QIconTheme() : _valid(false) {}
+    IconTheme() : _valid(false) {}
     const QHash<int, QString> &dirList() const { return _dirList; }
     const QStringList &parents() const { return _parents; }
     bool isValid() const { return _valid; }
@@ -24,14 +24,14 @@ private:
     bool _valid;
 };
 
-class QtIconLoaderImplementation
+class IconLoaderImplementation
 {
 public:
-    QtIconLoaderImplementation();
+    IconLoaderImplementation();
     QString findIcon(int size, const QString &name) const;
 
 private:
-    QIconTheme parseIndexFile(const QString &themeName) const;
+    IconTheme parseIndexFile(const QString &themeName) const;
     void lookupIconTheme() const;
     QString findIconHelper(int size,
                            const QString &themeName,
@@ -39,10 +39,10 @@ private:
                            QStringList &visited) const;
     mutable QString themeName;
     mutable QStringList iconDirs;
-    mutable QHash <QString, QIconTheme> themeList;
+    mutable QHash <QString, IconTheme> themeList;
 };
 
-Q_GLOBAL_STATIC(QtIconLoaderImplementation, iconLoaderInstance);
+Q_GLOBAL_STATIC(IconLoaderImplementation, iconLoaderInstance);
 #endif
 
 QString IconFinder::findIcon(const QString &name, const QString &fallback)
@@ -68,7 +68,7 @@ QString IconFinder::findIcon(const QString &name, const QString &fallback)
 }
 
 #ifdef Q_WS_X11
-QtIconLoaderImplementation::QtIconLoaderImplementation()
+IconLoaderImplementation::IconLoaderImplementation()
 {
     lookupIconTheme();
 }
@@ -113,7 +113,7 @@ static QString kdeHome()
     return kdeHomePath;
 }
 
-void QtIconLoaderImplementation::lookupIconTheme() const
+void IconLoaderImplementation::lookupIconTheme() const
 {
 
 #ifdef Q_WS_X11
@@ -181,9 +181,9 @@ void QtIconLoaderImplementation::lookupIconTheme() const
 #endif
 }
 
-QIconTheme QtIconLoaderImplementation::parseIndexFile(const QString &themeName) const
+IconTheme IconLoaderImplementation::parseIndexFile(const QString &themeName) const
 {
-    QIconTheme theme;
+    IconTheme theme;
     QFile themeIndex;
     QStringList parents;
     QHash <int, QString> dirList;
@@ -216,18 +216,18 @@ QIconTheme QtIconLoaderImplementation::parseIndexFile(const QString &themeName) 
         parents.append(QLatin1String("hicolor"));
     }
 
-    theme = QIconTheme(dirList, parents);
+    theme = IconTheme(dirList, parents);
     return theme;
 }
 
-QString QtIconLoaderImplementation::findIconHelper(int size, const QString &themeName,
+QString IconLoaderImplementation::findIconHelper(int size, const QString &themeName,
                                                    const QString &iconName, QStringList &visited) const
 {
     QString result;
 
     if (!themeName.isEmpty()) {
         visited << themeName;
-        QIconTheme theme = themeList.value(themeName);
+        IconTheme theme = themeList.value(themeName);
 
         if (!theme.isValid()) {
             theme = parseIndexFile(themeName);
@@ -265,7 +265,7 @@ QString QtIconLoaderImplementation::findIconHelper(int size, const QString &them
     return result;
 }
 
-QString QtIconLoaderImplementation::findIcon(int size, const QString &name) const
+QString IconLoaderImplementation::findIcon(int size, const QString &name) const
 {
     QString result;
 

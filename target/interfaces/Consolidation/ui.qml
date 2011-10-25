@@ -229,7 +229,7 @@ PanoramaUI {
         } else if(ui.state == "details") {
             var item = packageList.currentItem;
             switch(event.key) {
-                case Pandora.ButtonB:
+                case Pandora.ButtonX:
                     ui.state = "browse"
                     break;
                 case Pandora.ButtonB:
@@ -240,9 +240,6 @@ PanoramaUI {
                     break;
                 case Pandora.ButtonY:
                     if(item.hasUpgrade) item.upgrade();
-                    break;
-                case Pandora.ButtonX:
-                    state = "browse";
                     break;
                 default:
                     accept = false;
@@ -593,7 +590,7 @@ PanoramaUI {
         Rectangle {
             id: packages
             anchors.left: parent.left
-            anchors.right: actionQueueContainer.left
+            anchors.right: parent.right
             anchors.top: topSeparator.bottom
             anchors.bottom: searchBox.top
             color: "#eee"
@@ -696,13 +693,14 @@ PanoramaUI {
                 }
 
                 function gotoIndex(idx, mode) {
+                    scrollAnimation.stop();
                     var from = packageList.contentY;
                     packageList.positionViewAtIndex(idx, mode);
                     var to = packageList.contentY;
                     currentIndex = idx;
                     scrollAnimation.from = from;
                     scrollAnimation.to = to;
-                    scrollAnimation.running = true;
+                    scrollAnimation.start();
                 }
 
                 PropertyAnimation { id: scrollAnimation; target: packageList; property: "contentY"; duration: 200; easing.type: Easing.OutQuad }
@@ -761,6 +759,7 @@ PanoramaUI {
                     filterChildren: true
                 }
                 onReleased: {
+                    actionQueueContainerAnimation.stop();
                     actionQueueContainerAnimation.from = drag.target.x;
                     if(drag.target.width > parent.thresholdWidth) {
                         actionQueueContainerAnimation.to = parent.xMin;
@@ -769,7 +768,7 @@ PanoramaUI {
                         actionQueueContainerAnimation.to = parent.xMax;
                         drag.target.large = false;
                     }
-                    actionQueueContainerAnimation.running = true;
+                    actionQueueContainerAnimation.start();
                 }
 
                 ActionQueue {
@@ -779,6 +778,7 @@ PanoramaUI {
 
                     onItemAdded: {
                         if(actionQueueContainer.hidden) {
+                            actionQueueContainerAnimation.stop();
                             actionQueueContainer.hidden = false;
                             actionQueueContainerAnimation.from = actionQueueContainer.xHidden;
                             if(parent.large) {
@@ -786,18 +786,19 @@ PanoramaUI {
                             } else {
                                 actionQueueContainerAnimation.to = actionQueueContainer.xMax;
                             }
-                            actionQueueContainerAnimation.running = true;
+                            actionQueueContainerAnimation.start();
                         }
                     }
 
                     onLastItemRemoved: {
+                        actionQueueContainerAnimation.stop();
                         console.log("onLastItemRemoved");
                         actionQueueContainer.hidden = true;
                         console.log("from:" + actionQueueContainer.x + ", to: " + actionQueueContainer.xHidden);
                         console.log(actionQueueContainerAnimation.running);
                         actionQueueContainerAnimation.from = actionQueueContainer.x;
                         actionQueueContainerAnimation.to = actionQueueContainer.xHidden;
-                        actionQueueContainerAnimation.running = true;
+                        actionQueueContainerAnimation.start();
                         console.log(actionQueueContainerAnimation.running);
                     }
                 }

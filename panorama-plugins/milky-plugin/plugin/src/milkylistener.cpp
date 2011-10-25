@@ -15,7 +15,6 @@ MilkyListener::MilkyListener(QObject *parent) :
     PANORAMA_INITIALIZE(MilkyListener);
 
     priv->listening = false;
-    connect(this, SIGNAL(wait()), QThread::currentThread(), SLOT(sleepu));
 }
 
 MilkyListenerThread::MilkyListenerThread(QObject *parent) :
@@ -36,7 +35,7 @@ void MilkyListenerThread::run()
     exec();
 }
 
-void MilkyListenerThread::sleepu(unsigned long usecs = 10000)
+void MilkyListenerThread::sleepu(unsigned long usecs = 100)
 {
     usleep(usecs);
 }
@@ -52,6 +51,8 @@ void MilkyListener::listen()
 
     if(priv->listening)
         return;
+
+    MilkyListenerThread* thread = qobject_cast<MilkyListenerThread*>(QThread::currentThread());
 
     priv->listening = true;
 
@@ -199,11 +200,11 @@ void MilkyListener::listen()
                 break;
             }
             case M_SIG_WAIT: {
+                thread->sleepu();
                 break;
             }
             default:
             {
-                emit wait();
                 break;
             }
         }

@@ -40,15 +40,6 @@ Rectangle {
             height: 24
         }
 
-        // Set source only once, when the list is moving slow enough. Binding loop evasion manouver.
-        /*function setSource() {
-            if(Math.abs(packageItem.ListView.view.verticalVelocity) < 500) {
-                source = icon;
-            }
-            return true;
-        }
-        property bool foo: setSource()
-        source: ""*/
         source: icon
     }
 

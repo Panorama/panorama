@@ -1,10 +1,10 @@
-[submodule "pandora-libraries"]
+[submodule "deps/pandora-libraries"]
 	path = pandora-libraries
 	url = git://github.com/bzar/pandora-libraries.git
         branch = master
-[submodule "panorama-plugins/milky-plugin/libmilky/src"]
+[submodule "deps/libmilky"]
 	path = panorama-plugins/milky-plugin/libmilky/src
 	url = git://github.com/Cloudef/milkyhelper.git
-[submodule "panorama-plugins/milky-plugin/libjansson/src"]
+[submodule "deps/libjansson"]
 	path = panorama-plugins/milky-plugin/libjansson/src
 	url = git://github.com/akheron/jansson.git

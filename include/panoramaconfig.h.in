@@ -1,0 +1,19 @@
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+#define PANORAMA_VERSION_MAJOR @PANORAMA_VERSION_MAJOR@
+#define PANORAMA_VERSION_MINOR @PANORAMA_VERSION_MINOR@
+#define PANORAMA_VERSION_PATCH @PANORAMA_VERSION_PATCH@
+
+#define PANORAMA_PREFIX "@CMAKE_INSTALL_PREFIX@"
+
+//Width of an UI:
+#define PANORAMA_UI_WIDTH 800
+
+//Height of an UI:
+#define PANORAMA_UI_HEIGHT 480
+
+//Where to store the settings file, relative to our location.
+#define PANORAMA_SETTINGS_FILE "settings.cfg"
+
+#endif // CONSTANTS_H

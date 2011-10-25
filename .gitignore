@@ -16,7 +16,7 @@ Makefile
 *.a
 moc_*
 qrc_*
-target/panorama
+build/
 
 # Ignore project-related user-generated files
 *.user

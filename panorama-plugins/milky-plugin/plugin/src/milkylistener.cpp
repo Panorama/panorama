@@ -200,7 +200,7 @@ void MilkyListener::listen()
                 break;
             }
             case M_SIG_WAIT: {
-                thread->sleepu();
+                thread->sleepu(10000);
                 break;
             }
             default:
@@ -209,6 +209,7 @@ void MilkyListener::listen()
             }
         }
 
+        thread->sleepu();
         milky_free_signal(signal);
     }
 

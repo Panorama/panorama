@@ -1,5 +1,5 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef PANORAMACONFIG_H
+#define PANORAMACONFIG_H
 
 #define PANORAMA_VERSION_MAJOR @PANORAMA_VERSION_MAJOR@
 #define PANORAMA_VERSION_MINOR @PANORAMA_VERSION_MINOR@
@@ -16,4 +16,4 @@
 //Where to store the settings file, relative to our location.
 #define PANORAMA_SETTINGS_FILE "settings.cfg"
 
-#endif // CONSTANTS_H
+#endif // PANORAMACONFIG_H

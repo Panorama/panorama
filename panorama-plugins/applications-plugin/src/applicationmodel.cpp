@@ -2,6 +2,8 @@
 
 #include "applicationfiltermethods.h"
 
+#include <QDebug>
+
 class ApplicationModelPrivate
 {
     PANORAMA_DECLARE_PUBLIC(ApplicationModel)
@@ -21,6 +23,7 @@ ApplicationModel::ApplicationModel(QObject *parent) :
     priv->roles[ApplicationModel::Icon]        = QString("icon")      .toLocal8Bit();
     priv->roles[ApplicationModel::Version]     = QString("version")   .toLocal8Bit();
     priv->roles[ApplicationModel::Categories]  = QString("categories").toLocal8Bit();
+    priv->roles[ApplicationModel::PandoraId]  = QString("pandoraId").toLocal8Bit();
 
     setRoleNames(priv->roles);
 }
@@ -32,33 +35,45 @@ ApplicationModel::~ApplicationModel()
 
 void ApplicationModel::addApp(const Application &app)
 {
+    qDebug() << "ApplicationModel::addApp";
     PANORAMA_PRIVATE(ApplicationModel);
     //Store the app
+    qDebug() << "  storing";
     priv->apps += app;
 
+    qDebug() << "  creating indices";
     //Tell the View that it has to reload the end of the list
     const QModelIndex idx1 = createIndex(priv->apps.count() - 1, 0);
     const QModelIndex idx2 = createIndex(priv->apps.count(), 0);
+    qDebug() << "  emit dataChanged";
     emit dataChanged(idx1, idx2);
+    qDebug() << "done";
 }
 
 void ApplicationModel::removeApp(const Application &app)
 {
+    qDebug() << "ApplicationModel::removeApp";
     PANORAMA_PRIVATE(ApplicationModel);
+    qDebug() << "  searching";
     for(int i = 0; i < priv->apps.count(); i++)
     {
         if(priv->apps.at(i).relatedFile == app.relatedFile)
         {
+            qDebug() << "  found";
             //Remove the app
+            qDebug() << "  removing";
             priv->apps.removeAt(i);
 
+            qDebug() << "  creating indices";
             //Tell the View that it needs to reload part of the list
             const QModelIndex idx1 = createIndex(i - 1, 0);
             const QModelIndex idx2 = createIndex(i + 1, 0);
+            qDebug() << "  emit dataChanged";
             emit dataChanged(idx1, idx2);
             break;
         }
     }
+    qDebug() << "done";
 }
 
 int ApplicationModel::rowCount(const QModelIndex &) const
@@ -91,6 +106,8 @@ QVariant ApplicationModel::data(const QModelIndex &index, int role) const
             return value.preview;
         case ApplicationModel::Clockspeed:
             return value.clockspeed;
+        case ApplicationModel::PandoraId:
+            return value.pandoraId;
         default:
             return QVariant();
         }
@@ -119,6 +136,8 @@ QVariant ApplicationModel::headerData(int, Qt::Orientation, int role) const
         return QString("Preview image");
     case ApplicationModel::Clockspeed:
         return QString("Recommended clockspeed (MHz)");
+    case ApplicationModel::PandoraId:
+        return QString("PND id");
     default:
         return QVariant();
     }

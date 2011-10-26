@@ -34,6 +34,7 @@ public:
         Categories = Qt::UserRole + 5,
         Preview = Qt::UserRole + 6,
         Clockspeed = Qt::UserRole + 7,
+        PandoraId = Qt::UserRole + 7,
     };
 
     /** Returns the number of items in this model */

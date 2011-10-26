@@ -61,10 +61,13 @@ public:
 
 public slots:
     /** An Application should be added */
-    void addApp(const Application &app);
+    void addApp(const Application &app, bool signalChange = true);
 
     /** An Application should be removed, if it exists */
-    void removeApp(const Application &app);
+    void removeApp(const Application &app, bool signalChange = true);
+
+    /** The whole application set should be considered invalid and be reloaded */
+    void invalidateData();
 };
 
 #endif // APPLICATIONMODEL_H

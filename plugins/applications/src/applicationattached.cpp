@@ -32,10 +32,12 @@ ApplicationsAttached::ApplicationsAttached(QObject *parent) :
     if(!_model)
     {
         _model = new ApplicationModel();
-        connect(_accumulator, SIGNAL(appAdded(Application)),
-                _model, SLOT(addApp(Application)));
+        connect(_accumulator, SIGNAL(appAdded(Application, bool)),
+                _model, SLOT(addApp(Application, bool)));
         connect(_accumulator, SIGNAL(appRemoved(Application)),
                 _model, SLOT(removeApp(Application)));
+        connect(_accumulator, SIGNAL(finishedInitialLoad()),
+                _model, SLOT(invalidateData()));
         //XXX Is this needed??
         connect(_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
                 this, SIGNAL(listChanged()));

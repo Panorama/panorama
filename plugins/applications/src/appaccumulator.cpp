@@ -28,7 +28,7 @@ public:
         }
     };
 
-    void addViaDesktopFile(const QString &file);
+    void addViaDesktopFile(const QString &file, bool initial = false);
     void removeViaDesktopFile(const QString &file);
     bool shouldAddThisApp(const QString &file) const;
 
@@ -55,7 +55,7 @@ AppAccumulator::~AppAccumulator()
     PANORAMA_UNINITIALIZE(AppAccumulator);
 }
 
-void AppAccumulator::loadFrom(const QStringList &searchpaths)
+void AppAccumulator::loadFrom(const QStringList &searchpaths, const bool initial)
 {
     PANORAMA_PRIVATE(AppAccumulator);
     //Scan all search paths
@@ -65,7 +65,7 @@ void AppAccumulator::loadFrom(const QStringList &searchpaths)
         foreach(const QString &file, dir.entryList(QStringList("*.desktop")))
         {
             const QString desktopFile(dir.filePath(file));
-            priv->addViaDesktopFile(desktopFile);
+            priv->addViaDesktopFile(desktopFile, initial);
 
             priv->currentFileInfos[path] +=
                     AppAccumulatorPrivate::FileInfo(file, QFileInfo(desktopFile).lastModified());
@@ -81,6 +81,8 @@ void AppAccumulator::loadFrom(const QStringList &searchpaths)
         if(subPaths.count() > 0)
             loadFrom(subPaths);
     }
+    if(initial)
+        emit finishedInitialLoad();
 
     priv->watcher.addPaths(searchpaths);
 }
@@ -172,7 +174,7 @@ bool AppAccumulatorPrivate::shouldAddThisApp(const QString &f) const
     return true;
 }
 
-void AppAccumulatorPrivate::addViaDesktopFile(const QString &f)
+void AppAccumulatorPrivate::addViaDesktopFile(const QString &f, const bool initial)
 {
     PANORAMA_PUBLIC(AppAccumulator);
     if(shouldAddThisApp(f))
@@ -186,7 +188,8 @@ void AppAccumulatorPrivate::addViaDesktopFile(const QString &f)
 
             apps[result.id] = result;
 
-            emit pub->appAdded(result);
+            // If this is the initial scan, don't emit anything.
+            emit pub->appAdded(result, !initial);
         }
     }
 }

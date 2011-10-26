@@ -30,7 +30,7 @@ ApplicationModel::~ApplicationModel()
     PANORAMA_UNINITIALIZE(ApplicationModel);
 }
 
-void ApplicationModel::addApp(const Application &app)
+void ApplicationModel::addApp(const Application &app, const bool signalChange)
 {
     PANORAMA_PRIVATE(ApplicationModel);
     //Store the app
@@ -39,10 +39,11 @@ void ApplicationModel::addApp(const Application &app)
     //Tell the View that it has to reload the end of the list
     const QModelIndex idx1 = createIndex(priv->apps.count() - 1, 0);
     const QModelIndex idx2 = createIndex(priv->apps.count(), 0);
-    emit dataChanged(idx1, idx2);
+    if(signalChange)
+        emit dataChanged(idx1, idx2);
 }
 
-void ApplicationModel::removeApp(const Application &app)
+void ApplicationModel::removeApp(const Application &app, const bool signalChange)
 {
     PANORAMA_PRIVATE(ApplicationModel);
     for(int i = 0; i < priv->apps.count(); i++)
@@ -55,11 +56,19 @@ void ApplicationModel::removeApp(const Application &app)
             //Tell the View that it needs to reload part of the list
             const QModelIndex idx1 = createIndex(i - 1, 0);
             const QModelIndex idx2 = createIndex(i + 1, 0);
-            emit dataChanged(idx1, idx2);
+            if(signalChange)
+                emit dataChanged(idx1, idx2);
             break;
         }
     }
 }
+
+void ApplicationModel::invalidateData()
+{
+    PANORAMA_PRIVATE(ApplicationModel);
+    emit dataChanged(createIndex(0, 0), createIndex(priv->apps.count(), 0));
+}
+
 
 int ApplicationModel::rowCount(const QModelIndex &) const
 {

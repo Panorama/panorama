@@ -32,14 +32,17 @@ public:
 
 public slots:
     /** Loads all .desktop files from the specified search paths (not recursive) */
-    void loadFrom(const QStringList &searchpaths);
+    void loadFrom(const QStringList &searchpaths, bool initial = true);
 
 signals:
     /** An application has been found or added to one of the search paths */
-    void appAdded(const Application &app);
+    void appAdded(const Application &app, bool signalChange);
 
     /** An application has been removed from one of the search paths */
     void appRemoved(const Application &app);
+
+    /** The initial set of applications have been loaded */
+    void finishedInitialLoad();
 
 protected slots:
     void rescanDir(const QString &dir);

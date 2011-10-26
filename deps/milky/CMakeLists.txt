@@ -46,7 +46,7 @@ SET(milky_INCLUDES src/include/milky/milky.h src/lib/alpm_list.h)
 
 INCLUDE_DIRECTORIES(src/lib/)
 INCLUDE_DIRECTORIES(${JANSSON_BINARY_DIR}/include/)
-INCLUDE_DIRECTORIES(${PND_BINARY_DIR/include/})
+INCLUDE_DIRECTORIES(${PND_BINARY_DIR}/include/)
 
 FILE(COPY ${milky_INCLUDES} DESTINATION include/milky/)
 ADD_DEFINITIONS(-fPIC)

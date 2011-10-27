@@ -44,6 +44,13 @@ PanoramaUI {
         defaultValue: ""
     }
 
+    Setting {
+        id: minimumSearchQueryLength
+        section: "Consolidation"
+        key: "minimumSearchQueryLength"
+        defaultValue: 3
+    }
+
     // Run stuff when the entire UI is loaded
     Timer {
         interval: 1
@@ -99,7 +106,7 @@ PanoramaUI {
                 var item = packageList.currentItem;
                 switch(event.key) {
                     case Qt.Key_Return:
-                        ui.state = "details"
+                        ui.setState("details")
                         break;
                     default:
                         accept = false;
@@ -112,6 +119,28 @@ PanoramaUI {
                     default:
                         accept = false;
                 }
+            } else if(ui.state == "applications") {
+                switch(event.key) {
+                    case Qt.Key_Up:
+                        applications.moveCurrentIndexUp();
+                        break;
+                    case Qt.Key_Down:
+                        applications.moveCurrentIndexDown();
+                        break;
+                    case Qt.Key_Left:
+                        applications.moveCurrentIndexLeft();
+                        break;
+                    case Qt.Key_Right:
+                        applications.moveCurrentIndexRight();
+                        break;
+                    case Qt.Key_Return:
+                        applications.executeCurrentItem();
+                        break;
+                    default:
+                        accept = false;
+                }
+            } else{
+                accept = false;
             }
 
             event.accepted = accept;
@@ -127,11 +156,10 @@ PanoramaUI {
                     item.showDetails()
                     break;
                 case Pandora.TriggerL:
-                    statusFilter.selected = (statusFilter.selected + 1) % statusFilter.filterOptions.length
-                    packageList.updateModel();
+                    modeButton.clicked(false);
                     break;
                 case Pandora.TriggerR:
-                    ui.state = "categories";
+                    ui.setState("categories");
                     break;
                 case Pandora.ButtonStart:
                     syncButton.clicked(false);
@@ -161,11 +189,10 @@ PanoramaUI {
                     categoryListOverlay.categoryList.currentItem.clicked(false);
                     break;
                 case Pandora.TriggerL:
-                    statusFilter.selected = (statusFilter.selected + 1) % statusFilter.filterOptions.length
+                    modeButton.clicked(false);
                     break;
                 case Pandora.TriggerR:
-                    ui.state = "browse";
-                    packageList.updateModel();
+                    categoryFilter.clicked(false);
                     break;
                 case Pandora.ButtonStart:
                     syncButton.clicked(false);
@@ -231,22 +258,46 @@ PanoramaUI {
             var item = packageList.currentItem;
             switch(event.key) {
                 case Pandora.ButtonX:
-                    ui.state = "browse"
+                    ui.back();
                     break;
                 case Pandora.ButtonB:
-                    if(!item.isInstalled) item.install();
+                    if(!item.isInstalled) detailDialog.install();
                     break;
                 case Pandora.ButtonA:
-                    if(item.isInstalled) item.remove();
+                    if(item.isInstalled) detailDialog.remove();
                     break;
                 case Pandora.ButtonY:
-                    if(item.hasUpgrade) item.upgrade();
+                    if(item.hasUpgrade) detailDialog.upgrade();
+                    break;
+                default:
+                    accept = false;
+            }
+        } else if(ui.state == "applications") {
+            switch(event.key) {
+
+                case Pandora.ButtonB:
+                    applications.executeCurrentItem();
+                    break;
+                case Pandora.ButtonY:
+                    applications.showCurrentItemDetails();
+                    break;
+                case Pandora.TriggerL:
+                    modeButton.clicked(false);
+                    break;
+                case Pandora.TriggerR:
+                    ui.setState("categories");
+                    break;
+                case Pandora.ButtonStart:
+                    syncButton.clicked(false);
+                    break;
+                case Pandora.ButtonSelect:
+                    if(upgradeAllButton.enabled)
+                        upgradeAllButton.clicked(false);
                     break;
                 default:
                     accept = false;
             }
         }
-
         event.accepted = accept;
     }
 
@@ -260,10 +311,10 @@ PanoramaUI {
 
         Component.onCompleted: {
             events.syncStart.connect(function() {
-                ui.state = "sync";
+                ui.setState("sync");
             });
             events.syncDone.connect(function() {
-                ui.state = "browse";
+                ui.setState("browse");
                 syncButton.updateEnabled();
             });
 
@@ -277,19 +328,23 @@ PanoramaUI {
         }
     }
 
-    function categoryHue(name) {
-        var sum = 0;
-        for(var i = 0; i < name.length; ++i) {
-            sum += name.charCodeAt(i);
-        }
-        return (sum % 256) / 256.0;
-    }
-
     // ***************************************
     //                STATES
     // ***************************************
 
-    state: "browse"
+    state: "applications"
+    property string previousState: "applications"
+
+    function setState(newState) {
+        previousState = state;
+        state = newState;
+    }
+
+    function back() {
+        var temp = state;
+        state = previousState;
+        previousState = temp;
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -328,7 +383,7 @@ PanoramaUI {
             property variant model
 
             // Restrict mouse events to children
-            MouseArea { anchors.fill: parent; onPressed: ui.state = "details" }
+            MouseArea { anchors.fill: parent; onPressed: ui.setState("details") }
 
             color: Qt.rgba(0.1,0.1,0.1,0.8)
 
@@ -384,7 +439,7 @@ PanoramaUI {
             visible: ui.state == "details"
 
             // Restrict mouse events to children
-            MouseArea { anchors.fill: parent; onPressed: ui.state = "browse" }
+            MouseArea { anchors.fill: parent; onPressed: ui.setState("browse") }
 
             color: Qt.rgba(0.1,0.1,0.1,0.8)
 
@@ -405,10 +460,10 @@ PanoramaUI {
                 }
                 onPreview: {
                     previewOverlay.model = pnd.previewPics;
-                    ui.state = "preview";
+                    ui.setState("preview");
                 }
                 onBack: {
-                    ui.state = "browse";
+                    ui.setState("browse");
                 }
             }
         }
@@ -420,8 +475,8 @@ PanoramaUI {
             z: 10
             milky: ui.milky
             installDirectorySetting: installDirectory
-            onActivate: ui.state = "install";
-            onDeactivate: ui.state = "browse";
+            onActivate: ui.setState("install");
+            onDeactivate: ui.setState("browse");
         }
 
         RemoveDialog {
@@ -430,8 +485,8 @@ PanoramaUI {
             anchors.fill: parent
             z: 10
             milky: ui.milky
-            onActivate: ui.state = "remove";
-            onDeactivate: ui.state = "browse";
+            onActivate: ui.setState("remove");
+            onDeactivate: ui.setState("browse");
         }
 
         UpgradeDialog {
@@ -440,8 +495,8 @@ PanoramaUI {
             anchors.fill: parent
             z: 10
             milky: ui.milky
-            onActivate: ui.state = "upgrade";
-            onDeactivate: ui.state = "browse";
+            onActivate: ui.setState("upgrade");
+            onDeactivate: ui.back();
         }
 
         // ***************************************
@@ -450,7 +505,7 @@ PanoramaUI {
 
         Rectangle {
             id: toolbar
-
+            z: 50
             height: 48
             anchors.left: parent.left
             anchors.right: parent.right
@@ -462,38 +517,23 @@ PanoramaUI {
                 GradientStop { position: 1.0; color: "#888" }
             }
 
-            Row {
-                id: statusFilter
-                property int selected: 0
-                property string value: filterOptions[selected].value
-                property variant filterOptions: [
-                    { "value": "notInstalled", "label": "Browse", "baseColor": "#eee", "installed": "false", "hasUpdate": ".*" },
-                    { "value": "installed", "label": "Installed", "baseColor": "#eee", "installed": "true", "hasUpdate": ".*" },
-                ]
-
-                property string label: filterOptions[selected].label
-                property string installed: filterOptions[selected].installed
-                property string hasUpdate: filterOptions[selected].hasUpdate
-
+            Button {
+                id: modeButton
+                width: 110
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                anchors.left: parent.left
-
-                Repeater {
-                    model: statusFilter.filterOptions
-                    delegate: Button {
-                        width: 110
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        color: modelData.baseColor
-                        label: modelData.label
-                        controlHint: "L"
-                        onClicked: {statusFilter.selected = index; packageList.updateModel();}
-                        pressed: statusFilter.selected == index
+                label: ui.state == "applications" ? "Install" : "Launch"
+                controlHint: "L"
+                onClicked: {
+                    if(ui.state == "applications") {
+                        ui.setState("browse");
+                        packageList.updateModel();
+                    } else {
+                        ui.setState("applications");
+                        applications.updateModel();
                     }
                 }
             }
-
             Button {
                 id: categoryFilter
                 property string value: ""
@@ -516,18 +556,22 @@ PanoramaUI {
 
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                anchors.left: statusFilter.right
+                anchors.left: modeButton.right
                 anchors.right: upgradeAllButton.left
 
-                color:  Qt.hsla(ui.categoryHue(categoryFilter.value), 0.5, 0.7, 1.0)
+                color: "#ddf"
                 label: (categoryFilter.value ? categoryFilter.value : "All") + ", " + orderTitle
                 controlHint: "R"
                 onClicked: {
                     if(ui.state != "categories") {
-                        ui.state = "categories";
+                        ui.setState("categories");
                     } else {
-                        ui.state = "browse";
-                        packageList.updateModel();
+                        ui.back();
+                        if(ui.state == "applications") {
+                            applications.updateModel()
+                        } else {
+                            packageList.updateModel()
+                        }
                     }
                 }
             }
@@ -573,6 +617,7 @@ PanoramaUI {
 
         Rectangle {
             id: topSeparator
+            z: 50
             height: 4
             anchors.left: parent.left
             anchors.right: parent.right
@@ -584,18 +629,256 @@ PanoramaUI {
 
         }
 
-        // ***************************************
-        //                PACKAGES
-        // ***************************************
-
-
-        Rectangle {
-            id: packages
+        Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: topSeparator.bottom
             anchors.bottom: searchBox.top
-            color: "#eee"
+
+            // ***************************************
+            //             APPLICATIONS
+            // ***************************************
+
+            Rectangle {
+                id: applicationsContainer
+                anchors.fill: parent
+                visible: ui.state == "applications"
+
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "#555" }
+                    GradientStop { position: 1.0; color: "#333" }
+                }
+
+                GridView {
+                    id: applications
+                    anchors.fill: parent
+
+                    property int rowSize: 8
+                    property real spacing: 8
+
+                    property int textSize: 12
+                    property int iconSize: Math.floor((cellHeight - textSize) / 16) * 16
+
+                    function updateModel() {
+                        model = filteredModel();
+                    }
+
+                    function filteredModel() {
+                        var result = Applications.list;
+
+                        if(categoryFilter.value)
+                            result = result.inCategory(categoryFilter.value)
+
+                        if(search.text)
+                            result = result.matching("title", ".*" + search.text + ".*")
+
+                        return result.sortedBy("name", true);
+                    }
+
+                    function executeCurrentItem() {
+                        console.log(applications.currentItem.ident)
+                        Applications.execute(applications.currentItem.ident);
+                    }
+
+                    function showCurrentItemDetails() {
+                        console.log("*** pndId:" + applications.currentItem.pndId);
+                        if(applications.currentItem.pndId) {
+                            detailDialog.pndId = applications.currentItem.pndId;
+                            detailDialog.application = applications.currentItem;
+                            ui.setState("details");
+                        }
+                    }
+
+                    model: []
+
+                    Component.onCompleted: updateModel();
+
+                    cellWidth: width / rowSize
+                    cellHeight: cellWidth
+
+                    cacheBuffer: height*4
+
+                    highlightFollowsCurrentItem: false
+
+                    highlight: Rectangle {
+                        x: applications.currentItem.x
+                        y: applications.currentItem.y
+                        color: "#888"
+                        radius: width/8
+                        width: applications.cellWidth
+                        height: applications.cellWidth
+                    }
+
+                    delegate: Item {
+                        property string ident: identifier
+                        property string pndId: pandoraId
+                        width: applications.cellWidth
+                        height: applications.cellHeight
+                        Item {
+                            anchors.fill: parent
+                            anchors.margins: applications.spacing / 2
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    applications.currentIndex = index;
+                                }
+                                onDoubleClicked: {
+                                    applications.executeCurrentItem();
+                                }
+                            }
+                            Image {
+                                id: iconField
+                                source: icon ? icon : "images/application-x-executable.png"
+                                height: applications.iconSize
+                                width: applications.iconSize
+                                sourceSize.width: applications.iconSize
+                                asynchronous: true
+                                smooth: false
+                                anchors.top: parent.top
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text {
+                                id: nameLabel
+
+                                width: parent.width
+
+                                text: name
+                                font.pixelSize: applications.textSize
+                                font.bold: true
+                                style: Text.Outline; styleColor: "#222"
+                                color: "#ddd"
+
+                                anchors.fill: parent
+                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignBottom
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ***************************************
+            //                PACKAGES
+            // ***************************************
+
+
+            Rectangle {
+                id: packages
+                anchors.fill: parent
+                color: "#eee"
+                visible: ui.state != "applications"
+
+                ListView {
+                    id: packageList
+                    anchors.fill: parent
+                    currentIndex: 0
+
+                    function up() {
+                        decrementCurrentIndex();
+                        positionViewAtIndex(currentIndex, ListView.Contain);
+                    }
+                    function down() {
+                        incrementCurrentIndex();
+                        positionViewAtIndex(currentIndex, ListView.Contain);
+                    }
+                    function pageUp() {
+                        gotoIndex(currentIndex < 10 ? 0 : currentIndex - 10, ListView.Beginning);
+                    }
+                    function pageDown() {
+                        if(model.numResults === undefined)
+                            return;
+                        gotoIndex(currentIndex + 10 < model.numResults() ? currentIndex + 10 : model.numResults() - 1, ListView.Beginning);
+                    }
+
+                    function updateModel() {
+                        model = filteredModel();
+                    }
+
+                    function filteredModel() {
+                        if(search.text.length > 0 && search.text.length < minimumSearchQueryLength.value)
+                            return [];
+
+                        var result = ui.milky.matching("installed", false);
+
+                        if(categoryFilter.value)
+                            result = result.inCategory(categoryFilter.value)
+
+                        if(search.text)
+                            result = result.matching("title", ".*" + search.text + ".*")
+
+                        return result.sortedBy(categoryFilter.orderProperty, categoryFilter.orderAscending).sortedBy("hasUpdate", false);
+                    }
+
+                    model: []
+
+                    Component.onCompleted: updateModel();
+
+                    cacheBuffer: 2 * height
+
+                    highlightFollowsCurrentItem: false
+                    highlight: Rectangle {
+                        z: 10
+                        y: packageList.currentItem.y
+                        height: 32
+                        width: packageList.currentItem.width
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: Qt.rgba(0.8,0.6,0.8,0.1) }
+                            GradientStop { position: 0.7; color: Qt.rgba(0.8,0.6,0.8,0.3) }
+                            GradientStop { position: 1.0; color: Qt.rgba(0.8,0.6,0.8,0.8) }
+                        }
+                    }
+
+                    delegate: PackageDelegate {
+                        onShowDetails: {
+                            detailDialog.pndId = identifier;
+                            packageList.currentIndex = index;
+                            ui.setState("details");
+                        }
+                    }
+
+
+                    section.property: categoryFilter.sectionProperty
+                    section.criteria: categoryFilter.sectionCriteria
+                    section.delegate: Rectangle {
+                        height: 32
+                        width: packageList.width
+                        z: 10
+                        color: "#555"
+
+                        Text {
+                            anchors.leftMargin: 16
+                            anchors.fill: parent
+                            text: section
+                            font.pixelSize: 24
+                            color: "#eee"
+                        }
+                    }
+
+                    function gotoIndex(idx, mode) {
+                        scrollAnimation.stop();
+                        var from = packageList.contentY;
+                        packageList.positionViewAtIndex(idx, mode);
+                        var to = packageList.contentY;
+                        currentIndex = idx;
+                        scrollAnimation.from = from;
+                        scrollAnimation.to = to;
+                        scrollAnimation.start();
+                    }
+
+                    PropertyAnimation { id: scrollAnimation; target: packageList; property: "contentY"; duration: 200; easing.type: Easing.OutQuad }
+                }
+
+                Text {
+                    visible: search.text.length > 0 && packageList.count == 0
+                    text: search.text.length < 3 ? "At least three characters required to search" : "No packages found"
+                    color: "#888"
+                    font.pixelSize: 24
+                    anchors.centerIn: parent
+                }
+
+            }
 
             FilterDialog {
                 id: categoryListOverlay
@@ -603,121 +886,9 @@ PanoramaUI {
                 anchors.fill: parent
                 visible: ui.state == "categories"
                 categoryFilter: categoryFilter
-                milky: ui.milky
+                model: ui.milky.categories
             }
-
-            ListView {
-                id: packageList
-                anchors.fill: parent
-                clip: true
-                currentIndex: 0
-
-                function up() {
-                    decrementCurrentIndex();
-                    positionViewAtIndex(currentIndex, ListView.Contain);
-                }
-                function down() {
-                    incrementCurrentIndex();
-                    positionViewAtIndex(currentIndex, ListView.Contain);
-                }
-                function pageUp() {
-                    gotoIndex(currentIndex < 10 ? 0 : currentIndex - 10, ListView.Beginning);
-                }
-                function pageDown() {
-                    if(model.numResults === undefined)
-                        return;
-                    gotoIndex(currentIndex + 10 < model.numResults() ? currentIndex + 10 : model.numResults() - 1, ListView.Beginning);
-                }
-
-                function updateModel() {
-                    model = filteredModel();
-                }
-
-                function filteredModel() {
-                    if(search.text.length > 0 && search.text.length < 3)
-                        return []
-
-                    var result = ui.milky;
-
-                    result = result.matching("installed", statusFilter.installed)
-
-                    if(categoryFilter.value)
-                        result = result.inCategory(categoryFilter.value)
-
-                    if(search.text)
-                        result = result.matching("title", ".*" + search.text + ".*")
-
-                    return result.sortedBy(categoryFilter.orderProperty, categoryFilter.orderAscending).sortedBy("hasUpdate", false);
-                }
-
-                model: []
-
-                Component.onCompleted: updateModel();
-
-                cacheBuffer: 2 * height
-
-                highlightFollowsCurrentItem: false
-                highlight: Rectangle {
-                    z: 10
-                    y: packageList.currentItem.y
-                    height: 32
-                    width: packageList.currentItem.width
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: Qt.rgba(0.8,0.6,0.8,0.1) }
-                        GradientStop { position: 0.7; color: Qt.rgba(0.8,0.6,0.8,0.3) }
-                        GradientStop { position: 1.0; color: Qt.rgba(0.8,0.6,0.8,0.8) }
-                    }
-                }
-
-                delegate: PackageDelegate {
-                    onShowDetails: {
-                        detailDialog.pndId = identifier;
-                        ui.state = "details";
-                    }
-                }
-
-
-                section.property: categoryFilter.sectionProperty
-                section.criteria: categoryFilter.sectionCriteria
-                section.delegate: Rectangle {
-                    height: 32
-                    width: packageList.width
-                    z: 10
-                    color: "#555"
-
-                    Text {
-                        anchors.leftMargin: 16
-                        anchors.fill: parent
-                        text: section
-                        font.pixelSize: 24
-                        color: "#eee"
-                    }
-                }
-
-                function gotoIndex(idx, mode) {
-                    scrollAnimation.stop();
-                    var from = packageList.contentY;
-                    packageList.positionViewAtIndex(idx, mode);
-                    var to = packageList.contentY;
-                    currentIndex = idx;
-                    scrollAnimation.from = from;
-                    scrollAnimation.to = to;
-                    scrollAnimation.start();
-                }
-
-                PropertyAnimation { id: scrollAnimation; target: packageList; property: "contentY"; duration: 200; easing.type: Easing.OutQuad }
-            }
-
-            Text {
-                visible: search.text.length > 0 && packageList.count == 0
-                text: search.text.length < 3 ? "At least three characters required to search" : "No packages found"
-                color: "#888"
-                font.pixelSize: 24
-                anchors.centerIn: parent
-            }
-
         }
-
         // ***************************************
         //             ACTION QUEUE
         // ***************************************
@@ -734,6 +905,7 @@ PanoramaUI {
             property bool hidden: true
             property bool large: true
 
+            z: 50
             x: xHidden
 
             //anchors.right: parent.right
@@ -783,7 +955,7 @@ PanoramaUI {
                             actionQueueContainerAnimation.stop();
                             actionQueueContainer.hidden = false;
                             actionQueueContainerAnimation.from = actionQueueContainer.xHidden;
-                            if(parent.large) {
+                            if(actionQueueContainer.large) {
                                 actionQueueContainerAnimation.to = actionQueueContainer.xMin;
                             } else {
                                 actionQueueContainerAnimation.to = actionQueueContainer.xMax;
@@ -815,6 +987,7 @@ PanoramaUI {
 
         Rectangle {
             id: searchBox
+            z: 50
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: bottomSeparator.top
@@ -822,14 +995,20 @@ PanoramaUI {
             color: "#fff"
             border.width: 2
             border.color: "#111"
-            enabled: ui.state == "browse"
+            //enabled: ui.state == "browse"
 
             TextInput {
                 id: search
                 anchors.fill: parent
                 anchors.leftMargin: 4
                 font.pixelSize: 24
-                onTextChanged: packageList.updateModel()
+                onTextChanged: {
+                    if(ui.state == "applications") {
+                        applications.updateModel()
+                    } else {
+                        packageList.updateModel()
+                    }
+                }
             }
         }
 
@@ -839,6 +1018,7 @@ PanoramaUI {
 
         Rectangle {
             id: bottomSeparator
+            z: 50
             height: 4
             anchors.left: parent.left
             anchors.right: parent.right
@@ -853,6 +1033,7 @@ PanoramaUI {
         Rectangle {
             id: statusContainer
 
+            z: 50
             height: 48
             anchors.left: parent.left
             anchors.right: parent.right

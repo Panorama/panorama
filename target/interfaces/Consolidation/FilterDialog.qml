@@ -3,8 +3,8 @@ import Qt 4.7
 Rectangle {
     id: dialog
     property QtObject categoryFilter
-    property QtObject milky
     property alias categoryList: categoryList
+    property alias model: categoryList.model
 
     color: Qt.rgba(0.1,0.1,0.1,0.8)
 
@@ -44,7 +44,6 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        model: dialog.milky.categories
         clip: true
         cellWidth: width / 4
         cellHeight: 48
@@ -73,9 +72,9 @@ Rectangle {
                 color: "#ccc"
                 width: 2
             }
-            textColor: "#eee"
+            //textColor: "#223"
             font.pixelSize: 18
-            color: Qt.hsla(ui.categoryHue(edit), 0.5, 0.7, 1.0);
+            color: "#ddf"
             radius: 4
             label: edit ? edit : "All"
             pressed: categoryFilter.value == edit

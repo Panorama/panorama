@@ -6,7 +6,8 @@ Rectangle {
     clip: true
     property QtObject milky
     property string pndId
-    property QtObject pnd: pndId ? milky.getPackage(pndId) : null
+    property QtObject pnd: pndId ? milky.getPackage(pndId) : application
+    property QtObject application: null
 
     color: "white"
 
@@ -25,6 +26,7 @@ Rectangle {
         id: detailsContent
 
         Item {
+            Component.onCompleted: console.log(pndId)
             MouseArea { anchors.fill: parent; onPressed: mouse.accepted = true; }
 
             Flickable {

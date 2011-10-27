@@ -85,28 +85,19 @@ PanoramaUI {
         Keys.onPressed: {
             var accept = true;
             if(ui.state == "browse") {
-                var item = packageList.currentItem;
+                var item = packages.currentItem;
                 switch(event.key) {
                     case Qt.Key_Up:
-                        packageList.up();
+                        packages.up();
                         break;
                     case Qt.Key_Down:
-                        packageList.down();
+                        packages.down();
                         break;
                     case Qt.Key_Left:
-                        packageList.pageUp();
+                        packages.pageUp();
                         break;
                     case Qt.Key_Right:
-                        packageList.pageDown();
-                        break;
-                    default:
-                        accept = false;
-                }
-            } else if(ui.state == "preview") {
-                var item = packageList.currentItem;
-                switch(event.key) {
-                    case Qt.Key_Return:
-                        ui.setState("details")
+                        packages.pageDown();
                         break;
                     default:
                         accept = false;
@@ -150,7 +141,7 @@ PanoramaUI {
     Pandora.onPressed: {
         var accept = true;
         if(ui.state == "browse") {
-            var item = packageList.currentItem;
+            var item = packages.currentItem;
             switch(event.key) {
                 case Pandora.ButtonB:
                     item.showDetails()
@@ -165,8 +156,7 @@ PanoramaUI {
                     syncButton.clicked(false);
                     break;
                 case Pandora.ButtonSelect:
-                    if(upgradeAllButton.enabled)
-                        upgradeAllButton.clicked(false);
+                    upgradeAllButton.clicked(false);
                     break;
                 default:
                     accept = false;
@@ -198,8 +188,7 @@ PanoramaUI {
                     syncButton.clicked(false);
                     break;
                 case Pandora.ButtonSelect:
-                    if(upgradeAllButton.enabled)
-                        upgradeAllButton.clicked(false);
+                    upgradeAllButton.clicked(false);
                     break;
                 case Pandora.ButtonY:
                     categoryFilter.nextOrder();
@@ -240,34 +229,28 @@ PanoramaUI {
                 default:
                     accept = false;
             }
-        } else if(ui.state == "preview") {
+        } else if(ui.state == "details") {
             switch(event.key) {
                 case Pandora.DPadLeft:
-                    previewList.decrementCurrentIndex();
+                    detailDialog.previousPreview();
                     break;
                 case Pandora.DPadRight:
-                    previewList.incrementCurrentIndex();
+                    detailDialog.nextPreview();
                     break;
                 case Pandora.ButtonX:
-                    state = "details";
-                    break;
-                default:
-                    accept = false;
-            }
-        } else if(ui.state == "details") {
-            var item = packageList.currentItem;
-            switch(event.key) {
-                case Pandora.ButtonX:
-                    ui.back();
+                    detailDialog.back();
                     break;
                 case Pandora.ButtonB:
-                    if(!item.isInstalled) detailDialog.install();
+                    if(detailDialog.info.installed)
+                        detailDialog.execute();
+                    else
+                        detailDialog.install();
                     break;
                 case Pandora.ButtonA:
-                    if(item.isInstalled) detailDialog.remove();
+                    detailDialog.remove();
                     break;
                 case Pandora.ButtonY:
-                    if(item.hasUpgrade) detailDialog.upgrade();
+                    detailDialog.upgrade();
                     break;
                 default:
                     accept = false;
@@ -291,8 +274,7 @@ PanoramaUI {
                     syncButton.clicked(false);
                     break;
                 case Pandora.ButtonSelect:
-                    if(upgradeAllButton.enabled)
-                        upgradeAllButton.clicked(false);
+                    upgradeAllButton.clicked(false);
                     break;
                 default:
                     accept = false;
@@ -373,101 +355,6 @@ PanoramaUI {
             }
         }
 
-
-        Rectangle {
-            id: previewOverlay
-            anchors.fill: parent
-            z: 10
-            visible: ui.state == "preview"
-
-            property variant model
-
-            // Restrict mouse events to children
-            MouseArea { anchors.fill: parent; onPressed: ui.setState("details") }
-
-            color: Qt.rgba(0.1,0.1,0.1,0.8)
-
-            ListView {
-                id: previewList
-                property int previewSize: 500
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: 2*parent.height/3
-
-                orientation: ListView.Horizontal
-                snapMode: ListView.SnapToItem
-                flickDeceleration: 2500
-
-                preferredHighlightBegin: width/2 - previewSize/2
-                preferredHighlightEnd: width/2 + previewSize/2
-                highlightRangeMode: ListView.StrictlyEnforceRange
-
-                cacheBuffer: width*4
-                spacing: 16
-                boundsBehavior: ListView.DragOverBounds
-
-                model: parent.model
-
-                delegate: Rectangle {
-                    color: image.status == Image.Ready ? "#00000000" : "#eee"
-                    height: image.status == Image.Ready ? image.height : previewList.height
-                    width: previewList.previewSize
-                    Behavior on height { NumberAnimation { duration: 500 } }
-
-                    Text {
-                        anchors.centerIn: parent
-                        visible: image.status != Image.Ready
-                        text: parseInt(image.progress * 100) + "%"
-                        font.pixelSize: 24
-                    }
-
-                    Image {
-                        id: image
-                        source: modelData
-                        width: previewList.previewSize
-                        fillMode: Image.PreserveAspectFit
-                    }
-                }
-            }
-        }
-
-        Rectangle {
-            id: detailOverlay
-            anchors.fill: parent
-            z: 10
-            visible: ui.state == "details"
-
-            // Restrict mouse events to children
-            MouseArea { anchors.fill: parent; onPressed: ui.setState("browse") }
-
-            color: Qt.rgba(0.1,0.1,0.1,0.8)
-
-            PackageDetails {
-                id: detailDialog
-                anchors.fill: parent
-                anchors.margins: 64
-                milky: ui.milky
-
-                onInstall: {
-                    installDialog.install(pnd.id, pnd.title);
-                }
-                onRemove: {
-                    removeDialog.remove(pnd.id, pnd.title);
-                }
-                onUpgrade: {
-                    upgradeDialog.upgrade(pnd.id, pnd.title);
-                }
-                onPreview: {
-                    previewOverlay.model = pnd.previewPics;
-                    ui.setState("preview");
-                }
-                onBack: {
-                    ui.setState("browse");
-                }
-            }
-        }
-
         InstallDialog {
             id: installDialog
             visible: active
@@ -503,19 +390,13 @@ PanoramaUI {
         //                TOOLBAR
         // ***************************************
 
-        Rectangle {
+        Item {
             id: toolbar
             z: 50
             height: 48
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: "#ddd" }
-                GradientStop { position: 0.8; color: "#aaa" }
-                GradientStop { position: 1.0; color: "#888" }
-            }
 
             Button {
                 id: modeButton
@@ -527,9 +408,13 @@ PanoramaUI {
                 onClicked: {
                     if(ui.state == "applications") {
                         ui.setState("browse");
-                        packageList.updateModel();
+                        packagesContainer.visible = true;
+                        applicationsContainer.visible = false;
+                        packages.updateModel();
                     } else {
                         ui.setState("applications");
+                        packagesContainer.visible = false;
+                        applicationsContainer.visible = true;
                         applications.updateModel();
                     }
                 }
@@ -570,7 +455,7 @@ PanoramaUI {
                         if(ui.state == "applications") {
                             applications.updateModel()
                         } else {
-                            packageList.updateModel()
+                            packages.updateModel()
                         }
                     }
                 }
@@ -586,7 +471,7 @@ PanoramaUI {
                 enabled: milky.hasUpgrades
                 label: enabled ? "Upgrade all" : "No upgrades"
                 controlHint: enabled ? "Sl" : ""
-                onClicked: upgradeDialog.upgradeAll();
+                onClicked: if(enabled) upgradeDialog.upgradeAll();
             }
 
             Button {
@@ -598,7 +483,7 @@ PanoramaUI {
                 color: enabled ? "#bbf" : "#888"
                 label: enabled ? "Synchronize" : "Up to date"
                 controlHint: enabled ? "St" : ""
-                onClicked: ui.milky.syncWithRepository();
+                onClicked: if(enabled) ui.milky.syncWithRepository();
 
                 function updateEnabled() {
                     var updated = ui.milky.repositoryUpdated();
@@ -642,7 +527,6 @@ PanoramaUI {
             Rectangle {
                 id: applicationsContainer
                 anchors.fill: parent
-                visible: ui.state == "applications"
 
                 gradient: Gradient {
                     GradientStop { position: 0.0; color: "#555" }
@@ -681,7 +565,6 @@ PanoramaUI {
                     }
 
                     function showCurrentItemDetails() {
-                        console.log("*** pndId:" + applications.currentItem.pndId);
                         if(applications.currentItem.pndId) {
                             detailDialog.pndId = applications.currentItem.pndId;
                             detailDialog.application = applications.currentItem;
@@ -712,6 +595,8 @@ PanoramaUI {
                     delegate: Item {
                         property string ident: identifier
                         property string pndId: pandoraId
+                        property string version: version
+                        property string description: comment
                         width: applications.cellWidth
                         height: applications.cellHeight
                         Item {
@@ -765,13 +650,13 @@ PanoramaUI {
 
 
             Rectangle {
-                id: packages
+                id: packagesContainer
                 anchors.fill: parent
                 color: "#eee"
-                visible: ui.state != "applications"
+                visible: false
 
                 ListView {
-                    id: packageList
+                    id: packages
                     anchors.fill: parent
                     currentIndex: 0
 
@@ -820,9 +705,9 @@ PanoramaUI {
                     highlightFollowsCurrentItem: false
                     highlight: Rectangle {
                         z: 10
-                        y: packageList.currentItem.y
+                        y: packages.currentItem.y
                         height: 32
-                        width: packageList.currentItem.width
+                        width: packages.currentItem.width
                         gradient: Gradient {
                             GradientStop { position: 0.0; color: Qt.rgba(0.8,0.6,0.8,0.1) }
                             GradientStop { position: 0.7; color: Qt.rgba(0.8,0.6,0.8,0.3) }
@@ -833,7 +718,7 @@ PanoramaUI {
                     delegate: PackageDelegate {
                         onShowDetails: {
                             detailDialog.pndId = identifier;
-                            packageList.currentIndex = index;
+                            packages.currentIndex = index;
                             ui.setState("details");
                         }
                     }
@@ -843,7 +728,7 @@ PanoramaUI {
                     section.criteria: categoryFilter.sectionCriteria
                     section.delegate: Rectangle {
                         height: 32
-                        width: packageList.width
+                        width: packages.width
                         z: 10
                         color: "#555"
 
@@ -858,20 +743,20 @@ PanoramaUI {
 
                     function gotoIndex(idx, mode) {
                         scrollAnimation.stop();
-                        var from = packageList.contentY;
-                        packageList.positionViewAtIndex(idx, mode);
-                        var to = packageList.contentY;
+                        var from = packages.contentY;
+                        packages.positionViewAtIndex(idx, mode);
+                        var to = packages.contentY;
                         currentIndex = idx;
                         scrollAnimation.from = from;
                         scrollAnimation.to = to;
                         scrollAnimation.start();
                     }
 
-                    PropertyAnimation { id: scrollAnimation; target: packageList; property: "contentY"; duration: 200; easing.type: Easing.OutQuad }
+                    PropertyAnimation { id: scrollAnimation; target: packages; property: "contentY"; duration: 200; easing.type: Easing.OutQuad }
                 }
 
                 Text {
-                    visible: search.text.length > 0 && packageList.count == 0
+                    visible: search.text.length > 0 && packages.count == 0
                     text: search.text.length < 3 ? "At least three characters required to search" : "No packages found"
                     color: "#888"
                     font.pixelSize: 24
@@ -887,6 +772,34 @@ PanoramaUI {
                 visible: ui.state == "categories"
                 categoryFilter: categoryFilter
                 model: ui.milky.categories
+            }
+
+
+            PackageDetails {
+                z: 10
+                id: detailDialog
+                anchors.fill: parent
+                visible: ui.state == "details"
+                milky: ui.milky
+
+                onInstall: {
+                    if(pndId && !pnd.installed)
+                        installDialog.install(pnd.id, pnd.title);
+                }
+                onRemove: {
+                    if(pndId && pnd.installed)
+                        removeDialog.remove(pnd.id, pnd.title);
+                }
+                onUpgrade: {
+                    if(pndId && pnd.hasUpdate)
+                        upgradeDialog.upgrade(pnd.id, pnd.title);
+                }
+                onDeactivate: {
+                    ui.back();
+                }
+                onExecute: {
+                    Applications.execute(application.ident);
+                }
             }
         }
         // ***************************************
@@ -1006,7 +919,7 @@ PanoramaUI {
                     if(ui.state == "applications") {
                         applications.updateModel()
                     } else {
-                        packageList.updateModel()
+                        packages.updateModel()
                     }
                 }
             }

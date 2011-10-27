@@ -5,21 +5,79 @@ Rectangle {
 
     clip: true
     property QtObject milky
-    property string pndId
-    property QtObject pnd: pndId ? milky.getPackage(pndId) : application
+    property string pndId: ""
+    property QtObject pnd: milky.getPackage(pndId)
     property QtObject application: null
+    property variant info: gatherInfo()
+    state: "details"
+    function gatherInfo() {
+        var info = {}
+        if(pnd !== null) {
+            info.isPnd = true;
+            info.size = pnd.sizeString;
+            info.description = pnd.description ? pnd.description : "(no description)";
+            info.currentVersion = [pnd.currentVersionMajor, pnd.currentVersionMinor, pnd.currentVersionRelease, pnd.currentVersionBuild].join(".");
+            info.installedVersion = [pnd.installedVersionMajor, pnd.installedVersionMinor, pnd.installedVersionRelease, pnd.installedVersionBuild].join(".");
+            info.lastUpdated = pnd.lastUpdatedString;
+            info.previewPics = pnd.previewPics;
+            info.installed = pnd.installed;
+            info.hasUpdate = pnd.hasUpdate;
+        } else if(application !== null) {
+            info.isPnd = false;
+            info.size = "-";
+            info.description = application.description ? application.description : "(no description)";
+            info.currentVersion = "-";
+            info.installedVersion = application.version;
+            info.lastUpdated = "-";
+            info.previewPics = [];
+            info.installed = true;
+            info.hasUpdate = false;
+        } else {
+            console.log("*** PND: " + pnd + ", APPLICATION: " + application)
+            info = null;
+        }
+
+        return info;
+    }
 
     color: "white"
 
     signal install();
     signal remove();
     signal upgrade();
-    signal preview();
     signal back();
+    signal deactivate();
+    signal execute();
+
+    onDeactivate: {
+        pndId = "";
+        application = null;
+        state = "details";
+    }
+
+    onBack: {
+        if(state == "previews") {
+            state = "details";
+        } else {
+            deactivate();
+        }
+    }
+
+    signal nextPreview();
+    signal previousPreview();
 
     Loader {
+        function pickComponent() {
+            if(packageDetails.info !== null && packageDetails.state == "details")
+                return detailsContent;
+            else if(packageDetails.info !== null && packageDetails.state == "previews")
+                return previewComponent;
+            else
+                return null;
+        }
+
         anchors.fill: parent
-        sourceComponent: pnd ? detailsContent : null
+        sourceComponent: pickComponent()
     }
 
     Component {
@@ -47,7 +105,7 @@ Rectangle {
                     anchors.top: parent.top
                     width: descriptionContainer.width
 
-                    text: pnd.description
+                    text: info.description
                     color: "#222"
                     font.pixelSize: 16
                     wrapMode: Text.WordWrap
@@ -66,20 +124,20 @@ Rectangle {
                     spacing: 16
                     Text {
                         id: sizeText
-                        text: "Size: " + pnd.sizeString
+                        text: "Size: " + info.size
                     }
                     Text {
                         id: versionText
-                        text: "Current version: " + [pnd.currentVersionMajor, pnd.currentVersionMinor, pnd.currentVersionRelease, pnd.currentVersionBuild].join(".");
+                        text: "Current version: " + info.currentVersion;
                     }
                     Text {
                         id: installedVersionText
-                        text: "Installed version: " + [pnd.installedVersionMajor, pnd.installedVersionMinor, pnd.installedVersionRelease, pnd.installedVersionBuild].join(".");
-                        visible: pnd.installed
+                        text: "Installed version: " + info.installedVersion;
+                        visible: info.installed
                     }
                     Text {
                         id: lastUpdatedText
-                        text: "Last updated: " + pnd.lastUpdatedString
+                        text: "Last updated: " + info.lastUpdated
                     }
                 }
             }
@@ -98,10 +156,10 @@ Rectangle {
                     height: width
 
                     function selectImage() {
-                        if(pnd.previewPics.length == 0) {
+                        if(info.previewPics.length == 0) {
                             return ""
                         } else {
-                            return pnd.previewPics[0]
+                            return info.previewPics[0]
                         }
                     }
 
@@ -111,7 +169,7 @@ Rectangle {
                     MouseArea {
                         enabled: image.source != ""
                         anchors.fill: parent
-                        onClicked: packageDetails.preview()
+                        onClicked: packageDetails.state = "previews"
                     }
 
                     Text {
@@ -129,15 +187,28 @@ Rectangle {
                     anchors.right: parent.right
 
                     Button {
+                        id: runButton
+                        height: 32
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        visible: info.installed
+                        color: "#dfd"
+                        label: "Run"
+                        controlHint: "B"
+                        enabled: info.installed
+                        onClicked: packageDetails.execute()
+                    }
+
+                    Button {
                         id: installButton
                         height: 32
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        visible: !pnd.installed
-                        color: pnd.installed ? "#ccc" : "#cec"
+                        visible: !info.installed
+                        color: info.installed ? "#ccc" : "#cec"
                         label: "Install"
                         controlHint: "B"
-                        enabled: !pnd.installed
+                        enabled: !info.installed
                         onClicked: packageDetails.install()
                     }
 
@@ -146,11 +217,11 @@ Rectangle {
                         height: 32
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        visible: pnd.installed
-                        color: pnd.hasUpdate ? "#cce" :  "#ccc"
+                        visible: info.isPnd && info.installed
+                        color: info.hasUpdate ? "#cce" :  "#ccc"
                         label: "Upgrade"
                         controlHint: "Y"
-                        enabled: pnd.hasUpdate
+                        enabled: info.hasUpdate
                         onClicked: packageDetails.upgrade()
                     }
 
@@ -159,11 +230,11 @@ Rectangle {
                         height: 32
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        visible: pnd.installed
-                        color: pnd.installed ? "#ecc" :  "#ccc"
+                        visible: info.isPnd && info.installed
+                        color: info.installed ? "#ecc" :  "#ccc"
                         label: "Remove"
                         controlHint: "A"
-                        enabled: pnd.installed
+                        enabled: info.installed
                         onClicked: packageDetails.remove()
                     }
                     Button {
@@ -176,7 +247,68 @@ Rectangle {
                         label: "Back"
                         controlHint: "X"
                         enabled: true
-                        onClicked: packageDetails.back()
+                        onClicked: packageDetails.deactivate()
+                    }
+                }
+            }
+
+
+
+        }
+    }
+
+    Component {
+        id: previewComponent
+        Rectangle {
+            color: "#444"
+
+            ListView {
+                id: previewList
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: parent.height * 0.9
+
+                Component.onCompleted: {
+                    packageDetails.nextPreview.connect(function() {
+                       incrementCurrentIndex();
+                    });
+                    packageDetails.previousPreview.connect(function() {
+                       decrementCurrentIndex();
+                    });
+                }
+
+                orientation: ListView.Horizontal
+                snapMode: ListView.SnapToItem
+                flickDeceleration: 2500
+
+                preferredHighlightBegin: width/2 - currentItem.width/2
+                preferredHighlightEnd: width/2 + currentItem.width/2
+                highlightRangeMode: ListView.StrictlyEnforceRange
+
+                cacheBuffer: width*4
+                spacing: 16
+                boundsBehavior: ListView.DragOverBounds
+
+                model: packageDetails.info.previewPics
+
+                delegate: Rectangle {
+                    color: image.status == Image.Ready ? "#00000000" : "#eee"
+                    height: previewList.height
+                    width: image.status == Image.Ready ? image.width : height
+
+                    Text {
+                        anchors.centerIn: parent
+                        visible: image.status != Image.Ready
+                        text: parseInt(image.progress * 100) + "%"
+                        font.pixelSize: 24
+                    }
+
+                    Image {
+                        id: image
+                        source: modelData
+                        height: parent.height
+                        fillMode: Image.PreserveAspectFit
                     }
                 }
             }

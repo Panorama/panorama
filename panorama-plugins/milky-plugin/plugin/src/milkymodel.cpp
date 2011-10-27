@@ -160,7 +160,7 @@ MilkyPackage* MilkyModel::getPackage(QString pndId)
         }
     }
 
-    return new MilkyPackage();
+    return 0;
 }
 
 QString MilkyModel::getConfigFile()

@@ -20,15 +20,15 @@ Item {
         id: fullscreen
         section: "panorama"
         key: "fullscreen"
-        defaultValue: "false"
-        onValueChanged: runtime.setFullscreen(value == "true")
+        defaultValue: false
+        onValueChanged: runtime.setFullscreen(value)
     }
     Setting {
         id: dataDirectory
         section: "panorama"
         key: "dataDirectory"
     }
-    Component.onCompleted: runtime.setFullscreen(fullscreen.value == "true")
+    Component.onCompleted: runtime.setFullscreen(fullscreen.value)
 
     Keys.onPressed: {
         if((event.key == Qt.Key_F && event.modifiers & Qt.ControlModifier) || event.key == Qt.Key_F11) {

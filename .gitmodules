@@ -1,7 +1,7 @@
 [submodule "pandora-libraries"]
     path = deps/pnd/src
-    url = git://git.openpandora.org/pandora-libraries.git
-    branch = master
+    url = git://github.com/Panorama/pandora-libraries.git
+    branch = develop
 [submodule "milkyhelper"]
     path = deps/milky/src
     url = git://github.com/Cloudef/milkyhelper.git

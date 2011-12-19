@@ -41,7 +41,11 @@ ListView {
             downloading = true;
         });
         milky.installQueued.connect(function(pnd, jobId) {
-            model.append({title: pnd.title, progress: 0, jobId: jobId});
+            model.append({title: pnd.title, progress: 0, jobId: jobId, isUpgrade: false});
+            itemAdded();
+        });
+        milky.upgradeQueued.connect(function(pnd, jobId) {
+            model.append({title: pnd.title, progress: 0, jobId: jobId, isUpgrade: true});
             itemAdded();
         });
         milky.events.downloadFinished.connect(function() {
@@ -51,6 +55,15 @@ ListView {
                 removeItem(0);
             }
         });
+
+        milky.events.upgradeCheck.connect(function() {
+            milky.answer(true);
+        });
+
+        milky.events.installCheck.connect(function() {
+            milky.answer(true);
+        });
+
     }
 
     delegate: width > 128 ? actionDelegate : smallActionDelegate
@@ -105,8 +118,8 @@ ListView {
                         radius: 6
                         smooth: true
                         gradient: Gradient {
-                            GradientStop { position: 0; color: Qt.rgba(0.5+(1.0-value)*0.5, 0.5+value*0.5, 0.5, 1.0) }
-                            GradientStop { position: 1; color: Qt.rgba(0.5+(1.0-value)*0.8*0.5, 0.5+value*0.8*0.5, 0.5, 1.0) }
+                            GradientStop { position: 0; color: Qt.rgba(0.5+(1.0-value)*0.5, isUpgrade ? 0.5 : 0.5+value*0.5, !isUpgrade ? 0.5 : 0.5+value*0.5, 1.0) }
+                            GradientStop { position: 1; color: Qt.rgba(0.5+(1.0-value)*0.8*0.5, isUpgrade ? 0.5 : 0.5+value*0.8*0.5, !isUpgrade ? 0.5 : 0.5+value*0.8*0.5, 1.0) }
                         }
                     }
                 }

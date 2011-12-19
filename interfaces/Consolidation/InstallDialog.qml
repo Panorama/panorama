@@ -46,10 +46,6 @@ Rectangle {
                 dialog.deactivate();
             }
         });
-
-        milky.events.installCheck.connect(function() {
-            dialog.milky.answer(true);
-        });
     }
 
     Loader {

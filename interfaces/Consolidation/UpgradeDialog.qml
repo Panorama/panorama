@@ -7,6 +7,8 @@ Rectangle {
 
     signal activate()
     signal deactivate()
+    signal yes()
+    signal no()
 
     onActivate: active = true
     onDeactivate: active = false
@@ -21,23 +23,11 @@ Rectangle {
         activate();
     }
 
-    function yes() {
-        if(state == "verify") {
-            milky.upgrade();
-        }
-    }
-
-    function no() {
-        if(state == "verify") {
-            deactivate();
-            milky.clearTargets();
-        }
-    }
-
     color: Qt.rgba(0.1,0.1,0.1,0.8)
 
     Loader {
         sourceComponent: dialog.active ? dialogContent : null
+        anchors.fill: parent
     }
 
     Component {
@@ -51,68 +41,29 @@ Rectangle {
 
 
             Component.onCompleted: {
-                activate.connect(function() {
-                    var targets = milky.getTargetPackages();
-                    if(targets.length > 0) {
-                        upgradeVerify.upgradedPackages = targets;
-                        state = "verify";
-                    } else {
-                        milky.clearTargets();
+                var targets = milky.getTargetPackages();
+                if(targets.length > 0) {
+                    upgradeVerify.upgradedPackages = targets;
+                    state = "verify";
+                } else {
+                    milky.clearTargets();
+                    dialog.deactivate();
+                }
+
+                dialog.yes.connect(function() {
+                    if(state == "verify") {
+                        dialog.milky.upgrade();
                         dialog.deactivate();
                     }
-
                 });
 
-                milky.events.upgradeCheck.connect(function() {
-                    dialog.milky.answer(true);
+                dialog.no.connect(function() {
+                    if(state == "verify") {
+                        deactivate();
+                        dialog.milky.clearTargets();
+                    }
                 });
-                milky.events.downloadStarted.connect(function(pndId) {
-                    upgradeDownload.pnd = milky.getPackage(pndId);
-                    state = "download";
-                });
-                milky.events.downloadFinished.connect(function() {
-                    state = "apply";
-                });
-                milky.events.upgradeDone.connect(function() {
-                    state = "done";
-                });
-
             }
-
-            states: [
-                State {
-                    name: "verify"
-                    PropertyChanges { target: upgradeVerify; opacity: 1.0 }
-                    PropertyChanges { target: upgradeApply; opacity: 0.0 }
-                    PropertyChanges { target: upgradeDownload; opacity: 0.0 }
-                    PropertyChanges { target: upgradeDone; opacity: 0.0 }
-                    PropertyChanges { target: upgradeDownload; progress: 0 }
-
-                },
-                State {
-                    name: "download"
-                    PropertyChanges { target: upgradeVerify; opacity: 0.0 }
-                    PropertyChanges { target: upgradeApply; opacity: 0.0 }
-                    PropertyChanges { target: upgradeDownload; opacity: 1.0 }
-                    PropertyChanges { target: upgradeDone; opacity: 0.0 }
-                },
-                State {
-                    name: "apply"
-                    PropertyChanges { target: upgradeVerify; opacity: 0.0 }
-                    PropertyChanges { target: upgradeDownload; opacity: 0.0 }
-                    PropertyChanges { target: upgradeApply; opacity: 1.0 }
-                    PropertyChanges { target: upgradeDone; opacity: 0.0 }
-                },
-                State {
-                    name: "done"
-                    PropertyChanges { target: upgradeVerify; opacity: 0.0 }
-                    PropertyChanges { target: upgradeDownload; opacity: 0.0 }
-                    PropertyChanges { target: upgradeApply; opacity: 0.0 }
-                    PropertyChanges { target: upgradeDone; opacity: 1.0 }
-                }
-            ]
-
-            state: "verify"
 
             Item {
                 id: upgradeVerify
@@ -182,123 +133,6 @@ Rectangle {
                     text: modelData.title
                     color: "#eee"
                     font.pixelSize: 14
-                }
-            }
-
-            Item {
-                id: upgradeDownload
-                property variant pnd: {}
-                property int progress: 0
-                anchors.centerIn: parent
-                height: childrenRect.height
-
-                Timer {
-                    running: dialog.state == "download"
-                    interval: 100
-                    repeat: true
-                    onTriggered: {
-                        if(milky.bytesToDownload) {
-                            upgradeDownload.progress = parseInt(100.0 * milky.bytesDownloaded / milky.bytesToDownload)
-                        }
-                    }
-
-                }
-
-                Text {
-                    id: upgradeDownloadLabel
-                    anchors.top: parent.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Downloading " + upgradeDownload.pnd.title +"..."
-                    font.pixelSize: 24
-                    color: "#eee"
-                }
-
-                Row {
-                    id: upgradePercentageIndicator
-                    anchors.top: upgradeDownloadLabel.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.margins: 16
-                    spacing: 8
-                    Repeater {
-                        model: 10
-                        delegate: Rectangle {
-                            function calcValue() {
-                                if(upgradeDownload.progress >= 10 * (index+1))
-                                    return 1.0
-                                else if(upgradeDownload.progress < 10 * index)
-                                    return 0.0
-                                else
-                                    return (upgradeDownload.progress % 10) / 10.0
-                            }
-
-                            property real value: calcValue()
-
-                            height: 32
-                            width: 16
-                            radius: 6
-                            smooth: true
-                            gradient: Gradient {
-                                GradientStop { position: 0; color: Qt.rgba(0.5+(1.0-value)*0.5, 0.5, 0.5+value*0.5, 1.0) }
-                                GradientStop { position: 1; color: Qt.rgba(0.5+(1.0-value)*0.8*0.5, 0.5, 0.5+value*0.8*0.5, 1.0) }
-                            }
-                        }
-                    }
-                }
-
-                Text {
-                    id: upgradePercentage
-
-                    anchors.top: upgradePercentageIndicator.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.margins: 16
-                    text: upgradeDownload.progress + "%"
-                    font.pixelSize: 24
-                    color: "#eee"
-                }
-
-            }
-
-            Item {
-                id: upgradeApply
-                anchors.centerIn: parent
-                height: childrenRect.height
-
-                Text {
-                    id: upgradeProgressLabel
-                    anchors.top: parent.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Upgrading..."
-                    font.pixelSize: 24
-                    color: "#eee"
-                }
-            }
-
-            Item {
-                id: upgradeDone
-                anchors.centerIn: parent
-                height: childrenRect.height
-
-                Text {
-                    id: upgradeDoneLabel
-                    anchors.top: parent.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Upgrade complete"
-                    font.pixelSize: 24
-                    color: "#eee"
-                }
-                Button {
-                    id: upgradeDoneButton
-                    anchors.top: upgradeDoneLabel.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.margins: 16
-                    width: 128
-                    height: 48
-                    color: "#eee"
-                    label: "Continue"
-                    controlHint: "B"
-                    onClicked: {
-                        dialog.deactivate()
-                    }
                 }
             }
         }

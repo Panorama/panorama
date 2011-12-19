@@ -77,6 +77,7 @@ signals:
     void notifyListener();
 
     void installQueued(QObject* pnd, int jobId);
+    void upgradeQueued(QObject* pnd, int jobId);
 
 public slots:
     void applyConfiguration();
@@ -89,14 +90,14 @@ public slots:
     void removeTarget(QString pndId);
     void clearTargets();
 
-    int install();
-    int remove();
-    int upgrade();
-    int upgradeAll();
+    void install();
+    void remove();
+    void upgrade();
+    void upgradeAll();
 
-    int install(QString pndId);
-    int remove(QString pndId);
-    int upgrade(QString pndId);
+    void install(QString pndId);
+    void remove(QString pndId);
+    void upgrade(QString pndId);
     void answer(bool value);
 
     void cancelJob(int jobId);

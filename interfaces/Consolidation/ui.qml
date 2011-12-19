@@ -1,6 +1,6 @@
 import Qt 4.7
 import Panorama.UI 1.0
-import Panorama.Milky 1.0
+import Panorama.Packages 1.0
 import Panorama.Settings 1.0
 import Panorama.Pandora 1.0
 import Panorama.Applications 1.0
@@ -87,50 +87,27 @@ PanoramaUI {
             if(ui.state == "browse") {
                 var item = packages.currentItem;
                 switch(event.key) {
-                    case Qt.Key_Up:
-                        packages.up();
-                        break;
-                    case Qt.Key_Down:
-                        packages.down();
-                        break;
-                    case Qt.Key_Left:
-                        packages.pageUp();
-                        break;
-                    case Qt.Key_Right:
-                        packages.pageDown();
-                        break;
-                    default:
-                        accept = false;
+                    case Qt.Key_Up:    packages.up(); break;
+                    case Qt.Key_Down:  packages.down(); break;
+                    case Qt.Key_Left:  packages.pageUp(); break;
+                    case Qt.Key_Right: packages.pageDown(); break;
+                    default: accept = false; break;
                 }
             } else if(ui.state == "details") {
                 switch(event.key) {
-                    case Qt.Key_Return:
-                        detailDialog.preview();
-                        break;
-                    default:
-                        accept = false;
+                    case Qt.Key_Return: detailDialog.preview(); break;
+                    default:            accept = false; break;
                 }
             } else if(ui.state == "applications") {
                 switch(event.key) {
-                    case Qt.Key_Up:
-                        applications.moveCurrentIndexUp();
-                        break;
-                    case Qt.Key_Down:
-                        applications.moveCurrentIndexDown();
-                        break;
-                    case Qt.Key_Left:
-                        applications.moveCurrentIndexLeft();
-                        break;
-                    case Qt.Key_Right:
-                        applications.moveCurrentIndexRight();
-                        break;
-                    case Qt.Key_Return:
-                        applications.executeCurrentItem();
-                        break;
-                    default:
-                        accept = false;
+                    case Qt.Key_Up:     applications.moveCurrentIndexUp(); break;
+                    case Qt.Key_Down:   applications.moveCurrentIndexDown(); break;
+                    case Qt.Key_Left:   applications.moveCurrentIndexLeft(); break;
+                    case Qt.Key_Right:  applications.moveCurrentIndexRight(); break;
+                    case Qt.Key_Return: applications.executeCurrentItem(); break;
+                    default: accept = false; break;
                 }
-            } else{
+            } else {
                 accept = false;
             }
 
@@ -143,141 +120,70 @@ PanoramaUI {
         if(ui.state == "browse") {
             var item = packages.currentItem;
             switch(event.key) {
-                case Pandora.ButtonB:
-                    item.showDetails()
-                    break;
-                case Pandora.TriggerL:
-                    modeButton.clicked(false);
-                    break;
-                case Pandora.TriggerR:
-                    ui.setState("categories");
-                    break;
-                case Pandora.ButtonStart:
-                    syncButton.clicked(false);
-                    break;
-                case Pandora.ButtonSelect:
-                    upgradeAllButton.clicked(false);
-                    break;
-                default:
-                    accept = false;
+                case Pandora.ButtonB:      item.showDetails(); break;
+                case Pandora.TriggerL:     modeButton.clicked(false); break;
+                case Pandora.TriggerR:     ui.setState("categories"); break;
+                case Pandora.ButtonStart:  syncButton.clicked(false); break;
+                case Pandora.ButtonSelect: upgradeAllButton.clicked(false); break;
+                default:                   accept = false; break;
             }
         } else if(ui.state == "categories") {
             switch(event.key) {
-                case Pandora.DPadUp:
-                    categoryListOverlay.categoryList.moveCurrentIndexUp();
-                    break;
-                case Pandora.DPadDown:
-                    categoryListOverlay.categoryList.moveCurrentIndexDown();
-                    break;
-                case Pandora.DPadLeft:
-                    categoryListOverlay.categoryList.moveCurrentIndexLeft();
-                    break;
-                case Pandora.DPadRight:
-                    categoryListOverlay.categoryList.moveCurrentIndexRight();
-                    break;
-                case Pandora.ButtonB:
-                    categoryListOverlay.categoryList.currentItem.clicked(false);
-                    break;
-                case Pandora.TriggerL:
-                    modeButton.clicked(false);
-                    break;
-                case Pandora.TriggerR:
-                    categoryFilter.clicked(false);
-                    break;
-                case Pandora.ButtonStart:
-                    syncButton.clicked(false);
-                    break;
-                case Pandora.ButtonSelect:
-                    upgradeAllButton.clicked(false);
-                    break;
-                case Pandora.ButtonY:
-                    categoryFilter.nextOrder();
-                    break;
-                default:
-                    accept = false;
+                case Pandora.DPadUp:       categoryListOverlay.categoryList.moveCurrentIndexUp(); break;
+                case Pandora.DPadDown:     categoryListOverlay.categoryList.moveCurrentIndexDown(); break;
+                case Pandora.DPadLeft:     categoryListOverlay.categoryList.moveCurrentIndexLeft(); break;
+                case Pandora.DPadRight:    categoryListOverlay.categoryList.moveCurrentIndexRight(); break;
+                case Pandora.ButtonB:      categoryListOverlay.categoryList.currentItem.clicked(false); break;
+                case Pandora.TriggerL:     modeButton.clicked(false); break;
+                case Pandora.TriggerR:     categoryFilter.clicked(false); break;
+                case Pandora.ButtonStart:  syncButton.clicked(false); break;
+                case Pandora.ButtonSelect: upgradeAllButton.clicked(false); break;
+                case Pandora.ButtonY:      categoryFilter.nextOrder(); break;
+                default:                   accept = false; break;
             }
         } else if(ui.state == "install") {
             switch(event.key) {
-                case Pandora.ButtonB:
-                    installDialog.yes();
-                    break;
-                case Pandora.ButtonX:
-                    installDialog.no()
-                    break;
-                default:
-                    accept = false;
+                case Pandora.ButtonB: installDialog.yes(); break;
+                case Pandora.ButtonX: installDialog.no(); break;
+                default: accept = false; break;
             }
         } else if(ui.state == "remove") {
             switch(event.key) {
-                case Pandora.ButtonB:
-                    removeDialog.yes();
-                    break;
-                case Pandora.ButtonX:
-                    removeDialog.no()
-                    break;
-                default:
-                    accept = false;
+                case Pandora.ButtonB: removeDialog.yes(); break;
+                case Pandora.ButtonX: removeDialog.no(); break;
+                default: accept = false; break;
             }
         } else if(ui.state == "upgrade") {
             switch(event.key) {
-                case Pandora.ButtonB:
-                    upgradeDialog.yes();
-                    break;
-                case Pandora.ButtonX:
-                    upgradeDialog.no()
-                    break;
-                default:
-                    accept = false;
+                case Pandora.ButtonB: upgradeDialog.yes(); break;
+                case Pandora.ButtonX: upgradeDialog.no(); break;
+                default: accept = false; break;
             }
         } else if(ui.state == "details") {
             switch(event.key) {
-                case Pandora.DPadLeft:
-                    detailDialog.previousPreview();
-                    break;
-                case Pandora.DPadRight:
-                    detailDialog.nextPreview();
-                    break;
-                case Pandora.ButtonX:
-                    detailDialog.back();
-                    break;
+                case Pandora.DPadLeft:  detailDialog.previousPreview(); break;
+                case Pandora.DPadRight: detailDialog.nextPreview(); break;
+                case Pandora.ButtonX:   detailDialog.back(); break;
+                case Pandora.ButtonA: detailDialog.remove(); break;
+                case Pandora.ButtonY: detailDialog.upgrade(); break;
                 case Pandora.ButtonB:
                     if(detailDialog.info.installed)
                         detailDialog.execute();
                     else
                         detailDialog.install();
                     break;
-                case Pandora.ButtonA:
-                    detailDialog.remove();
-                    break;
-                case Pandora.ButtonY:
-                    detailDialog.upgrade();
-                    break;
-                default:
-                    accept = false;
+                default: accept = false; break;
             }
         } else if(ui.state == "applications") {
             switch(event.key) {
 
-                case Pandora.ButtonB:
-                    applications.executeCurrentItem();
-                    break;
-                case Pandora.ButtonY:
-                    applications.showCurrentItemDetails();
-                    break;
-                case Pandora.TriggerL:
-                    modeButton.clicked(false);
-                    break;
-                case Pandora.TriggerR:
-                    ui.setState("categories");
-                    break;
-                case Pandora.ButtonStart:
-                    syncButton.clicked(false);
-                    break;
-                case Pandora.ButtonSelect:
-                    upgradeAllButton.clicked(false);
-                    break;
-                default:
-                    accept = false;
+                case Pandora.ButtonB:      applications.executeCurrentItem(); break;
+                case Pandora.ButtonY:      applications.showCurrentItemDetails(); break;
+                case Pandora.TriggerL:     modeButton.clicked(false); break;
+                case Pandora.TriggerR:     ui.setState("categories"); break;
+                case Pandora.ButtonStart:  syncButton.clicked(false); break;
+                case Pandora.ButtonSelect: upgradeAllButton.clicked(false); break;
+                default:                   accept = false; break;
             }
         }
         event.accepted = accept;
@@ -300,7 +206,7 @@ PanoramaUI {
                 syncButton.updateEnabled();
             });
 
-            if(typeof(repositoryUrls.value) == "string" && repositoryUrls.value.length != 0) {
+            if(typeof(repositoryUrls.value) === "string" && repositoryUrls.value.length !== 0) {
                milky.addRepository(repositoryUrls.value);
             } else {
                 for(var i = 0; i < repositoryUrls.value.length; ++i) {
@@ -315,17 +221,34 @@ PanoramaUI {
     // ***************************************
 
     state: "applications"
-    property string previousState: "applications"
+
+    ListModel {
+        id: previousStates
+    }
 
     function setState(newState) {
-        previousState = state;
+        previousStates.append({name: state});
         state = newState;
     }
 
+    states: [
+        State {
+            name: "applications"
+            PropertyChanges { target: packagesContainer; visible: false }
+            PropertyChanges { target: applicationsContainer; visible: true }
+        },
+        State {
+            name: "browse"
+            PropertyChanges { target: packagesContainer; visible: true }
+            PropertyChanges { target: applicationsContainer; visible: false }
+        }
+    ]
+
     function back() {
-        var temp = state;
-        state = previousState;
-        previousState = temp;
+        if(previousStates.count > 0) {
+            state = previousStates.get(previousStates.count - 1).name;
+            previousStates.remove(previousStates.count - 1);
+        }
     }
 
     Rectangle {
@@ -363,7 +286,7 @@ PanoramaUI {
             milky: ui.milky
             installDirectorySetting: installDirectory
             onActivate: ui.setState("install");
-            onDeactivate: ui.setState("browse");
+            onDeactivate: ui.back();
         }
 
         RemoveDialog {
@@ -373,7 +296,7 @@ PanoramaUI {
             z: 10
             milky: ui.milky
             onActivate: ui.setState("remove");
-            onDeactivate: ui.setState("browse");
+            onDeactivate: ui.back();
         }
 
         UpgradeDialog {
@@ -408,13 +331,9 @@ PanoramaUI {
                 onClicked: {
                     if(ui.state == "applications") {
                         ui.setState("browse");
-                        packagesContainer.visible = true;
-                        applicationsContainer.visible = false;
                         packages.updateModel();
                     } else {
                         ui.setState("applications");
-                        packagesContainer.visible = false;
-                        applicationsContainer.visible = true;
                         applications.updateModel();
                     }
                 }
@@ -691,7 +610,7 @@ PanoramaUI {
                             result = result.inCategory(categoryFilter.value)
 
                         if(search.text)
-                            result = result.matching("title", ".*" + search.text + ".*")
+                            result = result.containing("title", search.text)
 
                         return result.sortedBy(categoryFilter.orderProperty, categoryFilter.orderAscending).sortedBy("hasUpdate", false);
                     }
@@ -908,7 +827,6 @@ PanoramaUI {
             color: "#fff"
             border.width: 2
             border.color: "#111"
-            //enabled: ui.state == "browse"
 
             TextInput {
                 id: search

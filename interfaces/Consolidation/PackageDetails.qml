@@ -11,33 +11,35 @@ Rectangle {
     property variant info: gatherInfo()
     state: "details"
     function gatherInfo() {
-        var info = {}
+        var infoTemp = {
+            isPnd: false,
+            size: "-",
+            description: "(no description)",
+            currentVersion: "-",
+            installedVersion: "-",
+            lastUpdated: "-",
+            previewPics: [],
+            installed: false,
+            hasUpdate: false
+        };
+
         if(pnd !== null) {
-            info.isPnd = true;
-            info.size = pnd.sizeString;
-            info.description = pnd.description ? pnd.description : "(no description)";
-            info.currentVersion = [pnd.currentVersionMajor, pnd.currentVersionMinor, pnd.currentVersionRelease, pnd.currentVersionBuild].join(".");
-            info.installedVersion = [pnd.installedVersionMajor, pnd.installedVersionMinor, pnd.installedVersionRelease, pnd.installedVersionBuild].join(".");
-            info.lastUpdated = pnd.lastUpdatedString;
-            info.previewPics = pnd.previewPics;
-            info.installed = pnd.installed;
-            info.hasUpdate = pnd.hasUpdate;
+            infoTemp.isPnd = true;
+            infoTemp.size = pnd.sizeString;
+            infoTemp.description = pnd.description ? pnd.description : "(no description)";
+            infoTemp.currentVersion = [pnd.currentVersionMajor, pnd.currentVersionMinor, pnd.currentVersionRelease, pnd.currentVersionBuild].join(".");
+            infoTemp.installedVersion = [pnd.installedVersionMajor, pnd.installedVersionMinor, pnd.installedVersionRelease, pnd.installedVersionBuild].join(".");
+            infoTemp.lastUpdated = pnd.lastUpdatedString;
+            infoTemp.previewPics = pnd.previewPics;
+            infoTemp.installed = pnd.installed;
+            infoTemp.hasUpdate = pnd.hasUpdate;
         } else if(application !== null) {
-            info.isPnd = false;
-            info.size = "-";
-            info.description = application.description ? application.description : "(no description)";
-            info.currentVersion = "-";
-            info.installedVersion = application.version;
-            info.lastUpdated = "-";
-            info.previewPics = [];
-            info.installed = true;
-            info.hasUpdate = false;
-        } else {
-            console.log("*** PND: " + pnd + ", APPLICATION: " + application)
-            info = null;
+            infoTemp.description = application.description ? application.description : "(no description)";
+            infoTemp.installedVersion = application.version;
+            infoTemp.installed = true;
         }
 
-        return info;
+        return infoTemp;
     }
 
     color: "white"
@@ -68,9 +70,11 @@ Rectangle {
 
     Loader {
         function pickComponent() {
-            if(packageDetails.info !== null && packageDetails.state == "details")
+            if(packageDetails.info === null || packageDetails.info === undefined)
+                return null;
+            else if(packageDetails.state == "details")
                 return detailsContent;
-            else if(packageDetails.info !== null && packageDetails.state == "previews")
+            else if(packageDetails.state == "previews")
                 return previewComponent;
             else
                 return null;
@@ -95,49 +99,59 @@ Rectangle {
                 anchors.bottom: parent.bottom
                 anchors.topMargin: 8
                 anchors.leftMargin: 8
-                contentWidth: descriptionText.paintedWidth
-                contentHeight: descriptionText.paintedHeight
+                contentWidth: width
+                contentHeight: descriptionTexts.height
                 flickableDirection: Flickable.VerticalFlick
                 boundsBehavior: Flickable.StopAtBounds
 
-                Text {
-                    id: descriptionText
+                Column {
+                    id: descriptionTexts
                     anchors.top: parent.top
                     width: descriptionContainer.width
+                    height: childrenRect.height
+                    Text {
+                        id: descriptionText
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: paintedHeight
 
-                    text: info.description
-                    color: "#222"
-                    font.pixelSize: 16
-                    wrapMode: Text.WordWrap
-                }
-            }
-            Rectangle {
-                id: sizeAndVersion
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                color: "#eee"
-                height: 16
-                z: 1
-                Row {
-                    anchors.fill: parent
-                    spacing: 16
+                        text: info.description
+                        color: "#222"
+                        font.pixelSize: 16
+                        wrapMode: Text.WordWrap
+                    }
                     Text {
                         id: sizeText
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: paintedHeight
                         text: "Size: " + info.size
+                        font.pixelSize: 16
                     }
                     Text {
                         id: versionText
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: paintedHeight
                         text: "Current version: " + info.currentVersion;
+                        font.pixelSize: 16
                     }
                     Text {
                         id: installedVersionText
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: paintedHeight
                         text: "Installed version: " + info.installedVersion;
+                        font.pixelSize: 16
                         visible: info.installed
                     }
                     Text {
                         id: lastUpdatedText
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: paintedHeight
                         text: "Last updated: " + info.lastUpdated
+                        font.pixelSize: 16
                     }
                 }
             }
@@ -145,16 +159,16 @@ Rectangle {
                 id: sidebar
                 anchors.top: parent.top
                 anchors.right: parent.right
-                anchors.bottom: sizeAndVersion.top
-                width: 192
+                anchors.bottom: parent.bottom
+                width: parent.width / 2
                 color: "#ddd"
 
                 Image {
                     id: image
+                    anchors.top: parent.top
+                    anchors.bottom: buttons.top
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    height: width
-
                     function selectImage() {
                         if(info.previewPics.length == 0) {
                             return ""
@@ -181,16 +195,18 @@ Rectangle {
                     }
                 }
 
-                Column {
+                Grid {
+                    id: buttons
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
 
+                    columns: 2
+
                     Button {
                         id: runButton
                         height: 32
-                        anchors.left: parent.left
-                        anchors.right: parent.right
+                        width: parent.width / parent.columns
                         visible: info.installed
                         color: "#dfd"
                         label: "Run"
@@ -202,8 +218,7 @@ Rectangle {
                     Button {
                         id: installButton
                         height: 32
-                        anchors.left: parent.left
-                        anchors.right: parent.right
+                        width: parent.width / parent.columns
                         visible: !info.installed
                         color: info.installed ? "#ccc" : "#cec"
                         label: "Install"
@@ -215,8 +230,7 @@ Rectangle {
                     Button {
                         id: upgradeButton
                         height: 32
-                        anchors.left: parent.left
-                        anchors.right: parent.right
+                        width: parent.width / parent.columns
                         visible: info.isPnd && info.installed
                         color: info.hasUpdate ? "#cce" :  "#ccc"
                         label: "Upgrade"
@@ -228,8 +242,7 @@ Rectangle {
                     Button {
                         id: removeButton
                         height: 32
-                        anchors.left: parent.left
-                        anchors.right: parent.right
+                        width: parent.width / parent.columns
                         visible: info.isPnd && info.installed
                         color: info.installed ? "#ecc" :  "#ccc"
                         label: "Remove"
@@ -240,9 +253,7 @@ Rectangle {
                     Button {
                         id: backButton
                         height: 32
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-
+                        width: parent.width / parent.columns
                         color: "#aaa"
                         label: "Back"
                         controlHint: "X"

@@ -266,100 +266,92 @@ void MilkyModel::clearTargets()
     priv->targets.clear();
 }
 
-int MilkyModel::install()
+void MilkyModel::install()
 {
     PANORAMA_PRIVATE(MilkyModel);
 
     foreach(MilkyPackage* package, priv->targets)
     {
         milky_add_target_id(package->getId().toLocal8Bit());
+
+        milky_check_targets();
+        milky_check_config();
+        int jobId = milky_install();
+        emit notifyListener();
+        emit installQueued(package, jobId);
+        milky_clear_targets();
+        milky_check_targets();
     }
 
-    milky_check_targets();
-    milky_check_config();
-    int jobId = milky_install();
-    emit notifyListener();
-
-    foreach(MilkyPackage* p, priv->targets) {
-        emit installQueued(p, jobId);
-    }
-
-    milky_clear_targets();
-    milky_check_targets();
     clearTargets();
-
-    return jobId;
 }
 
-int MilkyModel::remove()
+void MilkyModel::remove()
 {
     PANORAMA_PRIVATE(MilkyModel);
 
     foreach(MilkyPackage* package, priv->targets)
     {
         milky_add_target_id(package->getId().toLocal8Bit());
+        milky_check_targets();
+        milky_check_config();
+
+        int jobId = milky_remove();
+        emit notifyListener();
+
+        milky_clear_targets();
+        milky_check_targets();
     }
 
-    milky_check_targets();
-    milky_check_config();
-
-    int jobId = milky_remove();
-    emit notifyListener();
-
-    milky_clear_targets();
-    milky_check_targets();
     clearTargets();
-
-    return jobId;
 }
 
-int MilkyModel::upgrade()
+void MilkyModel::upgrade()
 {
     PANORAMA_PRIVATE(MilkyModel);
 
     foreach(MilkyPackage* package, priv->targets)
     {
         milky_add_target_id(package->getId().toLocal8Bit());
+        milky_check_targets();
+        milky_check_config();
+
+        int jobId = milky_upgrade();
+        emit notifyListener();
+        emit upgradeQueued(package, jobId);
+
+        milky_clear_targets();
+        milky_check_targets();
     }
 
-    milky_check_targets();
-    milky_check_config();
-
-    int jobId = milky_upgrade();
-    emit notifyListener();
-
-    milky_clear_targets();
-    milky_check_targets();
     clearTargets();
-
-    return jobId;
 }
 
-int MilkyModel::upgradeAll()
+void MilkyModel::upgradeAll()
 {
     addUpgradableTargets();
-    return upgrade();
+    upgrade();
 }
 
-int MilkyModel::install(QString pndId)
+void MilkyModel::install(QString pndId)
 {
     clearTargets();
     addTarget(pndId);
-    return install();
+    install();
 }
 
-int MilkyModel::remove(QString pndId)
+void MilkyModel::remove(QString pndId)
 {
     clearTargets();
     addTarget(pndId);
-    return remove();
+    remove();
 }
 
-int MilkyModel::upgrade(QString pndId)
+void MilkyModel::upgrade(QString pndId)
 {
     clearTargets();
     addTarget(pndId);
-    return upgrade();
+    upgrade();
 }
 
 void MilkyModel::answer(bool value)

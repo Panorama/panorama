@@ -678,17 +678,9 @@ PanoramaUI {
                     }
 
                     function gotoIndex(idx, mode) {
-                        //scrollAnimation.stop();
-                        //var from = packages.contentY;
                         packages.positionViewAtIndex(idx, mode);
-                        //var to = packages.contentY;
                         currentIndex = idx;
-                        //scrollAnimation.from = from;
-                        //scrollAnimation.to = to;
-                        //scrollAnimation.start();
                     }
-
-                    //PropertyAnimation { id: scrollAnimation; target: packages; property: "contentY"; duration: 200; easing.type: Easing.OutQuad }
                 }
             }
 
@@ -748,7 +740,6 @@ PanoramaUI {
             z: 50
             x: xHidden
 
-            //anchors.right: parent.right
             anchors.top: topSeparator.bottom
             anchors.bottom: searchBox.top
             width: parent.width - x

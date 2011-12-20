@@ -75,7 +75,6 @@ Rectangle {
             textColor: "#eee"
             font.pixelSize: 18
             color: "#a8a"
-            //radius: 4
             label: edit ? edit : "All"
             pressed: categoryFilter.value === edit
             onClicked: {

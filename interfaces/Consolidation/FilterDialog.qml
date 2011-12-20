@@ -52,14 +52,14 @@ Rectangle {
 
         highlightFollowsCurrentItem: false
         highlight: Rectangle {
-            color: "transparent"
+            color: Qt.rgba(1.0, 1.0, 1.0, 0.2)
             z: 100
             x: categoryList.currentItem.x
             y: categoryList.currentItem.y
             height: categoryList.currentItem.height
             width: categoryList.currentItem.width
             border {
-                color: "#aaf"
+                color: "#dad"
                 width: 4
             }
             radius: 4
@@ -72,12 +72,12 @@ Rectangle {
                 color: "#ccc"
                 width: 2
             }
-            //textColor: "#223"
+            textColor: "#eee"
             font.pixelSize: 18
-            color: "#ddf"
-            radius: 4
+            color: "#a8a"
+            //radius: 4
             label: edit ? edit : "All"
-            pressed: categoryFilter.value == edit
+            pressed: categoryFilter.value === edit
             onClicked: {
                 categoryFilter.value = edit;
             }

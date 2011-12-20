@@ -70,6 +70,12 @@ QVariant PackageFilterModel::matching(const QString &role,
     return PackageFilterMethods::matching(this, role, value);
 }
 
+QVariant PackageFilterModel::containing(const QString &role,
+                                        const QString &value)
+{
+    return PackageFilterMethods::containing(this, role, value);
+}
+
 QVariant PackageFilterModel::sortedBy(const QString &role, bool ascending)
 {
     return PackageFilterMethods::sortedBy(this, role, ascending);

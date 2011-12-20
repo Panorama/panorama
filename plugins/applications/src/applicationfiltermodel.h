@@ -44,6 +44,9 @@ public:
     /** QML helper method that applies a filter to this model */
     Q_INVOKABLE QVariant matching(const QString &role, const QString &value);
 
+    /** QML helper method that applies a filter to this model */
+    Q_INVOKABLE QVariant containing(const QString &role, const QString &value);
+
     /** QML helper method that sorts this model */
     Q_INVOKABLE QVariant sortedBy(const QString &role, bool ascending);
 

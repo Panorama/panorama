@@ -4,6 +4,7 @@ import Panorama.Packages 1.0
 import Panorama.Settings 1.0
 import Panorama.Pandora 1.0
 import Panorama.Applications 1.0
+import Panorama.SystemInformation 1.0
 
 PanoramaUI {
     id: ui
@@ -44,13 +45,6 @@ PanoramaUI {
         defaultValue: ""
     }
 
-    Setting {
-        id: minimumSearchQueryLength
-        section: "Consolidation"
-        key: "minimumSearchQueryLength"
-        defaultValue: 3
-    }
-
     // Run stuff when the entire UI is loaded
     Timer {
         interval: 1
@@ -84,7 +78,12 @@ PanoramaUI {
         id: hotKeyHandler
         Keys.onPressed: {
             var accept = true;
-            if(ui.state == "browse") {
+
+            if(event.modifiers & Qt.ShiftModifier && event.key === Qt.Key_L) {
+                log.visible = true;
+            } else if(event.modifiers & Qt.ShiftModifier && event.key === Qt.Key_D) {
+                deviceSelection.visible = true;
+            } else if(ui.state == "browse") {
                 var item = packages.currentItem;
                 switch(event.key) {
                     case Qt.Key_Up:    packages.up(); break;
@@ -121,10 +120,10 @@ PanoramaUI {
             var item = packages.currentItem;
             switch(event.key) {
                 case Pandora.ButtonB:      item.showDetails(); break;
-                case Pandora.TriggerL:     modeButton.clicked(false); break;
+                case Pandora.TriggerL:     modeButton.clicked(); break;
                 case Pandora.TriggerR:     ui.setState("categories"); break;
-                case Pandora.ButtonStart:  syncButton.clicked(false); break;
-                case Pandora.ButtonSelect: upgradeAllButton.clicked(false); break;
+                case Pandora.ButtonStart:  syncButton.clicked(); break;
+                case Pandora.ButtonSelect: upgradeAllButton.clicked(); break;
                 default:                   accept = false; break;
             }
         } else if(ui.state == "categories") {
@@ -133,11 +132,11 @@ PanoramaUI {
                 case Pandora.DPadDown:     categoryListOverlay.categoryList.moveCurrentIndexDown(); break;
                 case Pandora.DPadLeft:     categoryListOverlay.categoryList.moveCurrentIndexLeft(); break;
                 case Pandora.DPadRight:    categoryListOverlay.categoryList.moveCurrentIndexRight(); break;
-                case Pandora.ButtonB:      categoryListOverlay.categoryList.currentItem.clicked(false); break;
-                case Pandora.TriggerL:     modeButton.clicked(false); break;
-                case Pandora.TriggerR:     categoryFilter.clicked(false); break;
-                case Pandora.ButtonStart:  syncButton.clicked(false); break;
-                case Pandora.ButtonSelect: upgradeAllButton.clicked(false); break;
+                case Pandora.ButtonB:      categoryListOverlay.categoryList.currentItem.clicked(); break;
+                case Pandora.TriggerL:     modeButton.clicked(); break;
+                case Pandora.TriggerR:     categoryFilter.clicked(); break;
+                case Pandora.ButtonStart:  syncButton.clicked(); break;
+                case Pandora.ButtonSelect: upgradeAllButton.clicked(); break;
                 case Pandora.ButtonY:      categoryFilter.nextOrder(); break;
                 default:                   accept = false; break;
             }
@@ -179,10 +178,10 @@ PanoramaUI {
 
                 case Pandora.ButtonB:      applications.executeCurrentItem(); break;
                 case Pandora.ButtonY:      applications.showCurrentItemDetails(); break;
-                case Pandora.TriggerL:     modeButton.clicked(false); break;
+                case Pandora.TriggerL:     modeButton.clicked(); break;
                 case Pandora.TriggerR:     ui.setState("categories"); break;
-                case Pandora.ButtonStart:  syncButton.clicked(false); break;
-                case Pandora.ButtonSelect: upgradeAllButton.clicked(false); break;
+                case Pandora.ButtonStart:  syncButton.clicked(); break;
+                case Pandora.ButtonSelect: upgradeAllButton.clicked(); break;
                 default:                   accept = false; break;
             }
         }
@@ -313,20 +312,21 @@ PanoramaUI {
         //                TOOLBAR
         // ***************************************
 
-        Item {
+        Rectangle {
             id: toolbar
             z: 50
             height: 48
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
+            color: "#bbb"
 
             Button {
                 id: modeButton
                 width: 110
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                label: ui.state == "applications" ? "Install" : "Launch"
+                label: getLabel()
                 controlHint: "L"
                 onClicked: {
                     if(ui.state == "applications") {
@@ -337,6 +337,24 @@ PanoramaUI {
                         applications.updateModel();
                     }
                 }
+
+                function getLabel() {
+                    if(ui.state === "applications") {
+                        return "Install";
+                    } else if(ui.state === "browse") {
+                        return "Launch";
+                    } else {
+                        for(var i = previousStates.count - 1; i >= 0; --i) {
+                            if(previousStates.get(i).name === "applications") {
+                                return "Install";
+                            } else if(previousStates.get(i).name === "browse") {
+                                return "Launch";
+                            }
+                        }
+                        return "-";
+                    }
+                }
+
             }
             Button {
                 id: categoryFilter
@@ -362,8 +380,9 @@ PanoramaUI {
                 anchors.bottom: parent.bottom
                 anchors.left: modeButton.right
                 anchors.right: upgradeAllButton.left
+                anchors.leftMargin: 2
+                anchors.rightMargin: 2
 
-                color: "#ddf"
                 label: (categoryFilter.value ? categoryFilter.value : "All") + ", " + orderTitle
                 controlHint: "R"
                 onClicked: {
@@ -385,6 +404,7 @@ PanoramaUI {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.right: syncButton.left
+                anchors.rightMargin: 2
                 width: 160
                 color: enabled ? "#ddf" : "#888"
                 enabled: milky.hasUpgrades
@@ -473,7 +493,7 @@ PanoramaUI {
                             result = result.inCategory(categoryFilter.value)
 
                         if(search.text)
-                            result = result.matching("title", ".*" + search.text + ".*")
+                            result = result.containing("name", search.text)
 
                         return result.sortedBy("name", true);
                     }
@@ -601,9 +621,6 @@ PanoramaUI {
                     }
 
                     function filteredModel() {
-                        if(search.text.length > 0 && search.text.length < minimumSearchQueryLength.value)
-                            return [];
-
                         var result = ui.milky.matching("installed", false);
 
                         if(categoryFilter.value)
@@ -661,27 +678,18 @@ PanoramaUI {
                     }
 
                     function gotoIndex(idx, mode) {
-                        scrollAnimation.stop();
-                        var from = packages.contentY;
+                        //scrollAnimation.stop();
+                        //var from = packages.contentY;
                         packages.positionViewAtIndex(idx, mode);
-                        var to = packages.contentY;
+                        //var to = packages.contentY;
                         currentIndex = idx;
-                        scrollAnimation.from = from;
-                        scrollAnimation.to = to;
-                        scrollAnimation.start();
+                        //scrollAnimation.from = from;
+                        //scrollAnimation.to = to;
+                        //scrollAnimation.start();
                     }
 
-                    PropertyAnimation { id: scrollAnimation; target: packages; property: "contentY"; duration: 200; easing.type: Easing.OutQuad }
+                    //PropertyAnimation { id: scrollAnimation; target: packages; property: "contentY"; duration: 200; easing.type: Easing.OutQuad }
                 }
-
-                Text {
-                    visible: search.text.length > 0 && packages.count == 0
-                    text: search.text.length < 3 ? "At least three characters required to search" : "No packages found"
-                    color: "#888"
-                    font.pixelSize: 24
-                    anchors.centerIn: parent
-                }
-
             }
 
             FilterDialog {
@@ -836,7 +844,7 @@ PanoramaUI {
                 onTextChanged: {
                     if(ui.state == "applications") {
                         applications.updateModel()
-                    } else {
+                    } else if(ui.state == "browse") {
                         packages.updateModel()
                     }
                 }
@@ -865,7 +873,7 @@ PanoramaUI {
             id: statusContainer
 
             z: 50
-            height: 48
+            height: 20
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
@@ -876,13 +884,102 @@ PanoramaUI {
                 GradientStop { position: 1.0; color: "#aaa" }
             }
 
+            Clock {
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                color: "#222"
+                textSize: 18
+            }
+
+            Text {
+                text: SystemInformation.battery + "%"
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                color: "#222"
+                font.pixelSize: 18
+            }
+        }
+
+        Rectangle {
+            id: deviceSelection
+            property variant deviceOptions: ui.milky.getDeviceList()
+            anchors.centerIn: parent
+            visible: false
+            height: childrenRect.height
+            width: parent.width/2
+            color: "gray"
+            z: 1024
+
+            Text {
+                id: noDevicesFound
+                text: "No devices found"
+                font.pixelSize: 14
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: deviceListRepeater.count == 0
+            }
+            Column {
+                width: childrenRect.width
+                height: childrenRect.height
+                Repeater {
+                    function getDevices() {
+                        var list = []
+                        if(typeof(customDevices.value) == "string" && customDevices.value.length != 0) {
+                            list.push({mountPoint: customDevices.value});
+                        } else {
+                            for(var i = 0; i < customDevices.value.length; ++i) {
+                                list.push({mountPoint: customDevices.value[i]});
+                            }
+                        }
+
+                        for(var i = 0; i < deviceSelection.deviceOptions.length; ++i) {
+                            if(!/\/mnt\/(utmp|pnd)\/.*/.test(deviceSelection.deviceOptions[i].mountPoint))
+                                list.push(deviceSelection.deviceOptions[i])
+                        }
+                        return list;
+                    }
+
+                    id: deviceListRepeater
+                    model: getDevices()
+
+
+                    delegate: Button {
+                        property string mountPoint: modelData.mountPoint
+                        height: 32
+                        width: deviceSelection.width
+                        color: "#ccc"
+                        label: mountPoint
+                        onClicked: {
+                            installDevice.value = mountPoint;
+                            ui.milky.applyConfiguration();
+                            deviceSelection.visible = false;
+                            ui.milky.crawlDevice();
+                            syncButton.updateEnabled();
+                        }
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            id: log
+            visible: false
+            anchors.fill: parent
+            anchors.margins: 32
+            z: 1024
+            color: Qt.rgba(0.9, 0.9, 0.9, 0.9)
+            radius: 8
+            border {
+                color: "#111"
+                width: 1
+            }
+
             ListView {
-                id: status
+                id: statusMessageView
                 clip: true
                 anchors.left: parent.left
+                anchors.right: parent.right
                 anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.right: deviceButton.left
+                anchors.bottom: closeLogButton.top
                 anchors.margins: 4
                 highlightFollowsCurrentItem: true
 
@@ -900,77 +997,16 @@ PanoramaUI {
             }
 
             Button {
-                id: deviceButton
+                id: closeLogButton
+                label: "Close"
+                anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                width: 288
-
-                label: "Device: " + installDevice.value
-                color: "#ddd"
-                toggleButton: true
-
-                Rectangle {
-                    id: deviceSelection
-                    property variant deviceOptions: ui.milky.getDeviceList()
-                    anchors.bottom: parent.top
-                    visible: height > 0
-                    height: parent.pressed ? childrenRect.height : 0
-                    width: parent.width
-                    color: "gray"
-
-                    Text {
-                        id: noDevicesFound
-                        text: "No devices found"
-                        font.pixelSize: 14
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        visible: deviceListRepeater.count == 0
-                    }
-                    Column {
-                        width: childrenRect.width
-                        height: childrenRect.height
-                        Repeater {
-                            function getDevices() {
-                                var list = []
-                                if(typeof(customDevices.value) == "string" && customDevices.value.length != 0) {
-                                    list.push({mountPoint: customDevices.value});
-                                } else {
-                                    for(var i = 0; i < customDevices.value.length; ++i) {
-                                        list.push({mountPoint: customDevices.value[i]});
-                                    }
-                                }
-
-                                for(var i = 0; i < deviceSelection.deviceOptions.length; ++i) {
-                                    if(!/\/mnt\/(utmp|pnd)\/.*/.test(deviceSelection.deviceOptions[i].mountPoint))
-                                        list.push(deviceSelection.deviceOptions[i])
-                                }
-                                return list;
-                            }
-
-                            id: deviceListRepeater
-                            model: getDevices()
-
-
-                            delegate: Button {
-                                property string mountPoint: modelData.mountPoint
-                                height: 32
-                                width: deviceSelection.width
-                                color: "#ccc"
-                                label: mountPoint
-                                onClicked: {
-                                    installDevice.value = mountPoint;
-                                    ui.milky.applyConfiguration();
-                                    deviceButton.pressed = false;
-                                    ui.milky.crawlDevice();
-                                    syncButton.updateEnabled();
-                                }
-                            }
-                        }
-                    }
-                }
+                radius: 8
+                anchors.leftMargin: 1
+                onClicked: log.visible = false
             }
         }
-
 
         function handleMessage(messageType, messageData) {
             var messages = {}

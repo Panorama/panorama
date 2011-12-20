@@ -28,6 +28,20 @@ QVariant ApplicationFilterMethods::matching(QAbstractItemModel *source,
     return QVariant::fromValue((QObject *)result);
 }
 
+QVariant ApplicationFilterMethods::containing(QAbstractItemModel *source,
+                                              const QString &role,
+                                              const QString &value)
+{
+    ApplicationFilterModel *result = new ApplicationFilterModel(source, source);
+
+    result->setFilterRole(source->roleNames().key(role.toLocal8Bit(),
+                                                  ApplicationModel::Name));
+    result->setFilterWildcard(QString("*%1*").arg(value));
+    result->setFilterCaseSensitivity(Qt::CaseInsensitive);
+
+    return QVariant::fromValue((QObject *)result);
+}
+
 QVariant ApplicationFilterMethods::sortedBy(QAbstractItemModel *source,
                                             const QString &role, bool ascending)
 {

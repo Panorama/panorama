@@ -17,7 +17,13 @@ Item {
         return button.pressed || mouseArea.pressed;
     }
 
-    signal clicked(bool pressed);
+    signal clicked();
+
+    onClicked: {
+        if(button.toggleButton) {
+            button.pressed = !button.pressed;
+        }
+    }
 
     width: 64
     height: 32
@@ -73,13 +79,7 @@ Item {
         MouseArea {
             id: mouseArea
             anchors.fill: parent
-            onClicked: {
-                if(button.toggleButton) {
-                    button.pressed = !button.pressed;
-                }
-
-                button.clicked(button.pressed)
-            }
+            onClicked: button.clicked()
         }
 
         Rectangle {

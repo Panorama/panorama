@@ -69,6 +69,12 @@ QVariant ApplicationFilterModel::matching(const QString &role,
     return ApplicationFilterMethods::matching(this, role, value);
 }
 
+QVariant ApplicationFilterModel::containing(const QString &role,
+                                            const QString &value)
+{
+    return ApplicationFilterMethods::containing(this, role, value);
+}
+
 QVariant ApplicationFilterModel::sortedBy(const QString &role, bool ascending)
 {
     return ApplicationFilterMethods::sortedBy(this, role, ascending);

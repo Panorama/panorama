@@ -1,5 +1,5 @@
 import Qt 4.7
-import Panorama.Milky 1.0
+import Panorama.Packages 1.0
 
 ListView {
     id: actionQueue

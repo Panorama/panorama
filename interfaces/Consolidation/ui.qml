@@ -230,16 +230,25 @@ PanoramaUI {
         state = newState;
     }
 
+    property bool filterChangedApplications: false
+    property bool filterChangedBrowse: false
+
     states: [
         State {
             name: "applications"
             PropertyChanges { target: packagesContainer; visible: false }
             PropertyChanges { target: applicationsContainer; visible: true }
+            StateChangeScript { script: { if(filterChangedApplications) applications.updateModel(); filterChangedApplications = false; } }
         },
         State {
             name: "browse"
             PropertyChanges { target: packagesContainer; visible: true }
             PropertyChanges { target: applicationsContainer; visible: false }
+            StateChangeScript { script: { if(filterChangedBrowse) packages.updateModel(); filterChangedBrowse = false; } }
+        },
+        State {
+            name: "categories"
+            StateChangeScript { script: { filterChangedApplications = true; filterChangedBrowse = true; } }
         }
     ]
 
@@ -331,10 +340,8 @@ PanoramaUI {
                 onClicked: {
                     if(ui.state == "applications") {
                         ui.setState("browse");
-                        packages.updateModel();
                     } else {
                         ui.setState("applications");
-                        applications.updateModel();
                     }
                 }
 
@@ -390,11 +397,6 @@ PanoramaUI {
                         ui.setState("categories");
                     } else {
                         ui.back();
-                        if(ui.state == "applications") {
-                            applications.updateModel()
-                        } else {
-                            packages.updateModel()
-                        }
                     }
                 }
             }
@@ -472,7 +474,7 @@ PanoramaUI {
                     GradientStop { position: 1.0; color: "#333" }
                 }
 
-                GridView {
+                PreloadedGridView {
                     id: applications
                     anchors.fill: parent
 
@@ -517,10 +519,6 @@ PanoramaUI {
 
                     cellWidth: width / rowSize
                     cellHeight: cellWidth
-
-                    cacheBuffer: height*4
-
-                    highlightFollowsCurrentItem: false
 
                     highlight: Rectangle {
                         x: applications.currentItem.x
@@ -725,14 +723,18 @@ PanoramaUI {
         //             ACTION QUEUE
         // ***************************************
         Rectangle {
-            id: actionQueueContainer
+            id: actionQueueResizeHandle
+            width: 64
+            height: 64
+            anchors.verticalCenter: parent.verticalCenter
+            radius: 32
+            color: Qt.rgba(0.1, 0.1, 0.1, hidden ? 0.5 : 0.9)
 
             property int minWidth: 64
             property int maxWidth: 256
-            property int thresholdWidth: 128
-            property int xMin: parent.width - maxWidth
-            property int xMax: parent.width - minWidth
-            property int xHidden: parent.width
+            property int xMin: parent.width - maxWidth - width/2
+            property int xMax: parent.width - minWidth - width/2
+            property int xHidden: parent.width - width/2
 
             property bool hidden: true
             property bool large: true
@@ -740,76 +742,85 @@ PanoramaUI {
             z: 50
             x: xHidden
 
-            anchors.top: topSeparator.bottom
-            anchors.bottom: searchBox.top
-            width: parent.width - x
-            clip: true
+            MouseArea {
+                anchors.fill: parent
+                drag {
+                    target: actionQueueResizeHandle
+                    axis: Drag.XAxis
+                    minimumX: parent.xMin
+                    maximumX: parent.xHidden
+                    filterChildren: true
+                }
+                onReleased: {
+                    actionQueueResizeHandleAnimation.stop();
+                    actionQueueResizeHandleAnimation.from = drag.target.x;
+                    if(drag.target.x < (drag.target.xMin + drag.target.xMax)/2) {
+                        actionQueueResizeHandleAnimation.to = parent.xMin;
+                        drag.target.large = true;
+                        drag.target.hidden = false;
+                    } else if(drag.target.x < (drag.target.xMax + drag.target.xHidden)/2) {
+                        actionQueueResizeHandleAnimation.to = parent.xMax;
+                        drag.target.large = false;
+                        drag.target.hidden = false;
+                    } else {
+                        actionQueueResizeHandleAnimation.to = drag.target.xHidden;
+                        drag.target.hidden = true;
+                    }
 
-            color: "#111"
+                    actionQueueResizeHandleAnimation.start();
+                }
+            }
 
             PropertyAnimation {
-                id: actionQueueContainerAnimation
-                target: actionQueueContainer
+                id: actionQueueResizeHandleAnimation
+                target: actionQueueResizeHandle
                 property: "x"
                 duration: 200
             }
 
-            MouseArea {
+        }
+
+        Rectangle {
+            id: actionQueueContainer
+
+            z: 51
+
+            anchors.top: topSeparator.bottom
+            anchors.bottom: searchBox.top
+            anchors.left: actionQueueResizeHandle.horizontalCenter
+            anchors.right: parent.right
+
+            clip: true
+
+            color: Qt.rgba(0.1, 0.1, 0.1, 0.9)
+
+            ActionQueue {
+                id: actionQueue
                 anchors.fill: parent
-                drag {
-                    target: actionQueueContainer
-                    axis: Drag.XAxis
-                    minimumX: parent.xMin
-                    maximumX: parent.xMax
-                    filterChildren: true
-                }
-                onReleased: {
-                    actionQueueContainerAnimation.stop();
-                    actionQueueContainerAnimation.from = drag.target.x;
-                    if(drag.target.width > parent.thresholdWidth) {
-                        actionQueueContainerAnimation.to = parent.xMin;
-                        drag.target.large = true;
-                    } else {
-                        actionQueueContainerAnimation.to = parent.xMax;
-                        drag.target.large = false;
-                    }
-                    actionQueueContainerAnimation.start();
-                }
+                milky: ui.milky
 
-                ActionQueue {
-                    id: actionQueue
-                    anchors.fill: parent
-                    milky: ui.milky
-
-                    onItemAdded: {
-                        if(actionQueueContainer.hidden) {
-                            actionQueueContainerAnimation.stop();
-                            actionQueueContainer.hidden = false;
-                            actionQueueContainerAnimation.from = actionQueueContainer.xHidden;
-                            if(actionQueueContainer.large) {
-                                actionQueueContainerAnimation.to = actionQueueContainer.xMin;
-                            } else {
-                                actionQueueContainerAnimation.to = actionQueueContainer.xMax;
-                            }
-                            actionQueueContainerAnimation.start();
+                onItemAdded: {
+                    if(actionQueueContainer.hidden) {
+                        actionQueueResizeHandleAnimation.stop();
+                        actionQueueResizeHandle.hidden = false;
+                        actionQueueResizeHandleAnimation.from = actionQueueContainer.xHidden;
+                        if(actionQueueResizeHandle.large) {
+                            actionQueueResizeHandleAnimation.to = actionQueueContainer.xMin;
+                        } else {
+                            actionQueueResizeHandleAnimation.to = actionQueueContainer.xMax;
                         }
-                    }
-
-                    onLastItemRemoved: {
-                        actionQueueContainerAnimation.stop();
-                        console.log("onLastItemRemoved");
-                        actionQueueContainer.hidden = true;
-                        console.log("from:" + actionQueueContainer.x + ", to: " + actionQueueContainer.xHidden);
-                        console.log(actionQueueContainerAnimation.running);
-                        actionQueueContainerAnimation.from = actionQueueContainer.x;
-                        actionQueueContainerAnimation.to = actionQueueContainer.xHidden;
-                        actionQueueContainerAnimation.start();
-                        console.log(actionQueueContainerAnimation.running);
+                        actionQueueResizeHandleAnimation.start();
                     }
                 }
 
+                onLastItemRemoved: {
+                    actionQueueResizeHandleAnimation.stop();
+                    actionQueueResizeHandle.hidden = true;
+                    actionQueueResizeHandleAnimation.from = actionQueueContainer.x;
+                    actionQueueResizeHandleAnimation.to = actionQueueContainer.xHidden;
+                    actionQueueResizeHandleAnimation.start();
+                }
             }
-
         }
 
         // ***************************************

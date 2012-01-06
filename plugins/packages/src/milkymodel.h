@@ -4,13 +4,15 @@
 #include "panoramainternal.h"
 #include "milkylistener.h"
 #include "milkydevice.h"
+#include "milkyrepository.h"
+#include "milkypackagelist.h"
 #include <QAbstractListModel>
 #include <QtDeclarative>
 #include <QStringList>
 
 class MilkyModelPrivate;
 
-class MilkyModel : public QAbstractListModel
+class MilkyModel : public MilkyPackageList
 {
     Q_OBJECT
     Q_PROPERTY(QObject* categories   READ getCategories                  NOTIFY categoriesChanged)
@@ -18,7 +20,7 @@ class MilkyModel : public QAbstractListModel
     Q_PROPERTY(int     bytesToDownload READ getBytesToDownload)
     Q_PROPERTY(QString device        READ getDevice        WRITE setDevice        NOTIFY deviceChanged)
     Q_PROPERTY(QString targetDir     READ getTargetDir     WRITE setTargetDir     NOTIFY targetDirChanged)
-    Q_PROPERTY(QString repositoryUrl READ getRepositoryUrl WRITE setRepositoryUrl NOTIFY repositoryUrlChanged)
+    Q_PROPERTY(QList<QObject*> repositories READ getRepositories NOTIFY repositoriesChanged)
     Q_PROPERTY(QString configFile    READ getConfigFile    WRITE setConfigFile    NOTIFY configFileChanged)
     Q_PROPERTY(QString logFile       READ getLogFile       WRITE setLogFile       NOTIFY logFileChanged)
     Q_PROPERTY(bool    hasUpgrades   READ getHasUpgrades   WRITE setHasUpgrades   NOTIFY hasUpgradesChanged)
@@ -28,67 +30,6 @@ class MilkyModel : public QAbstractListModel
 public:
     explicit MilkyModel(QObject *parent = 0);
     virtual ~MilkyModel();
-
-    enum Roles
-    {
-        Id = Qt::UserRole,
-        Title,
-        Description,
-        Info,
-        Icon,
-        Uri,
-        MD5,
-        Vendor,
-        Group,
-        Modified,
-        Rating,
-        Size,
-        AuthorName,
-        AuthorSite,
-        AuthorEmail,
-        InstalledVersionMajor,
-        InstalledVersionMinor,
-        InstalledVersionRelease,
-        InstalledVersionBuild,
-        InstalledVersionType,
-        CurrentVersionMajor,
-        CurrentVersionMinor,
-        CurrentVersionRelease,
-        CurrentVersionBuild,
-        CurrentVersionType,
-        Installed,
-        HasUpdate,
-        InstallPath,
-        Categories,
-        CategoriesString,
-        PreviewPics,
-        Licenses,
-        SourceLinks
-    };
-
-    /** QML helper method that applies a filter to this model */
-    Q_INVOKABLE QVariant inCategory(const QString &category);
-
-    /** QML helper method that applies a filter to this model */
-    Q_INVOKABLE QVariant matching(const QString &role, const QString &value);
-
-    /** QML helper method that sorts this model */
-    Q_INVOKABLE QVariant sortedBy(const QString &role, bool ascending);
-
-    Q_INVOKABLE QVariant drop(int count);
-
-    Q_INVOKABLE QVariant take(int count);
-
-
-    /** Returns the number of items in this model */
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-
-    /** Returns the data at the specified index. */
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-
-    /** Returns the header for each role */
-    QVariant headerData(int section, Qt::Orientation orientation,
-                        int role = Qt::DisplayRole) const;
 
     QStringListModel* getCategories();
 
@@ -103,8 +44,12 @@ public:
     void setTargetDir(QString const newTargetDir);
     Q_INVOKABLE QList<QObject*> getTargetPackages();
 
-    QString getRepositoryUrl();
-    void setRepositoryUrl(QString const newRepositoryUrl);
+    QList<QObject*> getRepositories();
+    Q_INVOKABLE void addRepository(QString url);
+    Q_INVOKABLE void removeRepository(QString url);
+    Q_INVOKABLE void clearRepositories();
+
+    Q_INVOKABLE MilkyPackage* getPackage(QString pndId);
 
     QString getConfigFile();
     void setConfigFile(QString const newConfigFile);
@@ -113,7 +58,9 @@ public:
     void setLogFile(QString const newLogFile);
 
     bool getHasUpgrades();
-    void setHasUpgrades(bool const newLogFile);
+    void setHasUpgrades(bool const newHasUpgrades);
+
+    Q_INVOKABLE bool repositoryUpdated();
 
     MilkyListener* getListener();
 
@@ -121,7 +68,7 @@ signals:
     void categoriesChanged(QStringListModel* categories);
     void deviceChanged(QString device);
     void targetDirChanged(QString targetDir);
-    void repositoryUrlChanged(QString databaseFile);
+    void repositoriesChanged(QList<MilkyRepository*> repositories);
     void configFileChanged(QString configFile);
     void logFileChanged(QString logFile);
     void listenerChanged(MilkyListener* listener);
@@ -129,12 +76,17 @@ signals:
 
     void notifyListener();
 
+    void installQueued(QObject* pnd, int jobId);
+    void upgradeQueued(QObject* pnd, int jobId);
+
 public slots:
     void applyConfiguration();
 
-    void updateDatabase();
+    void crawlDevice();
+    void syncWithRepository();
 
     void addTarget(QString pndId);
+    void addUpgradableTargets();
     void removeTarget(QString pndId);
     void clearTargets();
 
@@ -147,6 +99,8 @@ public slots:
     void remove(QString pndId);
     void upgrade(QString pndId);
     void answer(bool value);
+
+    void cancelJob(int jobId);
 
 
 private slots:

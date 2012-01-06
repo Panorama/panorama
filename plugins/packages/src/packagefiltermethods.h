@@ -34,6 +34,15 @@ public:
                              const QString &value);
 
     /**
+     * Applies a filter to source that filters out all packages except those
+     * that have a role specified by "role" containing the substring given in "value".
+     * The source object's data is not modified. Instead, a proxy model is
+     * returned with the expected behavior.
+     */
+    static QVariant containing(QAbstractItemModel *source, const QString &role,
+                               const QString &value);
+
+    /**
      * Returns a model that contains the same data as "source", only sorted. The
      * role to sort by is specified in "role", and "ascending" indicates whether
      * the sort should be ascending or descending.

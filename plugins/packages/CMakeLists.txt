@@ -10,7 +10,9 @@ SET(packages_SOURCES
     src/milkypackage.cpp
     src/packagefiltermodel.cpp
     src/packagefiltermethods.cpp
-    src/milkydevice.cpp)
+    src/milkydevice.cpp
+    src/milkypackagelist.cpp
+    src/milkyrepository.cpp)
 
 SET(packages_HEADERS
     src/packagesplugin.h
@@ -19,7 +21,9 @@ SET(packages_HEADERS
     src/milkypackage.h
     src/packagefiltermodel.h
     src/packagefiltermethods.h
-    src/milkydevice.h)
+    src/milkydevice.h
+    src/milkypackagelist.h
+    src/milkyrepository.h)
 
 QT4_WRAP_CPP(packages_HEADERS_MOC ${packages_HEADERS})
 

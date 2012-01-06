@@ -25,7 +25,10 @@ MilkyPackage::MilkyPackage(MilkyPackage const& other) :
     currentVersion = other.currentVersion;
     installed = other.installed;
     hasUpdate = other.hasUpdate;
+    foreign = other.foreign;
     installPath = other.installPath;
+    deviceMount = other.deviceMount;
+    device = other.device;
     categories = other.categories;
     previewPics = other.previewPics;
     licenses = other.licenses;
@@ -53,7 +56,10 @@ MilkyPackage const& MilkyPackage::operator=(MilkyPackage const& other)
         currentVersion = other.currentVersion;
         installed = other.installed;
         hasUpdate = other.hasUpdate;
+        foreign = other.foreign;
         installPath = other.installPath;
+        deviceMount = other.deviceMount;
+        device = other.device;
         categories = other.categories;
         previewPics = other.previewPics;
         licenses = other.licenses;
@@ -63,7 +69,7 @@ MilkyPackage const& MilkyPackage::operator=(MilkyPackage const& other)
     return *this;
 }
 
-MilkyPackage::MilkyPackage(_pnd_package* p, QObject* parent) :
+MilkyPackage::MilkyPackage(pnd_package* p, QObject* parent) :
     QObject(parent)
 {
     setId(p->id);
@@ -93,7 +99,10 @@ MilkyPackage::MilkyPackage(_pnd_package* p, QObject* parent) :
     setCurrentVersionType(p->version->type);
     setInstalled(p->installed);
     setHasUpdate(p->hasupdate);
+    setForeign(p->foreign);
     setInstallPath(p->install_path);
+    setDeviceMount(p->mount);
+    setDevice(p->device);
     setCategories(alpmListToQStringList(p->categories));
     setPreviewPics(alpmListToQStringList(p->previewpics));
     setLicenses(alpmListToQStringList(p->licenses));
@@ -141,6 +150,41 @@ QDateTime MilkyPackage::getModified() const
     return modified;
 }
 
+QString MilkyPackage::getLastUpdatedString() const
+{
+    if(modified.toMSecsSinceEpoch() == 0) {
+        return "unknown";
+    }
+
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    qint64 days = (now - modified.toMSecsSinceEpoch()) / (1000 * 60*60*24);
+
+    if(days == 0)
+    {
+        return "today";
+    }
+    else if(days == 1)
+    {
+        return "yesterday";
+    }
+    else if(days < 2*7)
+    {
+        return QString("%1 %2").arg(days).arg("days ago");
+    }
+    else if(days < 2*30)
+    {
+        return QString("%1 %2").arg(days/7).arg("weeks ago");
+    }
+    else if(days < 2*365)
+    {
+        return QString("%1 %2").arg(days/30).arg("months ago");
+    }
+    else
+    {
+        return QString("%1 %2").arg(days/365).arg("years ago");
+    }
+}
+
 int MilkyPackage::getRating() const
 {
     return rating;
@@ -149,7 +193,33 @@ int MilkyPackage::getSize() const
 {
     return size;
 }
-
+QString MilkyPackage::getSizeString() const
+{
+    quint64 s = size;
+    QString suffix = "B";
+    quint64 kilo = 1024;
+    if(s > kilo*kilo*kilo*kilo)
+    {
+        suffix = "TiB";
+        s /= kilo*kilo*kilo*kilo;
+    }
+    else if(s > kilo*kilo*kilo)
+    {
+        suffix = "GiB";
+        s /= kilo*kilo*kilo;
+    }
+    if(s > kilo*kilo)
+    {
+        suffix = "MiB";
+        s /= kilo*kilo;
+    }
+    if(s > kilo)
+    {
+        suffix = "KiB";
+        s /= kilo;
+    }
+    return QString("%1 %2").arg(s).arg(suffix);
+}
 QString MilkyPackage::getAuthorName() const
 {
     return author.name;
@@ -213,9 +283,22 @@ bool MilkyPackage::getHasUpdate() const
 {
     return hasUpdate;
 }
+bool MilkyPackage::getForeign() const
+{
+    return foreign;
+}
+
 QString MilkyPackage::getInstallPath() const
 {
     return installPath;
+}
+QString MilkyPackage::getDeviceMount() const
+{
+    return deviceMount;
+}
+QString MilkyPackage::getDevice() const
+{
+    return device;
 }
 
 QStringList MilkyPackage::getCategories() const
@@ -383,10 +466,25 @@ void MilkyPackage::setHasUpdate(bool newHasUpdate)
     hasUpdate = newHasUpdate;
     emit hasUpdateChanged(hasUpdate);
 }
+void MilkyPackage::setForeign(bool newForeign)
+{
+    foreign = newForeign;
+    emit foreignChanged(foreign);
+}
 void MilkyPackage::setInstallPath(QString newInstallPath)
 {
     installPath = newInstallPath;
     emit installPathChanged(installPath);
+}
+void MilkyPackage::setDeviceMount(QString newDeviceMount)
+{
+    deviceMount = newDeviceMount;
+    emit deviceMountChanged(deviceMount);
+}
+void MilkyPackage::setDevice(QString newDevice)
+{
+    device = newDevice;
+    emit deviceChanged(device);
 }
 
 void MilkyPackage::setCategories(QStringList newCategories)

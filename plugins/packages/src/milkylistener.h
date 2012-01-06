@@ -20,10 +20,11 @@ class MilkyEvents : public QObject
     Q_ENUMS(MessageType)
 
 public:
-    enum MessageType { InvalidConfiguration, InvalidDevice, DeviceNotMounted, InvalidJSON, HTTPError, FileCreationError,
-                       FileCopyError, PNDNotFound, PNDNotInstalled, PNDAlreadyInstalled, PNDSkippingAlreadyInstalled,
-                       PNDReinstalling, PNDAlreadyUpdated, PNDRemoveFailed, PNDUpgradeFailed, PNDInstallFailed,
-                       PNDHasUpdate, PNDFound, NoTargets, NoDatabase, NoUpdates, MD5CheckFailed, MD5CheckFailedForce };
+    enum MessageType { Installing, Removing, Upgrading, InvalidConfiguration, InvalidDevice, DeviceNotMounted, InvalidJSON,
+                       HTTPError, FileCreationError, FileCopyError, PNDNotFound, PNDNotInstalled, PNDAlreadyInstalled,
+                       PNDSkippingAlreadyInstalled, PNDReinstalling, PNDAlreadyUpdated, PNDRemoveFailed, PNDUpgradeFailed,
+                       PNDInstallFailed, PNDHasUpdate, PNDRemoved, PNDFound, NoTargets, NoDatabase, NoUpdates, MD5CheckFailed,
+                       MD5CheckFailedForce };
 };
 
 class MilkyListener : public QObject
@@ -65,10 +66,12 @@ signals:
     // TODO: Should be fixed to send the new MilkyPackage after the bug is fixed.
     void downloadStarted(QString pndId);
 
-    void downloadFinished();
+    void downloadFinished(QString pndId);
     void checkingMD5();
     void parsingFilename();
     void copyingFile();
+
+    void wait();
 
 public slots:
     void listen();
@@ -87,6 +90,9 @@ public:
 
     void run();
     MilkyListener* listener;
+
+public slots:
+    void sleepm(unsigned long msecs);
 
 signals:
     void ready();

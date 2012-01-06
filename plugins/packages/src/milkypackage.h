@@ -20,9 +20,11 @@ class MilkyPackage : public QObject
     Q_PROPERTY(QString vendor READ getVendor WRITE setVendor NOTIFY vendorChanged);
     Q_PROPERTY(QString group READ getGroup WRITE setGroup NOTIFY groupChanged);
     Q_PROPERTY(QDateTime modified READ getModified WRITE setModified NOTIFY modifiedChanged);
+    Q_PROPERTY(QString lastUpdatedString READ getLastUpdatedString NOTIFY modifiedChanged);
 
     Q_PROPERTY(int rating READ getRating WRITE setRating NOTIFY ratingChanged);
     Q_PROPERTY(int size READ getSize WRITE setSize NOTIFY sizeChanged);
+    Q_PROPERTY(QString sizeString READ getSizeString NOTIFY sizeChanged);
 
     Q_PROPERTY(QString authorName READ getAuthorName WRITE setAuthorName NOTIFY authorNameChanged);
     Q_PROPERTY(QString authorSite READ getAuthorSite WRITE setAuthorSite NOTIFY authorSiteChanged);
@@ -42,7 +44,10 @@ class MilkyPackage : public QObject
 
     Q_PROPERTY(bool installed READ getInstalled WRITE setInstalled NOTIFY installedChanged);
     Q_PROPERTY(bool hasUpdate READ getHasUpdate WRITE setHasUpdate NOTIFY hasUpdateChanged);
+    Q_PROPERTY(bool foreign READ getForeign WRITE setForeign NOTIFY foreignChanged);
     Q_PROPERTY(QString installPath READ getInstallPath WRITE setInstallPath NOTIFY installPathChanged);
+    Q_PROPERTY(QString deviceMount READ getDeviceMount WRITE setDeviceMount NOTIFY deviceMountChanged);
+    Q_PROPERTY(QString device READ getDevice WRITE setDevice NOTIFY deviceChanged);
     Q_PROPERTY(QStringList categories READ getCategories WRITE setCategories NOTIFY categoriesChanged);
     Q_PROPERTY(QString categoriesString READ getCategoriesString WRITE setCategoriesString NOTIFY categoriesStringChanged);
     Q_PROPERTY(QStringList previewPics READ getPreviewPics WRITE setPreviewPics NOTIFY previewPicsChanged);
@@ -51,7 +56,7 @@ class MilkyPackage : public QObject
 
 public:
     explicit MilkyPackage(QObject *parent = 0);
-    MilkyPackage(_pnd_package* p, QObject* parent = 0);
+    MilkyPackage(pnd_package* p, QObject* parent = 0);
     MilkyPackage(MilkyPackage const& other);
     MilkyPackage const& operator=(MilkyPackage const& other);
 
@@ -66,8 +71,10 @@ public slots:
     QString getVendor() const;
     QString getGroup() const;
     QDateTime getModified() const;
+    QString getLastUpdatedString() const;
     int getRating() const;
     int getSize() const;
+    QString getSizeString() const;
     QString getAuthorName() const;
     QString getAuthorSite() const;
     QString getAuthorEmail() const;
@@ -83,7 +90,10 @@ public slots:
     QString getCurrentVersionType() const;
     bool getInstalled() const;
     bool getHasUpdate() const;
+    bool getForeign() const;
     QString getInstallPath() const;
+    QString getDeviceMount() const;
+    QString getDevice() const;
     QStringList getCategories() const;
     QString getCategoriesString() const;
     QStringList getPreviewPics() const;
@@ -117,7 +127,10 @@ public slots:
     void setCurrentVersionType(QString newCurrentVersionType);
     void setInstalled(bool newInstalled);
     void setHasUpdate(bool newHasUpdate);
+    void setForeign(bool newForeign);
     void setInstallPath(QString newInstallPath);
+    void setDeviceMount(QString newDeviceMount);
+    void setDevice(QString newDevice);
     void setCategories(QStringList newCategories);
     void setCategoriesString(QString newCategoriesString);
     void setPreviewPics(QStringList newPreviewPics);
@@ -152,7 +165,10 @@ signals:
     void currentVersionTypeChanged(QString);
     void installedChanged(bool);
     void hasUpdateChanged(bool);
+    void foreignChanged(bool);
     void installPathChanged(QString);
+    void deviceMountChanged(QString);
+    void deviceChanged(QString);
     void categoriesChanged(QStringList);
     void categoriesStringChanged(QString);
     void previewPicsChanged(QStringList);
@@ -195,7 +211,10 @@ private:
 
     bool installed;
     bool hasUpdate;
+    bool foreign;
     QString installPath;
+    QString device;
+    QString deviceMount;
     QStringList categories;
     QStringList previewPics;
     QStringList licenses;

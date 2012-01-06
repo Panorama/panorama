@@ -20,6 +20,7 @@ class SystemInformationAttached : public QObject
     Q_PROPERTY(int usedSd1  READ usedSd1    NOTIFY usedSd1Updated)
     Q_PROPERTY(int sd2      READ sd2        NOTIFY sd2Updated)
     Q_PROPERTY(int usedSd2  READ usedSd2    NOTIFY usedSd2Updated)
+    Q_PROPERTY(int battery  READ battery    NOTIFY batteryUpdated)
     PANORAMA_DECLARE_PRIVATE(SystemInformationAttached)
 public:
     explicit SystemInformationAttached(QObject *parent = 0);
@@ -59,6 +60,9 @@ public:
     /** Returns the amount of space that is used up on SD 2 in mebibytes */
     int usedSd2() const;
 
+    /** Returns the amount of remaining battery charge in percents */
+    int battery() const;
+
 signals:
     /** This value has changed */
     void cpuUpdated(int value);
@@ -89,6 +93,9 @@ signals:
 
     /** This value has changed */
     void usedSd2Updated(int value);
+
+    /** This value has changed */
+    void batteryUpdated(int value);
 
 protected slots:
     void update();

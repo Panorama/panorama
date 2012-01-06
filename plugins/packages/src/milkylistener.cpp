@@ -35,6 +35,11 @@ void MilkyListenerThread::run()
     exec();
 }
 
+void MilkyListenerThread::sleepm(unsigned long msecs = 10)
+{
+    msleep(msecs);
+}
+
 void MilkyListener::answer(bool value)
 {
     milky_answer(value ? 1 : 0);
@@ -47,16 +52,18 @@ void MilkyListener::listen()
     if(priv->listening)
         return;
 
+    MilkyListenerThread* thread = qobject_cast<MilkyListenerThread*>(QThread::currentThread());
+
     priv->listening = true;
 
-    __m_signal_t* signal;
+    _m_signal_t* signal;
     while((signal = milky_update()))
     {
         switch(signal->id)
         {
             case M_SIG_MESSAGE:
             {
-                __m_sig_message* msgSignal = reinterpret_cast<__m_sig_message*>(signal);
+                _m_sig_message* msgSignal = reinterpret_cast<_m_sig_message*>(signal);
                 handleMessage(msgSignal);
                 break;
             }
@@ -167,14 +174,14 @@ void MilkyListener::listen()
             }
             case M_SIG_DL_STARTED:
             {
-                _pnd_package* pnd = static_cast<_pnd_package*>(signal->data);
-                MilkyPackage package(pnd);
-                emit downloadStarted(package.getTitle());
+                MilkyPackage package(static_cast<pnd_package*>(signal->data));
+                emit downloadStarted(package.getId());
                 break;
             }
             case M_SIG_DL_FINISHED:
             {
-                emit downloadFinished();
+                MilkyPackage package(static_cast<pnd_package*>(signal->data));
+                emit downloadFinished(package.getId());
                 break;
             }
             case M_SIG_MD5_CHECK:
@@ -192,24 +199,45 @@ void MilkyListener::listen()
                 emit copyingFile();
                 break;
             }
-            case M_SIG_WAIT:
+            case M_SIG_WAIT: {
+                thread->sleepm(1000);
+                break;
+            }
             default:
             {
-
                 break;
             }
         }
 
+        thread->sleepm(10);
         milky_free_signal(signal);
     }
 
     priv->listening = false;
 }
 
-void MilkyListener::handleMessage(__m_sig_message *msgSignal)
+void MilkyListener::handleMessage(_m_sig_message *msgSignal)
 {
     switch(msgSignal->msg)
     {
+        case M_MSG_PND_INSTALLING:
+        {
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::Installing, package.getId());
+            break;
+        }
+        case M_MSG_PND_REMOVING:
+        {
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::Removing, package.getId());
+            break;
+        }
+        case M_MSG_PND_UPGRADING:
+        {
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::Upgrading, package.getId());
+            break;
+        }
         case M_MSG_CONFIG:
         {
             emit message(MilkyEvents::InvalidConfiguration, QVariant());
@@ -247,7 +275,8 @@ void MilkyListener::handleMessage(__m_sig_message *msgSignal)
         }
         case M_MSG_PND_NOT_FOUND:
         {
-            emit message(MilkyEvents::PNDNotFound, reinterpret_cast<char*>(msgSignal->data));
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::PNDNotFound, package.getId());
             break;
         }
         case M_MSG_PND_NOT_INSTALLED:
@@ -257,47 +286,62 @@ void MilkyListener::handleMessage(__m_sig_message *msgSignal)
         }
         case M_MSG_PND_ALREADY_INSTALLED:
         {
-            emit message(MilkyEvents::PNDAlreadyInstalled, reinterpret_cast<char*>(msgSignal->data));
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::PNDAlreadyInstalled, package.getId());
             break;
         }
         case M_MSG_PND_ALREADY_INSTALLED_SKIP:
         {
-            emit message(MilkyEvents::PNDSkippingAlreadyInstalled, reinterpret_cast<char*>(msgSignal->data));
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::PNDSkippingAlreadyInstalled, package.getId());
             break;
         }
         case M_MSG_PND_REINSTALL:
         {
-            emit message(MilkyEvents::PNDReinstalling, reinterpret_cast<char*>(msgSignal->data));
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::PNDReinstalling, package.getId());
             break;
         }
         case M_MSG_PND_ALREADY_UPDATE:
         {
-            emit message(MilkyEvents::PNDAlreadyUpdated, reinterpret_cast<char*>(msgSignal->data));
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::PNDAlreadyUpdated, package.getId());
             break;
         }
         case M_MSG_PND_REMOVE_FAIL:
         {
-            emit message(MilkyEvents::PNDRemoveFailed, reinterpret_cast<char*>(msgSignal->data));
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::PNDRemoveFailed, package.getId());
             break;
         }
         case M_MSG_PND_UPGRADE_FAIL:
         {
-            emit message(MilkyEvents::PNDUpgradeFailed, reinterpret_cast<char*>(msgSignal->data));
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::PNDUpgradeFailed, package.getId());
             break;
         }
         case M_MSG_PND_INSTALL_FAIL:
         {
-            emit message(MilkyEvents::PNDInstallFailed, reinterpret_cast<char*>(msgSignal->data));
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::PNDInstallFailed, package.getId());
             break;
         }
         case M_MSG_PND_HAS_UPDATE:
         {
-            emit message(MilkyEvents::PNDHasUpdate, reinterpret_cast<char*>(msgSignal->data));
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::PNDHasUpdate, package.getId());
+            break;
+        }
+        case M_MSG_PND_REMOVED:
+        {
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::PNDRemoved, package.getId());
             break;
         }
         case M_MSG_PND_FOUND:
         {
-            emit message(MilkyEvents::PNDFound, reinterpret_cast<char*>(msgSignal->data));
+            MilkyPackage package(reinterpret_cast<pnd_package*>(msgSignal->data));
+            emit message(MilkyEvents::PNDFound, package.getId());
             break;
         }
         case M_MSG_NO_TARGETS:

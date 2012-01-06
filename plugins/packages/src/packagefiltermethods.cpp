@@ -29,6 +29,20 @@ QVariant PackageFilterMethods::matching(QAbstractItemModel *source,
     return QVariant::fromValue((QObject *)result);
 }
 
+QVariant PackageFilterMethods::containing(QAbstractItemModel *source,
+                                          const QString &role,
+                                          const QString &value)
+{
+    PackageFilterModel *result = new PackageFilterModel(source, source);
+
+    result->setFilterRole(source->roleNames().key(role.toLocal8Bit(),
+                                                  MilkyModel::Title));
+    result->setFilterWildcard(QString("*%1*").arg(value));
+    result->setFilterCaseSensitivity(Qt::CaseInsensitive);
+
+    return QVariant::fromValue((QObject *)result);
+}
+
 QVariant PackageFilterMethods::sortedBy(QAbstractItemModel *source,
                                             const QString &role, bool ascending)
 {

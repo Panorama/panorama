@@ -21,6 +21,7 @@ ApplicationModel::ApplicationModel(QObject *parent) :
     priv->roles[ApplicationModel::Icon]        = QString("icon")      .toLocal8Bit();
     priv->roles[ApplicationModel::Version]     = QString("version")   .toLocal8Bit();
     priv->roles[ApplicationModel::Categories]  = QString("categories").toLocal8Bit();
+    priv->roles[ApplicationModel::PandoraId]  = QString("pandoraId").toLocal8Bit();
 
     setRoleNames(priv->roles);
 }
@@ -100,6 +101,8 @@ QVariant ApplicationModel::data(const QModelIndex &index, int role) const
             return value.preview;
         case ApplicationModel::Clockspeed:
             return value.clockspeed;
+        case ApplicationModel::PandoraId:
+            return value.pandoraId;
         default:
             return QVariant();
         }
@@ -128,6 +131,8 @@ QVariant ApplicationModel::headerData(int, Qt::Orientation, int role) const
         return QString("Preview image");
     case ApplicationModel::Clockspeed:
         return QString("Recommended clockspeed (MHz)");
+    case ApplicationModel::PandoraId:
+        return QString("PND id");
     default:
         return QVariant();
     }
@@ -142,6 +147,11 @@ QVariant ApplicationModel::inCategory(const QString &category)
 QVariant ApplicationModel::matching(const QString &role, const QString &value)
 {
     return ApplicationFilterMethods::matching(this, role, value);
+}
+
+QVariant ApplicationModel::containing(const QString &role, const QString &value)
+{
+    return ApplicationFilterMethods::containing(this, role, value);
 }
 
 QVariant ApplicationModel::sortedBy(const QString &role, bool ascending)

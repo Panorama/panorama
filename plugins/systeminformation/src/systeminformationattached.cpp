@@ -18,6 +18,7 @@ public:
     void updateMem();
     void updateCpu();
     void updateSd();
+    void updateBattery();
 
     QTimer timer;
     long long lastUsedCpuTime;
@@ -32,6 +33,7 @@ public:
     int usedSd1;
     int sd2;
     int usedSd2;
+    int battery;
 };
 
 SystemInformationAttached::SystemInformationAttached(QObject *parent) :
@@ -56,6 +58,7 @@ void SystemInformationAttached::update()
     priv->updateCpu();
     priv->updateMem();
     priv->updateSd();
+    priv->updateBattery();
 }
 
 int SystemInformationAttached::cpu() const
@@ -116,6 +119,12 @@ int SystemInformationAttached::usedSd2() const
 {
     PANORAMA_PRIVATE(const SystemInformationAttached);
     return priv->usedSd2;
+}
+
+int SystemInformationAttached::battery() const
+{
+    PANORAMA_PRIVATE(const SystemInformationAttached);
+    return priv->battery;
 }
 
 void SystemInformationAttachedPrivate::updateCpu()
@@ -302,6 +311,24 @@ void SystemInformationAttachedPrivate::updateMem()
     }
 }
 
+void SystemInformationAttachedPrivate::updateBattery() {
+    PANORAMA_PUBLIC(SystemInformationAttached);
+    QFile stat("/sys/class/power_supply/bq27500-0/capacity");
+    if(!stat.open(QFile::Text | QFile::ReadOnly | QFile::Unbuffered))
+        return;
+    QString line = QTextStream(&stat).readLine();
+    stat.close();
+    if(!line.isNull())
+    {
+        bool ok = false;
+        int batteryCapacity = line.toInt(&ok);
+        if(ok) {
+            battery = batteryCapacity;
+            emit pub->batteryUpdated(battery);
+        }
+    }
+}
+
 SystemInformationAttachedPrivate::SystemInformationAttachedPrivate()
 {
     ram = 0;
@@ -315,5 +342,7 @@ SystemInformationAttachedPrivate::SystemInformationAttachedPrivate()
 
     lastCpuTime = 0;
     lastUsedCpuTime = 0;
+
+    battery = 0;
 }
 

@@ -1,9 +1,42 @@
 #include "iconfinder.h"
 
-#include <QtCore/QList>
-#include <QtCore/QHash>
 #include <QtCore/QDir>
 #include <QtCore/QString>
+
+#ifdef HAS_GTK
+
+#undef signals // Avoids GTK/Qt collision
+#include <gtk/gtk.h>
+
+QString IconFinder::findIcon(const QString &name, const QString &fallback)
+{
+    if(name.contains(QDir::separator()))
+        return name; //Already resolved
+
+    GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
+
+    // XXX Determine optimal icon size; assuming 48 below
+
+    GtkIconInfo *icon_info =
+      gtk_icon_theme_lookup_icon(icon_theme, name.toLocal8Bit(), 48,
+                                 (GtkIconLookupFlags) 0);
+
+    if (icon_info)
+    {
+        QString icon_file = gtk_icon_info_get_filename(icon_info);
+        gtk_icon_info_free(icon_info);
+        return icon_file;
+    }
+    else
+    {
+        return fallback;
+    }
+}
+
+#else // HAS_GTK
+
+#include <QtCore/QList>
+#include <QtCore/QHash>
 #include <QtCore/QLibrary>
 #include <QtCore/QSettings>
 #include <QtCore/QTextStream>
@@ -43,7 +76,7 @@ private:
 };
 
 Q_GLOBAL_STATIC(IconLoaderImplementation, iconLoaderInstance);
-#endif
+#endif // Q_WS_X11
 
 QString IconFinder::findIcon(const QString &name, const QString &fallback)
 {
@@ -62,7 +95,7 @@ QString IconFinder::findIcon(const QString &name, const QString &fallback)
         if(!icon.isNull())
             return icon;
     }
-#endif
+#endif // Q_WS_X11
     Q_UNUSED(name);
     return fallback;
 }
@@ -178,7 +211,7 @@ void IconLoaderImplementation::lookupIconTheme() const
     QSettings settings(kdeHome() + QLatin1String("/share/config/kdeglobals"), QSettings::IniFormat);
     settings.beginGroup(QLatin1String("Icons"));
     themeName = settings.value(QLatin1String("Theme"), defaultTheme).toString();
-#endif
+#endif // Q_WS_X11
 }
 
 IconTheme IconLoaderImplementation::parseIndexFile(const QString &themeName) const
@@ -275,4 +308,6 @@ QString IconLoaderImplementation::findIcon(int size, const QString &name) const
     }
     return result;
 }
-#endif
+#endif // Q_WS_X11
+
+#endif // HAS_GTK
